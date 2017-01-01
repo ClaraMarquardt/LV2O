@@ -1,4 +1,4 @@
-### **LV2O - LeistungsVerzeichnis(LV)-to-Order**
+### **LV2O - LeistungsVerzeichnis (LV)-to-Order**
 
 _Current Version: V2.0 (17th August 2017)_
 
@@ -116,16 +116,16 @@ source documentation_setup/installer/installer.sh > documentation_setup/installe
 Launch the LV20.app and confirm that the application starts without any error messages
 
 ## User settings:
-* _Email settings_: When asked for an email username and password - enter the 
+* *Email settings*: When asked for an email username and password - enter the 
 Gmail address and password of the gmail account which is to be used to receive and 
 send customer emails. When asked for a cc address enter the email address which is to be cc'ed 
 on all emails sent to customers (e.g. for archival purposes). When asked for a sender/reply to address 
 enter the email address which is to receive all customer replies
 
-* _Excel settings_: When asked for an excel path - enter the path to the local instance 
-of Microsoft Excel 2011 (e.g. _/Applications/Microsoft\ Office\ 2011/Microsoft\ Excel.app/_)
+* *Excel settings*: When asked for an excel path - enter the path to the local instance 
+of Microsoft Excel 2011 (e.g. /Applications/Microsoft\ Office\ 2011/Microsoft\ Excel.app/)
 
-* _Installation settings_: When asked whether to create Desktop aliases - enter 'Yes' or 'No'. When asked
+* *Installation settings*: When asked whether to create Desktop aliases - enter 'Yes' or 'No'. When asked
 whether to complete a dependency install - enter 'No' unless the application is installed for the 
 1st time. When asked whether to complete a Homebrew reset enter 'No' unless 
 problems arise during the set-up process in which case it may help to re-run the installer with a Homebrew 
@@ -138,7 +138,7 @@ instructions to complete the installation
 * Depending on whether or not e.g. Xcode (command line tools), are already installed the installation 
 may take up to 30 minutes
 * Should problems occur during installation - review the more detailed installation 
-log (_documentation_setup/install_log.txt_)
+log (documentation_setup/install_log.txt)
 
 ````
 
@@ -150,22 +150,22 @@ log (_documentation_setup/install_log.txt_)
 - Launch the LV2O.app
 - Select the processing step which is to be performed
 - Upon completion a notification will appear and an output folder containing the output and 
-log files will be available in the output folder (_output/[Processing Stage]_[Execution ID]_)
+log files will be available in the output folder (output/[Processing Stage]_[Execution ID])
 
 ## Notes:
 * Manual user intervention is required at two points: 
 
 (a) Prior to launching the **TextToCode** process  - all processed LVs 
-(_output/ExtractToExcel.../processed_order_) need to be reviewed. *Correctly* processed LVs need to be 
-copied, along with the _order_master...xlsx_ file, to the _interface/product_code_input_ folder 
+(output/ExtractToExcel.../processed_order) need to be reviewed. *Correctly* processed LVs need to be 
+copied, along with the order_master...xlsx file, to the interface/product_code_input folder 
 prior to launching the *TextToCode* process
 
 (b) Prior to launching the *SendToCustomer* process - (a) all processed LVs
 (_output/WriteToPDF.../annotated_order_) need to be reviewed and where necessary modified in-place 
 using e.g. AdobeAcrobat Reader (or any other PDF reader) (b) non-processed LVs 
 (_output/WriteToPDF.../non_processed_PDF_) need to be processed manually and appended to 
-the _email_list..._csv_ file . *Correctly* processed LVs need to be copied, along with the 
-_email_list..._csv_ file, to the _interface/send_order_ folder prior to launching 
+the email_list...csv file . *Correctly* processed LVs need to be copied, along with the 
+email_list...csv file, to the interface/send_order folder prior to launching 
 the *SendToCustomer* process
 
 ````
@@ -193,6 +193,6 @@ database replaced with newer versions, by selecting "* Update TextToCode Applica
 ## Customization
 
 - Keywords, email settings, etc. can be customized (i.e. reset) by right clicking the application 
-icon, selecting "Show Package Contents" and navigating to _Content/Resources/helper/user_setting_)
+icon, selecting "Show Package Contents" and navigating to Content/Resources/helper/user_setting)
 
 ````
