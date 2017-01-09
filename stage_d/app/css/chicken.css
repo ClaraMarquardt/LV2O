@@ -1,0 +1,8 @@
+html,
+body {
+    height: 380px;
+    overflow: hidden;
+    width: 380px;
+    -webkit-app-region: drag;
+    -webkit-user-select: none;
+}
