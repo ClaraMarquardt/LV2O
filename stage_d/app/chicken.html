@@ -4,11 +4,18 @@
     <meta charset="UTF-8">
     <title>The Problem</title>
     <link href="css/chicken.css" rel="stylesheet" type="text/css"/>
+     <script>
+const ipc = require('electron').ipcRenderer;
+</script>
 </head>
 <body>
+<div class="close">Close</div>
 <video width="480" height="320" autoplay="autoplay" loop="true">
    <source src="mov/chicken.mov"">
 </video>
+
+<script src="js/chicken.js"></script>
+
 </body>
 </html>
 

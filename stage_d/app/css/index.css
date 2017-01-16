@@ -99,7 +99,6 @@ body {
     top: 6px;
     width: 32px;
     z-index: 1;
-
     -webkit-app-region: no-drag;
 }
 

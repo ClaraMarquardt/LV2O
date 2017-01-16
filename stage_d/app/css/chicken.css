@@ -6,3 +6,22 @@ body {
     -webkit-app-region: drag;
     -webkit-user-select: none;
 }
+
+.close {
+    cursor: pointer;
+    display: inline-block;
+    height: 32px;
+    position: absolute;
+    text-indent: -10000px;
+    top: 6px;
+    width: 32px;
+    z-index: 1;
+    -webkit-app-region: no-drag;
+}
+
+.close {
+    background: transparent url('../img/close.png') no-repeat 4px 4px;
+    background-size: 24px 24px;
+    right: 6px;
+}
+

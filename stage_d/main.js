@@ -9,25 +9,41 @@ var ipc = require('electron').ipcMain
 // var BrowserWindow = require('electron').browser-window;
 
 var mainWindow = null;
+var baumerWindow = null;
+var chickenWindow = null;
 
-app.on('ready', function() {
-	  console.log('done proxy kind of things'); 
+const PDFWindow = require('electron-pdf-window')
+ 
+app.on('ready', () => {
+  const win = new PDFWindow({
+    width: 800,
+    height: 600,
+    x:10,
+    y:1000
+  })
+ 
+  win.loadURL('http://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf')
+})
+
+
+
+// app.on('ready', function() {
    
-    mainWindow = new BrowserWindow({
-        frame: false,
-        height: 700,
-        resizable: false,
-        width: 368
-    });
+//     mainWindow = new BrowserWindow({
+//         frame: false,
+//         height: 700,
+//         resizable: false,
+//         width: 368
+//     });
 
-    mainWindow.loadURL('file://' + __dirname + '/app/index.html');
+//     mainWindow.loadURL('file://' + __dirname + '/app/index.html');
 
 
-});
+// });
 
 
 ipc.on('open-baumer-window', function () {
-var baumerWindow = new BrowserWindow({
+    baumerWindow = new BrowserWindow({
         frame: false,
         height:250,
         resizable: false,
@@ -42,7 +58,7 @@ var baumerWindow = new BrowserWindow({
 
 
 ipc.on('open-chicken-window', function () {
-var chickenWindow = new BrowserWindow({
+    chickenWindow = new BrowserWindow({
         frame: false,
         height:380,
         resizable: false,
@@ -54,3 +70,19 @@ var chickenWindow = new BrowserWindow({
    
 
 });
+
+ipc.on('close-baumer-window', function () {
+    baumerWindow.close();
+});
+
+ipc.on('close-chicken-window', function () {
+    chickenWindow.close();
+
+});
+
+
+ipc.on('close-main-window', function () {
+    app.quit();
+});
+
+
