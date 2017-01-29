@@ -59,6 +59,11 @@ body {
     -webkit-app-region: no-drag;
 }
 
+.button-event {
+    background-color: #FF0000;
+}
+
+
 .button-sound:hover {
     box-shadow: 0 2px 0 #044D7F;
     top: 2px;

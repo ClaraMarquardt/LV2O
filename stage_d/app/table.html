@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Information Verification</title>
+    <link href="css/table.css" rel="stylesheet" type="text/css"/>
+     <script>
+const ipc = require('electron').ipcRenderer;
+var remote = require('electron').remote;
+const jquery=require("jQuery")
+
+     console.log(remote.getGlobal('sharedObj').pdf_csv_count);     
+
+     // remote.getGlobal('sharedObj').prop1 = 125;     
+
+     // var ipcRenderer = require('electron').ipcRenderer;     
+     // ipcRenderer.send('show-prop1');
+
+</script>
+</head>
+<body>
+<script src="js/table_prep.js"></script>
+
+
+<!-- <div class="close">Close</div>
+ -->
+<table id="confirm">
+    <tr>
+        <th id="var_name">dddd</th>
+        <td><input id="var_value" class="textbox" value="Alf"></input></td>
+    </tr>
+    <tr>
+        <th id="var_name">ddd</th>
+        <td><input id="var_value" class="textbox" value="Marquardt"></input></td>
+    </tr>
+    <tr>
+        <th id="var_name">Username</th>
+        <td><input id="var_value" class="textbox" value="Herkules"></input></td>
+    </tr>
+    <tr>
+        <th id="var_name">Email</th>
+        <td><input id="var_value" class="textbox" value="Suppenhuhn@gmail.com"></input></td>
+    </tr>
+    <tr>
+        <th id="var_name">Phone</th>
+        <td><input id="var_value" class="textbox" value="847-305-6573"></input></td>
+    </tr>
+    <tr>
+        <th id="var_name">Phone</th>
+        <td><input id="var_value" class="textbox" value="847-305-6573"></input></td>
+    </tr>
+    <tr>
+        <th id="var_name">Phone</th>
+        <td><input id="var_value" class="textbox" value="847-305-6573"></input></td>
+    </tr>
+    <tr>
+        <th id="var_name">Phone</th>
+        <td><input id="var_value" class="textbox" value="847-305-6573"></input></td>
+    </tr>
+        <tr>
+        <th id="var_name">Phone</th>
+        <td><input id="var_value" class="textbox" value="847-305-6573"></input></td>
+    </tr>
+        <tr>
+        <th id="var_name">Phone</th>
+        <td><input id="var_value" class="textbox" value="847-305-6573"></input></td>
+    </tr>
+        <tr>
+        <th id="var_name">Phone</th>
+        <td><input id="var_value" class="textbox" value="847-305-6573"></input></td>
+    </tr>
+        <tr>
+        <th id="var_name">Phone</th>
+        <td><input id="var_value" class="textbox" value="847-305-6573"></input></td>
+    </tr>
+</table>
+
+<button class="Submit">Save</button>
+
+<script src="js/table.js"></script>
+
+</body>
+</html>
+

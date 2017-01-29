@@ -1,0 +1,346 @@
+
+R version 3.3.1 (2016-06-21) -- "Bug in Your Hair"
+Copyright (C) 2016 The R Foundation for Statistical Computing
+Platform: x86_64-apple-darwin13.4.0 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+Loading required package: utils
+
+Attaching package: ‘dplyr’
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+------------------------------------------------------------------------------
+data.table + dplyr code now lives in dtplyr.
+Please library(dtplyr)!
+------------------------------------------------------------------------------
+
+Attaching package: ‘data.table’
+
+The following objects are masked from ‘package:dplyr’:
+
+    between, last
+
+
+Attaching package: ‘lubridate’
+
+The following objects are masked from ‘package:data.table’:
+
+    hour, mday, month, quarter, wday, week, yday, year
+
+The following object is masked from ‘package:base’:
+
+    date
+
+Welcome to the "icd" package for finding comorbidities and interpretation of ICD-9 and ICD-10 codes. Suggestions and contributions are welcome at https://github.com/jackwasey/icd .
+
+Available options are:
+options("icd.warn_deprecated" = TRUE) which will warn if deprecated functions from the old "icd9" package are used.
+See the vignettes for examples.
+
+Please cite this package if you find it useful in your published work.
+citation(package = "icd")
+
+
+Attaching package: ‘reshape’
+
+The following objects are masked from ‘package:tidyr’:
+
+    expand, smiths
+
+The following object is masked from ‘package:lubridate’:
+
+    stamp
+
+The following object is masked from ‘package:data.table’:
+
+    melt
+
+The following object is masked from ‘package:dplyr’:
+
+    rename
+
+
+Attaching package: ‘reshape2’
+
+The following objects are masked from ‘package:reshape’:
+
+    colsplit, melt, recast
+
+The following object is masked from ‘package:tidyr’:
+
+    smiths
+
+The following objects are masked from ‘package:data.table’:
+
+    dcast, melt
+
+[[1]]
+[1] "dplyr"   "utils"   "methods" "base"   
+
+[[2]]
+[1] "data.table" "dplyr"      "utils"      "methods"    "base"      
+
+[[3]]
+[1] "stringr"    "data.table" "dplyr"      "utils"      "methods"   
+[6] "base"      
+
+[[4]]
+[1] "lubridate"  "stringr"    "data.table" "dplyr"      "utils"     
+[6] "methods"    "base"      
+
+[[5]]
+[1] "icd"        "lubridate"  "stringr"    "data.table" "dplyr"     
+[6] "utils"      "methods"    "base"      
+
+[[6]]
+[1] "taxize"     "icd"        "lubridate"  "stringr"    "data.table"
+[6] "dplyr"      "utils"      "methods"    "base"      
+
+[[7]]
+ [1] "tidyr"      "taxize"     "icd"        "lubridate"  "stringr"   
+ [6] "data.table" "dplyr"      "utils"      "methods"    "base"      
+
+[[8]]
+ [1] "reshape"    "tidyr"      "taxize"     "icd"        "lubridate" 
+ [6] "stringr"    "data.table" "dplyr"      "utils"      "methods"   
+[11] "base"      
+
+[[9]]
+ [1] "reshape2"   "reshape"    "tidyr"      "taxize"     "icd"       
+ [6] "lubridate"  "stringr"    "data.table" "dplyr"      "utils"     
+[11] "methods"    "base"      
+
+[[10]]
+ [1] "xlsxjars"   "rJava"      "reshape2"   "reshape"    "tidyr"     
+ [6] "taxize"     "icd"        "lubridate"  "stringr"    "data.table"
+[11] "dplyr"      "utils"      "methods"    "base"      
+
+[[11]]
+ [1] "xlsx"       "xlsxjars"   "rJava"      "reshape2"   "reshape"   
+ [6] "tidyr"      "taxize"     "icd"        "lubridate"  "stringr"   
+[11] "data.table" "dplyr"      "utils"      "methods"    "base"      
+
+[[12]]
+ [1] "ggplot2"    "xlsx"       "xlsxjars"   "rJava"      "reshape2"  
+ [6] "reshape"    "tidyr"      "taxize"     "icd"        "lubridate" 
+[11] "stringr"    "data.table" "dplyr"      "utils"      "methods"   
+[16] "base"      
+
+[[13]]
+ [1] "RODBC"      "ggplot2"    "xlsx"       "xlsxjars"   "rJava"     
+ [6] "reshape2"   "reshape"    "tidyr"      "taxize"     "icd"       
+[11] "lubridate"  "stringr"    "data.table" "dplyr"      "utils"     
+[16] "methods"    "base"      
+
+[[14]]
+ [1] "knitr"      "RODBC"      "ggplot2"    "xlsx"       "xlsxjars"  
+ [6] "rJava"      "reshape2"   "reshape"    "tidyr"      "taxize"    
+[11] "icd"        "lubridate"  "stringr"    "data.table" "dplyr"     
+[16] "utils"      "methods"    "base"      
+
+[[15]]
+ [1] "rmarkdown"  "knitr"      "RODBC"      "ggplot2"    "xlsx"      
+ [6] "xlsxjars"   "rJava"      "reshape2"   "reshape"    "tidyr"     
+[11] "taxize"     "icd"        "lubridate"  "stringr"    "data.table"
+[16] "dplyr"      "utils"      "methods"    "base"      
+
+[[16]]
+ [1] "ReporteRs"     "ReporteRsjars" "rmarkdown"     "knitr"        
+ [5] "RODBC"         "ggplot2"       "xlsx"          "xlsxjars"     
+ [9] "rJava"         "reshape2"      "reshape"       "tidyr"        
+[13] "taxize"        "icd"           "lubridate"     "stringr"      
+[17] "data.table"    "dplyr"         "utils"         "methods"      
+[21] "base"         
+
+Warning messages:
+1: package ‘tidyr’ was built under R version 3.3.2 
+2: package ‘ggplot2’ was built under R version 3.3.2 
+[1] "**************************  loaded .Rprofile ***************************"
+[Previously saved workspace restored]
+
+> #----------------------------------------------------------------------------#
+> 
+> # Purpose:     Project
+> # Author:      Clara Marquardt
+> # Date:        Nov 2016
+> 
+> #----------------------------------------------------------------------------#
+> 
+> #----------------------------------------------------------------------------#
+> #                               Control Section                              #
+> #----------------------------------------------------------------------------#
+> 
+> # set-up
+> #-------------------------------------------------#
+> print(sessionInfo())
+R version 3.3.1 (2016-06-21)
+Platform: x86_64-apple-darwin13.4.0 (64-bit)
+Running under: OS X 10.12.1 (Sierra)
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+[1] stats     graphics  grDevices datasets  utils     methods   base     
+
+other attached packages:
+ [1] ReporteRs_0.8.7     ReporteRsjars_0.0.2 rmarkdown_0.9.6    
+ [4] knitr_1.13          RODBC_1.3-13        ggplot2_2.2.1      
+ [7] xlsx_0.5.7          xlsxjars_0.6.1      rJava_0.9-8        
+[10] reshape2_1.4.2      reshape_0.8.5       tidyr_0.6.1        
+[13] taxize_0.7.9        icd_2.1             lubridate_1.5.6    
+[16] stringr_1.1.0       data.table_1.9.6    dplyr_0.5.0        
+
+loaded via a namespace (and not attached):
+ [1] Rcpp_0.12.9       plyr_1.8.4        R.methodsS3_1.7.1 R.utils_2.5.0    
+ [5] iterators_1.0.8   tools_3.3.1       digest_0.6.11     jsonlite_1.2     
+ [9] tibble_1.2        nlme_3.1-128      checkmate_1.8.1   gtable_0.2.0     
+[13] lattice_0.20-33   png_0.1-7         foreach_1.4.3     shiny_1.0.0      
+[17] DBI_0.5-1         httr_1.2.1        xml2_1.0.0        gdtools_0.1.3    
+[21] grid_3.3.1        rredlist_0.1.0    R6_2.2.0          rvg_0.1.1        
+[25] rentrez_1.0.2     XML_3.98-1.4      magrittr_1.5      htmltools_0.3.5  
+[29] backports_1.0.3   scales_0.4.1      codetools_0.2-14  assertthat_0.1   
+[33] bold_0.3.5        xtable_1.8-2      mime_0.5          ape_3.5          
+[37] colorspace_1.2-6  httpuv_1.3.3      stringi_1.1.2     rncl_0.6.0       
+[41] lazyeval_0.2.0    rotl_3.0.0        munsell_0.4.3     chron_2.3-47     
+[45] R.oo_1.21.0      
+> print(Sys.time())
+[1] "2017-01-29 11:03:57 EST"
+> current_date <- as.character(format(Sys.time(), "%d_%m_%Y")) 
+> 
+> # command line arguments
+> #-------------------------------------------------#
+> mod_order_path    <- commandArgs(trailingOnly = TRUE)[1]
+> parsed_order_path <-  commandArgs(trailingOnly = TRUE)[2]
+> parse_code_path <-  commandArgs(trailingOnly = TRUE)[3]
+> 
+> print(mod_order_path )
+[1] "/Users/claramarquardt/Google_Drive/Jobs/indep_project/herkules_nlp/tool/data/mod_data/parsed_pdf_txt_stage_b"
+> print(parsed_order_path)
+[1] "/Users/claramarquardt/Google_Drive/Jobs/indep_project/herkules_nlp/tool/data/mod_data/annotated_pdf_csv_stage_c_i"
+> print(parse_code_path)
+[1] "/Users/claramarquardt/Google_Drive/Jobs/indep_project/herkules_nlp/experiments/part_a_extraction_parsing/code/function_code/parse"
+> 
+> # parameters
+> #-------------------------------------------------#
+> 
+> # regx patterns
+> # xxx <- "fhdsjkfhdsjk: ()" ## 1
+> # xxx <- "fhdsjkfhdsjk: ()" ## 1
+> # xxx <- "fhdsjkfhdsjk: ()" ## 1
+> 
+> 
+> #----------------------------------------------------------------------------#
+> #                                    Code                                    #
+> #----------------------------------------------------------------------------#
+> 
+> # obtain file list 
+> #----------------------------------------------------------------------------#
+> file_list <- list.files(mod_order_path)
+> file_list <- file_list[file_list %like% "txt"]
+> 
+> # iterate over files
+> #----------------------------------------------------------------------------#
+> 
+> lapply(file_list, function(file_name) {
++ 
++ 	# extract and format text
++ 	text <- readLines(paste0(mod_order_path, "/",file_name))
++ 
++ 	text_coll <- gsub("/|#|x|\\f", "", paste0(text, collapse=""))
++ 
++ 	nchar_text <- nchar(text_coll)
++ 	nchar_text_chunk <- round(nchar_text/3, digit=0)
++ 
++ 	cutoff_1 <- sample(1:nchar_text_chunk ,1)
++ 	length_extract_1  <- sample(20:90,1)
++ 	cutoff_2  <- sample((nchar_text_chunk+1):(nchar_text_chunk*2),1)
++ 	length_extract_2  <- sample(20:90,1)
++ 	cutoff_3  <- sample(((nchar_text_chunk*2)+1):((nchar_text_chunk*3)-100),1)
++ 	length_extract_3  <- sample(20:90,1)
++ 
++ 	text_coll_1 <- substr(text_coll, 1,cutoff_1)
++ 	text_coll_extract_1 <- substr(text_coll, (cutoff_1+1), (cutoff_1+length_extract_1))
++ 	text_coll_2 <- substr(text_coll, (cutoff_1+length_extract_1+1),cutoff_2)
++ 	text_coll_extract_2 <- substr(text_coll, (cutoff_2+1), (cutoff_2+length_extract_2))
++ 	text_coll_3 <- substr(text_coll, (cutoff_2+length_extract_2+1),cutoff_3)
++ 	text_coll_extract_3 <- substr(text_coll, (cutoff_3+1), (cutoff_3+length_extract_3))
++ 	text_coll_4 <- substr(text_coll, (cutoff_3+length_extract_3+1),nchar(text_coll))
++ 
++ 
++ 	doc <- docx()
++ 	highlight_style_1 <- textProperties(color='#00ff00', font.weight = 'bold')
++ 	highlight_style_2 <- textProperties(color='#ff0000', font.weight = 'bold')
++ 	highlight_style_3 <- textProperties(color='#0000ff', font.weight = 'bold')
++ 
++ 	text_coll_final <- text_coll_1 + pot(text_coll_extract_1,highlight_style_1) + text_coll_2 +
++ 		pot(text_coll_extract_2,highlight_style_2) + text_coll_3 +
++ 		pot(text_coll_extract_3,highlight_style_3) + text_coll_4
++ 
++ 	doc <- addParagraph(doc, text_coll_final)
++ 
++ 	writeDoc(doc, file = paste0(parsed_order_path, "/", gsub(".txt", "", file_name), ".docx"))
++ 
++ 	# extract reg_xPatterns
++ 	file_info_list <- list()
++ 
++ 	file_info_list$pressure <- text_coll_extract_1 
++ 	file_info_list$max_temperature <- text_coll_extract_2
++ 	file_info_list$conductivity <- text_coll_extract_3
++ 
++ 	# # save extracted info  (csv)
++ 	file_info <- data.table(names(file_info_list), t(rbindlist(list(file_info_list))))
++ 	setnames(file_info,c("var", "var_value"))
++ 	write.csv(file_info,paste0(parsed_order_path, "/",file_name, "_order_extracted.csv"), 
++ 		row.names=F)
++ 
++ 
++ })
+[[1]]
+NULL
+
+[[2]]
+NULL
+
+[[3]]
+NULL
+
+Warning messages:
+1: In readLines(paste0(mod_order_path, "/", file_name)) :
+  incomplete final line found on '/Users/claramarquardt/Google_Drive/Jobs/indep_project/herkules_nlp/tool/data/mod_data/parsed_pdf_txt_stage_b/raw_order_01_29_2017_9547_1.txt'
+2: In readLines(paste0(mod_order_path, "/", file_name)) :
+  incomplete final line found on '/Users/claramarquardt/Google_Drive/Jobs/indep_project/herkules_nlp/tool/data/mod_data/parsed_pdf_txt_stage_b/raw_order_01_29_2017_9547_2.txt'
+3: In readLines(paste0(mod_order_path, "/", file_name)) :
+  incomplete final line found on '/Users/claramarquardt/Google_Drive/Jobs/indep_project/herkules_nlp/tool/data/mod_data/parsed_pdf_txt_stage_b/raw_order_01_29_2017_9547_3.txt'
+> 
+> # convert to pdf and bind
+> #----------------------------------------------------------------------------#
+> system(sprintf("source %s", paste0(parse_code_path, "/order_post_parse.sh")))
+convert /Users/claramarquardt/Google_Drive/Jobs/indep_project/herkules_nlp/tool/data/mod_data/annotated_pdf_csv_stage_c_i/raw_order_01_29_2017_9547_1.docx -> /Users/claramarquardt/Google_Drive/Jobs/indep_project/herkules_nlp/tool/data/mod_data/annotated_pdf_csv_stage_c_i/raw_order_01_29_2017_9547_1.pdf using filter : writer_pdf_Export
+convert /Users/claramarquardt/Google_Drive/Jobs/indep_project/herkules_nlp/tool/data/mod_data/annotated_pdf_csv_stage_c_i/raw_order_01_29_2017_9547_2.docx -> /Users/claramarquardt/Google_Drive/Jobs/indep_project/herkules_nlp/tool/data/mod_data/annotated_pdf_csv_stage_c_i/raw_order_01_29_2017_9547_2.pdf using filter : writer_pdf_Export
+convert /Users/claramarquardt/Google_Drive/Jobs/indep_project/herkules_nlp/tool/data/mod_data/annotated_pdf_csv_stage_c_i/raw_order_01_29_2017_9547_3.docx -> /Users/claramarquardt/Google_Drive/Jobs/indep_project/herkules_nlp/tool/data/mod_data/annotated_pdf_csv_stage_c_i/raw_order_01_29_2017_9547_3.pdf using filter : writer_pdf_Export
+> 
+> #----------------------------------------------------------------------------#
+> #                                    End                                     #
+> #----------------------------------------------------------------------------#
+> 
+> 
+> proc.time()
+   user  system elapsed 
+ 68.722  16.946 172.358 
