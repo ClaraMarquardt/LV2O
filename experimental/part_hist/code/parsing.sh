@@ -19,8 +19,6 @@ for file in *; do
 	if [ "$file" != 'temp.pdf' ]; then
 
 		cp $file temp.pdf
-		# find . -type f -name 'temp.pdf' -exec perl -pi -e 's/ obj.*<<.*Annots.*>>.*endobj/jjjjj/smg' {} +
-		# find . -type f -name 'temp.pdf' -exec perl -pi -e 's/[0-9 ]*jjjjj//smg' {} +
 
 		find . -type f -name 'temp.pdf' -exec perl -pi -e 's/Annots/ffffff/g' {} +
 
@@ -30,6 +28,7 @@ for file in *; do
 		if [ "$file_fonts" = '' ] || [ "$file_fonts" = '[none]' ]; then
     	
     		echo "non ocr - parse"
+    		
     		# parse -- ocr recognition
 			pdfsandwich -lang deu $file -o "${mod_annotated_sample_hist_path}/${file}" 
 			# pdfsandwich -lang deu -coo "-contrast -unsharp 0" $file -o "${mod_annotated_sample_hist_path}/${file}" 
