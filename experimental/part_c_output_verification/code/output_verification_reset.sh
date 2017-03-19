@@ -13,57 +13,34 @@
 
 # control
 #----------------------------------------------------------------------------#
-echo "experimental - email extraction and parsing (stage #1) [stage #a and #b]"
+echo "experimental - information extraction reset"
 
 # source settings
 #----------------------------------------------------------------------------#
 cd /Users/claramarquardt/Google_Drive/Jobs/indep_project/herkules_nlp/tool/code_base/experimental/part_a_extraction_parsing/code/machine_code
 source control.sh
 
-# reset folders
-#----------------------------------------------------------------------------#
-cd ${raw_order_path}
-rm *.txt
-rm *.pdf
-rm *.docx
-
-cd "${mod_order_path}"
-rm *.txt
-rm *.pdf
-rm *.docx
-
-cd "${parsed_order_path}" 
-rm *.txt
-rm *.pdf
-rm *.docx
-rm *.csv
-
-cd "${annotated_order_path}" 
-rm *.txt
-rm *.pdf
-rm *.docx
-rm *.csv
-
-cd "${verified_order_path}" 
-rm *.txt
-rm *.pdf
-rm *.docx
-rm *.csv
-
-
-cd "${verified_order_final_path}" 
-rm *.txt
-rm *.pdf
-rm *.docx
-rm *.csv
-
-
-echo "reset all folders";
-
-# # execute email/parsing script ((a) php and (b) shell)
+# # rename files
 # #----------------------------------------------------------------------------#
-${php_path}/php "${extract_code_path}/email_extract.php"
+cd  ${annotated_order_path}
+
+for file in ${annotated_order_path}/*; do
+	echo ${file}
+	echo "${file/_reviewed/}"
+	while [[ !("${file/_reviewed/}" -ef "${file}") ]]; do
+		file_new="${file/_reviewed/}"
+		echo ${file_new}
+		mv ${file} ${file_new}
+		if [ "${file/_reviewed/}" -ef "${file}" ]; then
+      		break
+      	fi
+      	file=${file_new}
+	done
+done
+
+sleep 10
 
 #----------------------------------------------------------------------------#
 #                                     End                                    #
 #----------------------------------------------------------------------------#
+

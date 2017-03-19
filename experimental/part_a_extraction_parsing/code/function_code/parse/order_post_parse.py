@@ -34,7 +34,6 @@ import glob
 
 from random import randint
 
-
 from PyPDF2 import PdfFileWriter, PdfFileReader
 
 import StringIO
@@ -44,6 +43,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.graphics.shapes import Rect
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.lib.colors import PCMYKColor, PCMYKColorSep, Color, black, blue, red, white, green
+red50transparent = Color( 100, 0, 0, alpha=0.5)
 
 import numpy as np
 import pandas as pd
@@ -57,17 +57,12 @@ print 'Argument List:', str(sys.argv)
 input_path=sys.argv[1]
 print input_path
 
-input_file_path=input_path+"/*_[0-9]_mod.pdf"
-
+input_file_path=input_path+"/*.csv"
 output_path=sys.argv[2]
 print output_path
 
-simulate=sys.argv[3]
-print simulate
-
 # # set wd
 # os.chdir(wd_path)
-
 
 #----------------------------------------------------------------------------#
 #                          Methods/Functions                                 #
@@ -91,10 +86,12 @@ class pdfPositionHandling:
 
             # if it's a textbox, also recurse
             if isinstance(obj, pdfminer.layout.LTTextBoxHorizontal):
+                # print "textbox"
                 self.parse_obj(obj._objs, position_list_new, page_num)
 
             # if it's a container, recurse
             elif isinstance(obj, pdfminer.layout.LTFigure):
+                # print "container"
                 self.parse_obj(obj._objs,position_list_new, page_num)
 
     def parsepdf(self, filename, startpage, endpage):
@@ -151,31 +148,42 @@ class pdfPositionHandling:
 
         return(position_list)
 
+# character encoding
+#----------------------------------------------------------------------------#
+def strip_non_ascii(string):
+    ''' Returns the string without non ASCII characters'''
+    stripped = (c for c in string if 0 < ord(c) < 127)
+    return ''.join(stripped)
 
 #----------------------------------------------------------------------------#
 #                                    Code                                    #
 #----------------------------------------------------------------------------#
 
-file_list = glob.glob(input_file_path)
+# files
+#----------------------------------------------------------------------------#
+
+file_list = np.unique([x.split("/")[len(x.split("/"))-1].split("_order_id")[0] for x in 
+                glob.glob(input_file_path)])
 
 for x in range(0, len(file_list)):
 
-    fname=file_list[x]
-    file_name=fname.split("/")[len(fname.split("/"))-1]
+    fname_pdf_abb = file_list[x]+".pdf"
+    fname_pdf = input_path + "/"+ fname_pdf_abb
 
-    print(fname)
-    print(file_name)
+    print(fname_pdf_abb)
 
     # parse PDF 
     #----------------------------------------------------------------------------#
     # read existing PDF
-    existing_pdf             = PdfFileReader(file(fname, "rb"))
+    existing_pdf             = PdfFileReader(file(fname_pdf, "rb"))
     existing_pdf_page_number = existing_pdf.getNumPages() 
 
     # parse
     position_class   = pdfPositionHandling()
-    position         = position_class.parsepdf(fname, 0, existing_pdf_page_number)
-    
+    position         = position_class.parsepdf(fname_pdf, 0, existing_pdf_page_number)
+    position["text"] =[ strip_non_ascii(z) for z in position["text"] ]
+    position["text"] =[ re.sub("\\(|\\)", "", z) for z in position["text"] ]
+
     # new PDF 
     #----------------------------------------------------------------------------#
     can_list    = []
@@ -188,124 +196,82 @@ for x in range(0, len(file_list)):
         packet_list.append(packet_temp)
         can_list.append(can_temp)
 
+
     # iterate through csvs
     #----------------------------------------------------------------------------#
 
-    file_list_csv = glob.glob(input_path+'/' + re.sub("_mod.pdf", "", file_name) + '*.csv')
-    print file_list_csv
+    file_list_csv = glob.glob(input_path+'/' + file_list[x] + '*.csv')
+
     for y in range(0, len(file_list_csv)):
 
-        fname_csv=file_list_csv[y]
-        file_name_csv=fname_csv.split("/")[len(fname.split("/"))-1]
+        fname      = re.sub("order_id_[0-9]*", "order_id_"+str(y), file_list_csv[1])
+        fname_abb  = fname.split("/")[len(fname.split("/"))-1]
 
-        # generate product id
+        print(fname_abb)
+
+        # read csv
+        #----------------------------------------------------------------------------#
+        dt=pd.read_csv(fname)
+        print dt
+
+        dt["var_value"] = [strip_non_ascii(i) for i in dt["var_value"]]
+
+        # identify text pos
         #----------------------------------------------------------------------------#
         
-        # determine number of rows 
+        # coordinates unicode(dt["var_value"][i], 'utf-8')
+        position_subset =  []
         position_prod_subset=position.copy()
         position_prod_subset.ix[0, "text"]="#order-item: 0 " + position_prod_subset.ix[0, "text"]
         position_prod_subset.ix[position_prod_subset["text"].str.contains("#order-item: " + str(y)), 
             "min"]=0
         position_prod_subset.ix[position_prod_subset["text"].str.contains("#order-item: " + str(y+1)), 
-             "min"]=1
+            "min"]=1
         position_prod_subset.fillna(method="ffill", inplace=True)
         position_prod_subset=position_prod_subset.ix[position_prod_subset["min"]==0]
-
-        min_index=position_prod_subset.index.min()
-        max_index=position_prod_subset.index.max()
-
-        position_prod_subset_alt=position.copy()
-        max_index_glob_alt=position_prod_subset_alt.index.max()
-        position_prod_subset_alt.ix[0, "text"]="#order-item: 0 " + position_prod_subset_alt.ix[0, "text"]
-        min_index_alt=0
-        max_index_alt=max_index_glob_alt
-
-        if (len(np.array(position_prod_subset_alt[position_prod_subset_alt["text"].str.contains("#order-item: " + str(y))].index+5))>0):
-            min_index_alt=np.array(position_prod_subset_alt[position_prod_subset_alt["text"].str.contains("#order-item: " + str(y))].index+5)[0]
+        position_prod_subset.reset_index(drop=True, inplace=True)
         
-        if (len(np.array(position_prod_subset_alt[position_prod_subset_alt["text"].str.contains("#order-item: " + str(y+1))].index+5))>0):
-            max_index_alt=np.array(position_prod_subset_alt[position_prod_subset_alt["text"].str.contains("#order-item: " + str(y+1))].index+5)[0]
-        
-        position_prod_subset_alt=position_prod_subset_alt.ix[min_index_alt:max_index_alt]
-           
-
-        if simulate=="True":
-            
-            print "simulate"
-            info_csv=pd.read_csv(fname_csv)
-        
-            product_id_list=["prod_Axx","prod_Bxx","prod_Cxx","prod_Dxx", "prod_Exx", "prod_Fxx"]
-            product_id=product_id_list[randint(0,(len(product_id_list)-1))]
-            print(product_id)
-
-            # random line number
-            # position_line=randint(min_index,max_index)
-            id_line = position_prod_subset_alt[position_prod_subset_alt["text"].str.contains("(Stck( |$))|(Stk( |$))|(St( |$))")].index
-            if (id_line.shape[0]>0):
-                position_line=np.array(id_line)[0]
-            else:
-                position_line=min_index
-                product_id="Non-Product Item"
-
-            print(position_line)
-        
-            info_csv_new=pd.DataFrame()
-            info_csv_new["var"]=[ " ", "product_id", " ", "annotation_position_line", " ", "comments", " ", "reviewed_by", "reviewed_on"]
-            info_csv_new["var_value"]=[" ",product_id, " ",(position_line+1) ," ","Non-Product"," "," "," "]
-        
-            info_csv=pd.concat([info_csv,info_csv_new])
-        
-            info_csv.to_csv(output_path+"/"+file_name_csv, index=False)
-
-        elif simulate=="False":
-            print "non-simulate"
-            info_csv=pd.read_csv(fname_csv)
-            # product_id=info_csv.loc[info_csv["var"]=="product_id"]["var_value"]
-            product_id=info_csv.iloc[4]["var_value"]
-            # position_line=int(info_csv.loc[info_csv["var"]=="annotation_position_line"]["var_value"])
-            position_line=int(info_csv.iloc[6]["var_value"])
-
-            print(product_id)
-            print(position_line)
+        for i in range(0,len(np.array(dt["var_value"]))):
+            text_match = dt["var_value"][i]
+            # text_match = re.sub("^[0-9 \\.]*", "",  text_match)
+            # text_match = re.sub("[  ]*[a-z0-9\\\\A-Z]*$", "",  text_match)
+            # text_match = re.sub("^[a-z0-9\\\\A-Z\\+]*[  ]*", "",  text_match)
+            text_match = re.sub("^[+]*[ ]*", "",  text_match)
+            text_match = re.sub("\\$", "",  text_match)
+            text_match = re.sub("\\\\", "",text_match)
+            text_match = re.sub("\\)", "",text_match)
+            text_match = re.sub("\\(", "",text_match)
+            text_match_temp = text_match.split("  ")
+            text_match = text_match_temp[max(enumerate([len(v) for v in text_match_temp]),key=lambda x: x[1])[0]]
+            temp=position_prod_subset.ix[position_prod_subset["text"].str.contains(text_match)]
+            if (len(temp)>0):
+                position_subset.append(np.array(temp)[0])
+            else:   
+                print "none"
 
 
-        # parse PDF (extract position of 1st line - position ID at the left side)
-        #----------------------------------------------------------------------------#
-
-        # print(position)
-
-        # x1 = position[position.text=="line1_"]["pos_x"]
-        # y1 = position[position.text=="line1_"]["pos_y"]
-
-        # x1   = max(position_prod_subset["pos_x"].min()-60, 10)
-        # y1   = position.ix[(position_line)]["pos_y"]+3
-        x1    = position.ix[(position_line)]["pos_x"]+50
-        y1    = position.ix[(position_line)]["pos_y"]+3
-
-        page1 = position.ix[(position_line)]["page"]
-        print x1
-        print y1
-        print page1
-
-
-        # randomly position white squares/text
-        #----------------------------------------------------------------------------#
-
-        if simulate=="True":
-            FillColor=red
-        elif simulate=="False":
-            FillColor=green
+        position_subset = pd.DataFrame(position_subset)
+        if len(position_subset)>0:
+            position_subset.columns = ["pos_x", "pos_y", "page", "text", "min"]
+            position_subset.drop("min", axis=1, inplace=True)
 
         # draw box at text - iterate through pages
         #----------------------------------------------------------------------------#
 
         # iterate & draw line/add text
-        can_page = can_list[page1]
-        can_page.setFont('Helvetica', 10)
-        can_page.setFillColor(FillColor)
-        can_page.drawString(x1, y1, product_id)
+        for page_num in range(0,existing_pdf_page_number):
+            if len(position_subset)>0:
+                text_pos = position_subset.ix[position_subset["page"]==page_num]
+                text_pos.reset_index(drop=True, inplace=True)
+                can_page = can_list[page_num]
+                for text_num in range(0,len(text_pos["pos_x"])):
+                    x_1=text_pos.ix[text_num]["pos_x"]
+                    y_1=text_pos.ix[text_num]["pos_y"]
+                    can_page.setFillColor(red50transparent)
+                    can_page.rect(x_1, y_1, 50, 10, fill=True, stroke=False)
         
           
+
     # merge with background PDF
     #----------------------------------------------------------------------------#
     for i in range(0,existing_pdf_page_number):
@@ -318,15 +284,13 @@ for x in range(0, len(file_list)):
     for i in range(0,existing_pdf_page_number):
         page = existing_pdf.getPage(i)
         if pdf_list[i].getNumPages()>0:
-            page.mergePage(pdf_list[i] .getPage(0))
+            page.mergePage(pdf_list[i].getPage(0))
         output.addPage(page)
 
     # save 
-    outputStream = file(output_path + "/"+ file_name, "wb")
+    outputStream = file(output_path + "/"+ re.sub("\\.pdf", "_mod.pdf", fname_pdf_abb), "wb")
     output.write(outputStream)
     outputStream.close()
-
-
 
 #----------------------------------------------------------------------------#
 #                                    End                                     #

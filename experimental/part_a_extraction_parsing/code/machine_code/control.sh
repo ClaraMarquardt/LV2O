@@ -18,14 +18,18 @@ current_date=$(date +"%m_%d_%Y")
 #-------------------------------------------------#
 
 # directories
-export wd_path_1="/Users/claramarquardt/Google_Drive/Jobs/indep_project/herkules_nlp/tool/code_base/experimental/part_a_extraction_parsing"
-export wd_path_exec_1="/Users/claramarquardt/Google_Drive/Jobs/indep_project/herkules_nlp/tool/code_base/experimental/part_a_extraction_parsing"
+export wd_path_main="/Users/claramarquardt/Google_Drive/Jobs/indep_project/herkules_nlp/tool"
 
-export wd_path_2="/Users/claramarquardt/Google_Drive/Jobs/indep_project/herkules_nlp/tool/code_base/experimental/part_b_pdf_output"
-export wd_path_3="/Users/claramarquardt/Google_Drive/Jobs/indep_project/herkules_nlp/tool/code_base/experimental/part_c_output_verification"
+export wd_path_1=$wd_path_main"/code_base/experimental/part_a_extraction_parsing"
+export wd_path_exec_1=$wd_path_main"/code_base/experimental/part_a_extraction_parsing"
 
-export wd_path_data="/Users/claramarquardt/Google_Drive/Jobs/indep_project/herkules_nlp/tool/data"
-export wd_path_exec_data="/Users/claramarquardt/Google_Drive/Jobs/indep_project/herkules_nlp/tool/data"
+export wd_path_2=$wd_path_main"/code_base/experimental/part_b_pdf_output"
+export wd_path_3=$wd_path_main"/code_base/experimental/part_c_output_verification"
+export wd_path_4=$wd_path_main"/code_base/experimental/part_hist"
+
+export wd_path_helper=$wd_path_main"/helper"
+export wd_path_data=$wd_path_main"/data"
+export wd_path_exec_data=$wd_path_main"/data"
 
 export raw_order_path="${wd_path_data}/mod_data/raw_pdf_stage_a"
 export mod_order_path="${wd_path_data}/mod_data/parsed_pdf_txt_stage_b"
@@ -34,9 +38,17 @@ export annotated_order_path="${wd_path_data}/mod_data/annotated_pdf_csv_stage_c_
 export verified_order_path="${wd_path_data}/mod_data/verified_pdf_csv_stage_d_i"
 export verified_order_final_path="${wd_path_data}/mod_data/verified_pdf_csv_stage_d_ii"
 
+export annotated_sample_hist_path="${wd_path_data}/mod_data/annotated_hist/raw"
+export mod_annotated_sample_hist_path="${wd_path_data}/mod_data/annotated_hist/mod"
+export final_annotated_sample_hist_path="${wd_path_data}/mod_data/annotated_hist/final"
+
+export doc_path="${wd_path_data}/mod_data/doc"
+export key_word_path="${wd_path_helper}/product_identification/master_keyword.xlsm"
+
 export code_path_1="${wd_path_1}/code"
 export code_path_2="${wd_path_2}/code"
 export code_path_3="${wd_path_3}/code"
+export code_path_4="${wd_path_4}/code"
 
 export code_path_exec_1="${wd_path_exec_1}/code"
 
@@ -47,6 +59,8 @@ export parse_code_path="${code_path_1}/function_code/parse"
 export annotate_code_path="${code_path_2}"
 
 export output_verification_code_path="${code_path_3}"
+
+export annotated_hist_code_path="${code_path_4}"
 
 # other paths
 export php_path=/usr/local/opt/php56/bin

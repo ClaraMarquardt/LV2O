@@ -14,8 +14,18 @@ cd "${raw_order_path}"
 
 for file in *; do
 
-	# parse -- ocr recognition
-	pdfsandwich $file -o "${mod_order_path}/${file}"
+	# file_fonts=$(pdffonts -l 5 "$file" | tail -n +3 | cut -d' ' -f1 | sort | uniq)
+	
+	# if [ "$file_fonts" = '' ] || [ "$file_fonts" = '[none]' ]; then
+    	
+    # parse -- ocr recognition
+	pdfsandwich -lang deu $file -o "${mod_order_path}/${file}" 
+
+	# else 
+	#  	cp $file ${mod_order_path}/$file
+	#  	sleep 10
+	
+	#  fi 
 
 	# extract 
 	pdftotext -layout "${mod_order_path}/${file}" 

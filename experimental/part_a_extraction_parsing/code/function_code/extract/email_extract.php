@@ -21,14 +21,16 @@ $password = getenv("email_pwd");
 
 $date = getenv("email_date");
 
-/* directory and file path settings */echo
+$filename_master = array();
+
+/* directory and file path settings */
 
 /* try to connect */
 $inbox = imap_open($hostname,$username,$password) or die('Cannot connect to Gmail: ' . imap_last_error());
 
 /* extract emails */
 // $emails = imap_search($inbox,'UNSEEN SUBJECT "herkules_order_update"' );
-$emails = imap_search($inbox,'SUBJECT "herkules_order_update"' );
+$emails = imap_search($inbox,'SUBJECT "Fwd: Herkules NLP"');
 echo "number of emails: " . count($emails);
 echo "\n\n";
 
@@ -48,9 +50,29 @@ if($emails) {
 		echo "email #: " . $email_number;
         echo "\n\n";
 
+        /* get mail structure */
+        $structure = imap_fetchstructure($inbox, $email_number);
 
 		/* get information specific to this email */
-		$message = imap_fetchbody($inbox,$email_number,1);
+		$message = base64_decode(imap_fetchbody($inbox,$email_number,1.1));
+
+        // if($structure->encoding == 3) {
+        //     $message = imap_base64($message);
+        // } else if($structure->encoding == 4) {
+        //     $message = imap_qprint($message);
+        // }
+
+        echo $message;
+
+        $address = array();
+
+
+        if (preg_match('/(.*@.*)(<mailto.*)/', $message, $address)) {
+            // var_dump($address);
+            // echo "match";
+        };
+
+        echo $address[1];
 
 		// #----------------------------------------------#
 		// START script to extract and download attachments
@@ -59,8 +81,6 @@ if($emails) {
         /* get information specific to this email */
         $overview = imap_fetch_overview($inbox,$email_number,0);
 
-        /* get mail structure */
-        $structure = imap_fetchstructure($inbox, $email_number);
 
         $attachments = array();
 
@@ -134,9 +154,17 @@ if($emails) {
 
         for($j = 0; $j < count($attachments); $j++) {
 
-        	$filename = "raw_order" . "_" . $date . "_" . $email_number . "_" . $j . "." . "pdf";
+            echo iconv_mime_decode($attachments[$j]["filename"]);
+
+        	// $filename = "raw_order" . "_" . $date . "_" . $email_number . "_" . $j . "." . "pdf";
+             $filename_raw = iconv_mime_decode($attachments[$j]["filename"]);
+             $filname_mod = array();
+             preg_match('/(.*)(.pdf)/', $filename_raw, $filname_mod);
+             $filename = $filname_mod[1];
+             $filename = $filename . "_RAW.pdf";
+
             // echo $folder;
-            // echo $filename;
+            echo $filename;
         	echo "attachment #: " . $j;
             echo "\n\n";
 
@@ -156,6 +184,15 @@ if($emails) {
 		// END script to extract and download attachments
 		// #----------------------------------------------#
 
+
+
+    #push to arrays
+    $filename_master[$email_number] = array();
+    $filename_master[$email_number]["filename"] = $filename;
+    $filename_master[$email_number]["address"] = $address[1];
+    $filename_master[$email_number]["date"] = $date;
+    echo $filename_master;
+
     }
 }
 
@@ -163,13 +200,28 @@ if($emails) {
 /* close the connection */
 imap_close($inbox);
 
-/* parse all attachments - shell script */
-$shell_file =  'order_extract.sh';
-$shell_root_path = getenv("extract_code_path_exec");
+/* generate master file */
+echo $filename_master;
 
-$shell_path = "$shell_root_path" . "/" .  "$shell_file";
-echo $shell_path;
-shell_exec("sh $shell_path");
+$folder = getenv("doc_path");
+$filepath = $folder ."/". "order_email_master.csv";
+
+$fp = fopen($filepath, 'w');
+
+foreach ($filename_master as $fields) {
+    fputcsv($fp, $fields);
+}
+
+fclose($fp);
+
+
+// /* parse all attachments - shell script */
+// $shell_file =  'order_extract.sh';
+// $shell_root_path = getenv("extract_code_path_exec");
+
+// $shell_path = "$shell_root_path" . "/" .  "$shell_file";
+// echo $shell_path;
+// shell_exec("sh $shell_path");
 
 
  ?>

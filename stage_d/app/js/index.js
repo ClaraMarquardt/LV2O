@@ -1,85 +1,90 @@
-'use strict';
-// var ipc= require('electron').ipcMain
+//----------------------------------------------------------------------------//
+
+// Purpose:     Index.js - main window
+// Project:     NLP sales/order automation
+// Author:      Clara Marquardt
+// Date:        2017
+// Notes:       /
+
+//----------------------------------------------------------------------------//
+
+//----------------------------------------------------------------------------//
+//                               Control Section                              //
+//----------------------------------------------------------------------------//
+
+// set-up & dependencies
+//-------------------------------------------------//
+// 'use strict';
+
 require('/usr/local/lib/node_modules/shelljs/global');
 var shell = require("/usr/local/lib/node_modules/shelljs");
-
-// var config = require('/usr/local/lib/node_modules/config');
-// console.log(config);
-// console.log(config.execPath);
-
-
 var exec = require('child_process').exec;
 
-function execute(command, callback){
-    exec(command, function(error, stdout, stderr){ callback(stdout); });
+var remote = require('electron').remote;
+var glob   = require("glob")
+var fs     = require('fs');
+
+// variables 
+//-------------------------------------------------//
+var close_button   = document.querySelectorAll('.close');
+var sound_button   = document.querySelectorAll('.button-sound');
+var chicken_button = document.querySelectorAll('.chicken');
+var baumer_button  = document.querySelectorAll('.baumer');
+
+var email_parsing_button       = document.querySelectorAll('.email_parsing');
+var info_extraction_button     = document.querySelectorAll('.info_extraction');
+var pdf_annotation_button      = document.querySelectorAll('.pdf_annotation');
+var output_verification_button = document.querySelectorAll('.output_verification');
+var final_output_button        = document.querySelectorAll('.final_output');
+
+
+// helper functions
+//-------------------------------------------------//
+var helper = require(remote.getGlobal('shared_code_path').helper_function_js_script);
+
+//----------------------------------------------------------------------------//
+//                                    Code                                    //
+//----------------------------------------------------------------------------//
+
+//----------------------------------------------------------------------------//
+// side functionalities
+//----------------------------------------------------------------------------//
+
+// sound buttons
+//----------------------------------------------------------------------------//
+
+for (var i = 0; i < sound_button.length; i++) {
+    var button = sound_button[i];
+    var soundName = button.attributes['data-sound'].value;
+
+    prepare_sound_button(button, soundName);
 };
 
-var soundButtons = document.querySelectorAll('.button-sound');
-
-for (var i = 0; i < soundButtons.length; i++) {
-    var soundButton = soundButtons[i];
-    var soundName = soundButton.attributes['data-sound'].value;
-
-    prepareSoundButton(soundButton, soundName);
-}
-
-function prepareSoundButton(buttonEl, soundName) {
-    buttonEl.querySelector('span').style.backgroundImage = 'url("img/icons/' + soundName + '.png")';
+function prepare_sound_button(button, soundName) {
+    button.querySelector('span').style.backgroundImage = 'url("img/icons/' + soundName + '.png")';
 
     var audio = new Audio(__dirname + '/wav/' + soundName + '.wav');
-    buttonEl.addEventListener('click', function () {
+    button.addEventListener('click', function () {
         audio.currentTime = 0;
         audio.play();
     });
-}
+};
 
+// chicken button
+//----------------------------------------------------------------------------//
+helper.prepare_button_ipc(chicken_button, 'open-chicken-window');
 
-var baumerButtons = document.querySelectorAll('.baumer');
+// baumer button
+//----------------------------------------------------------------------------//
+helper.prepare_button_ipc(baumer_button, 'open-baumer-window');
 
-for (var i = 0; i < baumerButtons.length; i++) {
-    var soundButton = baumerButtons[i];
-    prepareBaumerButton(soundButton);
-}
+// close buttons
+//----------------------------------------------------------------------------//
+helper.prepare_button_ipc(close_button, 'close-main-window');
 
-function prepareBaumerButton(buttonEl) {
-
-     buttonEl.addEventListener('click', function () {
-      ipc.send('open-baumer-window');
-});
-}
-
-
-var chickenButtons = document.querySelectorAll('.chicken');
-
-for (var i = 0; i < chickenButtons.length; i++) {
-    var chickenButton = chickenButtons[i];
-    preparechickenButton(chickenButton);
-}
-
-function preparechickenButton(buttonEl) {
-
-     buttonEl.addEventListener('click', function () {
-      ipc.send('open-chicken-window');
-});
-}
-
-
-
-var closeButtons = document.querySelectorAll('.close');
-
-for (var i = 0; i < closeButtons.length; i++) {
-    var closeButton = closeButtons[i];
-    preparecloseButton(closeButton);
-}
-
-function preparecloseButton(buttonEl) {
-
-     buttonEl.addEventListener('click', function () {
-      ipc.send('close-main-window');
-});
-}
-
-///// main components scripts
+//----------------------------------------------------------------------------//
+// main functionalities
+//----------------------------------------------------------------------------//
 
 // Button 1: Download and parse (.email_parsing)
 // Button 2: Extract and save csv and annotated PDF (.info_extraction)
@@ -89,115 +94,56 @@ function preparecloseButton(buttonEl) {
 
 
 //1 - .email_parsing
-
-var email_parsingButtons = document.querySelectorAll('.email_parsing');
-
-for (var i = 0; i < email_parsingButtons.length; i++) {
-    var email_parsingButton = email_parsingButtons[i];
-    prepareemail_parsingButton(email_parsingButton);
-}
-
-function prepareemail_parsingButton(buttonEl) {
-
-     buttonEl.addEventListener('click', function () {
-console.log('.email_parsing -- stage #1');
-
-
-// call the function
-execute('bash /Users/claramarquardt/Google_Drive/Jobs/indep_project/herkules_nlp/experiments/part_a_extraction_parsing/code/machine_code/extract_machine.sh', function(output) {
-    console.log(output);
-});
-
-});
-}
-
+//----------------------------------------------------------------------------//
+helper.prepare_button_shell_script(email_parsing_button, 
+  remote.getGlobal('shared_code_path').email_parsing_script, 
+  '.email_parsing -- stage #1');
 
 //2 - .info_extraction
-
-var info_extractionButtons = document.querySelectorAll('.info_extraction');
-
-for (var i = 0; i < info_extractionButtons.length; i++) {
-    var info_extractionButton = info_extractionButtons[i];
-    prepareinfo_extractionButton(info_extractionButton);
-}
-
-function prepareinfo_extractionButton(buttonEl) {
-
-     buttonEl.addEventListener('click', function () {
-console.log('.info_extraction -- stage #2');
-
-
-// call the function
-execute('bash /Users/claramarquardt/Google_Drive/Jobs/indep_project/herkules_nlp/experiments/part_a_extraction_parsing/code/machine_code/extract_info_machine.sh', function(output) {
-    console.log(output);
-});
-
-});
-}
+//----------------------------------------------------------------------------//
+helper.prepare_button_shell_script(info_extraction_button, 
+  remote.getGlobal('shared_code_path').info_extraction_script, 
+  '.info_extraction -- stage #2');
 
 //3 - .pdf_annotation
-
-var pdf_annotationButtons = document.querySelectorAll('.pdf_annotation');
-
-for (var i = 0; i < pdf_annotationButtons.length; i++) {
-    var pdf_annotationButton = pdf_annotationButtons[i];
-    preparepdf_annotationButton(pdf_annotationButton);
-}
-
-function preparepdf_annotationButton(buttonEl) {
-
-     buttonEl.addEventListener('click', function () {
-console.log('.pdf_annotation -- stage #2');
-
-
-// call the function
-execute('bash /Users/claramarquardt/Google_Drive/Jobs/indep_project/herkules_nlp/experiments/part_b_pdf_output/code/output_machine.sh', function(output) {
-    console.log(output);
-});
-
-});
-}
+//----------------------------------------------------------------------------//
+helper.prepare_button_shell_script(pdf_annotation_button, 
+  remote.getGlobal('shared_code_path').pdf_annotation_script, 
+  '.pdf_annotation -- stage #3');
 
 //4 - .output_verification
+//----------------------------------------------------------------------------//
+helper.prepare_button_ipc(pdf_annotation_button, 
+  'open-pdf-csv-window');
 
-var output_verificationButtons = document.querySelectorAll('.output_verification');
-
-for (var i = 0; i < output_verificationButtons.length; i++) {
-    var output_verificationButton = output_verificationButtons[i];
-    prepareoutput_verificationButton(output_verificationButton);
-}
-
-function prepareoutput_verificationButton(buttonEl) {
-
-     buttonEl.addEventListener('click', function () {
-console.log('.output_verification -- stage #2');
-
-      ipc.send('open-pdf-csv-window');
+//5 - .final_output
+//----------------------------------------------------------------------------//
+helper.prepare_button_ipc(final_output_button, 
+  'open-pdf-csv-window-new');
 
 
-});
-}
+//----------------------------------------------------------------------------//
+//                                    End                                     //
+//----------------------------------------------------------------------------//
 
 
-//4 - .final_output
-
-var final_outputButtons = document.querySelectorAll('.final_output');
-
-for (var i = 0; i < final_outputButtons.length; i++) {
-    var final_outputButton = final_outputButtons[i];
-    preparefinal_outputButton(final_outputButton);
-}
-
-function preparefinal_outputButton(buttonEl) {
-
-     buttonEl.addEventListener('click', function () {
-console.log('.final_output -- stage #2');
-
-      ipc.send('open-pdf-csv-window-new');
 
 
-});
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

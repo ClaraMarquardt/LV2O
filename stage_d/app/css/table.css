@@ -1,18 +1,14 @@
 html,
 body {
-    height: 770px;
-/*    overflow: hidden;
-*/   
- width: 770px;
+    height: 770px; 
+    width: 770px;
     -webkit-app-region: drag;
     -webkit-user-select: none;
 }
 
 table td, th {
     border: 1px solid black;
-/*    width:50%;
-    box-sizing:border-box;
-    -moz-box-sizing:border-box;*/
+
 }
 }
 

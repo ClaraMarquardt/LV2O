@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #----------------------------------------------------------------------------#
 
 # Purpose:     Parse & fill out background
@@ -57,17 +58,14 @@ print 'Argument List:', str(sys.argv)
 input_path=sys.argv[1]
 print input_path
 
-input_file_path=input_path+"/*_[0-9]_mod.pdf"
+# input_file_path=input_path+"/*_[0-9].pdf"
+input_file_path=input_path+"/*.pdf"
 
 output_path=sys.argv[2]
 print output_path
 
-simulate=sys.argv[3]
-print simulate
-
 # # set wd
 # os.chdir(wd_path)
-
 
 #----------------------------------------------------------------------------#
 #                          Methods/Functions                                 #
@@ -91,10 +89,12 @@ class pdfPositionHandling:
 
             # if it's a textbox, also recurse
             if isinstance(obj, pdfminer.layout.LTTextBoxHorizontal):
+                # print "textbox"
                 self.parse_obj(obj._objs, position_list_new, page_num)
 
             # if it's a container, recurse
             elif isinstance(obj, pdfminer.layout.LTFigure):
+                # print "container"
                 self.parse_obj(obj._objs,position_list_new, page_num)
 
     def parsepdf(self, filename, startpage, endpage):
@@ -156,15 +156,12 @@ class pdfPositionHandling:
 #                                    Code                                    #
 #----------------------------------------------------------------------------#
 
-file_list = glob.glob(input_file_path)
+for x in range(0, len(glob.glob(input_file_path))):
 
-for x in range(0, len(file_list)):
-
-    fname=file_list[x]
-    file_name=fname.split("/")[len(fname.split("/"))-1]
-
+    fname     = glob.glob(input_file_path)[x]
+    fname_abb = fname.split("/")[len(fname.split("/"))-1]
     print(fname)
-    print(file_name)
+    print(fname_abb)
 
     # parse PDF 
     #----------------------------------------------------------------------------#
@@ -175,8 +172,42 @@ for x in range(0, len(file_list)):
     # parse
     position_class   = pdfPositionHandling()
     position         = position_class.parsepdf(fname, 0, existing_pdf_page_number)
+
+
+    # extract products / product breaks
+    #----------------------------------------------------------------------------#
     
-    # new PDF 
+    # coordinates
+    x_min = min(position[position.pos_x>0]["pos_x"])
+    x_min_min = x_min-15
+    x_min_max = x_min+15
+
+    x_max = max(position["pos_x"])
+
+    # identify breaks
+    product_break = []
+
+    for i in range(0,existing_pdf_page_number):
+        temp_1 = np.array(position.ix[position.page==i][position.pos_x<=x_min_max][
+                 position["text"].str.contains("^[0-9]+([^A-Za-z])+[0-9]+([^A-Za-z]|[0-9])+")].pos_y)+10
+        temp_1_index = position.ix[position.page==i][position.pos_x<=x_min_max][
+                 position["text"].str.contains("^[0-9]+([^A-Za-z])+[0-9]+([^A-Za-z]|[0-9])+")].index
+        temp_2 = np.array(position.ix[position.page==i][
+                position["text"].str.contains("[0-9,\\.’ ]*Stck|Stk|St")].pos_y)-10
+        temp_2_index = position.ix[position.page==i][
+                position["text"].str.contains("[0-9,\\.’ ]*Stck|Stk|St")].index
+        temp = np.concatenate([temp_1], axis=0)
+        # temp = np.concatenate([temp_1, temp_2], axis=0)
+        # temp_index = np.concatenate([temp_1_index, temp_2_index], axis=0)
+        temp_index = np.concatenate([temp_1_index], axis=0)
+
+        if (len(temp)>0):
+            temp_mod = np.concatenate([temp[:-1][np.array(abs(temp_index[:-1]-temp_index[1:])!=1)], [temp[-1]]])
+        else:
+            temp_mod=temp
+        product_break.append(temp_mod)
+
+    # create a new PDF
     #----------------------------------------------------------------------------#
     can_list    = []
     packet_list = []
@@ -188,131 +219,31 @@ for x in range(0, len(file_list)):
         packet_list.append(packet_temp)
         can_list.append(can_temp)
 
-    # iterate through csvs
+
+    # draw line at product break - iterate through pages
     #----------------------------------------------------------------------------#
 
-    file_list_csv = glob.glob(input_path+'/' + re.sub("_mod.pdf", "", file_name) + '*.csv')
-    print file_list_csv
-    for y in range(0, len(file_list_csv)):
-
-        fname_csv=file_list_csv[y]
-        file_name_csv=fname_csv.split("/")[len(fname.split("/"))-1]
-
-        # generate product id
-        #----------------------------------------------------------------------------#
-        
-        # determine number of rows 
-        position_prod_subset=position.copy()
-        position_prod_subset.ix[0, "text"]="#order-item: 0 " + position_prod_subset.ix[0, "text"]
-        position_prod_subset.ix[position_prod_subset["text"].str.contains("#order-item: " + str(y)), 
-            "min"]=0
-        position_prod_subset.ix[position_prod_subset["text"].str.contains("#order-item: " + str(y+1)), 
-             "min"]=1
-        position_prod_subset.fillna(method="ffill", inplace=True)
-        position_prod_subset=position_prod_subset.ix[position_prod_subset["min"]==0]
-
-        min_index=position_prod_subset.index.min()
-        max_index=position_prod_subset.index.max()
-
-        position_prod_subset_alt=position.copy()
-        max_index_glob_alt=position_prod_subset_alt.index.max()
-        position_prod_subset_alt.ix[0, "text"]="#order-item: 0 " + position_prod_subset_alt.ix[0, "text"]
-        min_index_alt=0
-        max_index_alt=max_index_glob_alt
-
-        if (len(np.array(position_prod_subset_alt[position_prod_subset_alt["text"].str.contains("#order-item: " + str(y))].index+5))>0):
-            min_index_alt=np.array(position_prod_subset_alt[position_prod_subset_alt["text"].str.contains("#order-item: " + str(y))].index+5)[0]
-        
-        if (len(np.array(position_prod_subset_alt[position_prod_subset_alt["text"].str.contains("#order-item: " + str(y+1))].index+5))>0):
-            max_index_alt=np.array(position_prod_subset_alt[position_prod_subset_alt["text"].str.contains("#order-item: " + str(y+1))].index+5)[0]
-        
-        position_prod_subset_alt=position_prod_subset_alt.ix[min_index_alt:max_index_alt]
-           
-
-        if simulate=="True":
-            
-            print "simulate"
-            info_csv=pd.read_csv(fname_csv)
-        
-            product_id_list=["prod_Axx","prod_Bxx","prod_Cxx","prod_Dxx", "prod_Exx", "prod_Fxx"]
-            product_id=product_id_list[randint(0,(len(product_id_list)-1))]
-            print(product_id)
-
-            # random line number
-            # position_line=randint(min_index,max_index)
-            id_line = position_prod_subset_alt[position_prod_subset_alt["text"].str.contains("(Stck( |$))|(Stk( |$))|(St( |$))")].index
-            if (id_line.shape[0]>0):
-                position_line=np.array(id_line)[0]
-            else:
-                position_line=min_index
-                product_id="Non-Product Item"
-
-            print(position_line)
-        
-            info_csv_new=pd.DataFrame()
-            info_csv_new["var"]=[ " ", "product_id", " ", "annotation_position_line", " ", "comments", " ", "reviewed_by", "reviewed_on"]
-            info_csv_new["var_value"]=[" ",product_id, " ",(position_line+1) ," ","Non-Product"," "," "," "]
-        
-            info_csv=pd.concat([info_csv,info_csv_new])
-        
-            info_csv.to_csv(output_path+"/"+file_name_csv, index=False)
-
-        elif simulate=="False":
-            print "non-simulate"
-            info_csv=pd.read_csv(fname_csv)
-            # product_id=info_csv.loc[info_csv["var"]=="product_id"]["var_value"]
-            product_id=info_csv.iloc[4]["var_value"]
-            # position_line=int(info_csv.loc[info_csv["var"]=="annotation_position_line"]["var_value"])
-            position_line=int(info_csv.iloc[6]["var_value"])
-
-            print(product_id)
-            print(position_line)
-
-
-        # parse PDF (extract position of 1st line - position ID at the left side)
-        #----------------------------------------------------------------------------#
-
-        # print(position)
-
-        # x1 = position[position.text=="line1_"]["pos_x"]
-        # y1 = position[position.text=="line1_"]["pos_y"]
-
-        # x1   = max(position_prod_subset["pos_x"].min()-60, 10)
-        # y1   = position.ix[(position_line)]["pos_y"]+3
-        x1    = position.ix[(position_line)]["pos_x"]+50
-        y1    = position.ix[(position_line)]["pos_y"]+3
-
-        page1 = position.ix[(position_line)]["page"]
-        print x1
-        print y1
-        print page1
-
-
-        # randomly position white squares/text
-        #----------------------------------------------------------------------------#
-
-        if simulate=="True":
-            FillColor=red
-        elif simulate=="False":
-            FillColor=green
-
-        # draw box at text - iterate through pages
-        #----------------------------------------------------------------------------#
-
-        # iterate & draw line/add text
-        can_page = can_list[page1]
+    # iterate & draw line/add text
+    agg_product_num=1
+    for page_num in range(0,existing_pdf_page_number):
+        product_break_page = product_break[page_num]
+        can_page = can_list[page_num]
         can_page.setFont('Helvetica', 10)
-        can_page.setFillColor(FillColor)
-        can_page.drawString(x1, y1, product_id)
-        
-          
-    # merge with background PDF
-    #----------------------------------------------------------------------------#
+        for product_num in range(0,len(product_break_page)):
+            can_page.setFillColor(black)
+            can_page.line(x_min, product_break_page[product_num], x_max, product_break_page[product_num])
+            can_page.setFillColor(green)
+            can_page.drawString(x_min, product_break_page[product_num]+5, "#order-item: " + str(agg_product_num)+" ")
+            agg_product_num+=1        
+
     for i in range(0,existing_pdf_page_number):
         can_list[i].save()
         packet_list[i].seek(0)
         pdf_list.append(PdfFileReader(packet_list[i]))
+      
 
+    # merge with background PDF
+    #----------------------------------------------------------------------------#
     output = PdfFileWriter()
 
     for i in range(0,existing_pdf_page_number):
@@ -322,11 +253,9 @@ for x in range(0, len(file_list)):
         output.addPage(page)
 
     # save 
-    outputStream = file(output_path + "/"+ file_name, "wb")
+    outputStream = file(output_path + "/"+ fname_abb, "wb")
     output.write(outputStream)
     outputStream.close()
-
-
 
 #----------------------------------------------------------------------------#
 #                                    End                                     #

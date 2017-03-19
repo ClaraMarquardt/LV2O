@@ -2,29 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Information Verification</title>
+    <title>App</title>
     <link href="css/table.css" rel="stylesheet" type="text/css"/>
-     <script>
-const ipc = require('electron').ipcRenderer;
-var remote = require('electron').remote;
-const jquery=require("jQuery")
+    <script>
 
-     console.log(remote.getGlobal('sharedObj').pdf_csv_count);     
+        const ipc = require('electron').ipcRenderer;
+        var   remote = require('electron').remote;
 
-     // remote.getGlobal('sharedObj').prop1 = 125;     
-
-     // var ipcRenderer = require('electron').ipcRenderer;     
-     // ipcRenderer.send('show-prop1');
-
-</script>
+    </script>
 </head>
+
 <body>
-<script src="js/table_prep.js"></script>
 
-
-<!-- <div class="close">Close</div>
+<!-- <div class="close">Close</div> 
  -->
-<table id="confirm">
+ <table id="confirm">
     <tr>
         <th id="var_name">dddd</th>
         <td><input id="var_value" class="textbox" value="Alf"></input></td>
@@ -77,6 +69,7 @@ const jquery=require("jQuery")
 
 <button class="Submit">Save</button>
 
+<script src="js/table_prep.js"></script>
 <script src="js/table.js"></script>
 
 </body>

@@ -13,56 +13,53 @@
 
 # control
 #----------------------------------------------------------------------------#
-echo "experimental - email extraction and parsing (stage #1) [stage #a and #b]"
+echo "experimental - processing of historical orders"
 
 # source settings
 #----------------------------------------------------------------------------#
 cd /Users/claramarquardt/Google_Drive/Jobs/indep_project/herkules_nlp/tool/code_base/experimental/part_a_extraction_parsing/code/machine_code
 source control.sh
 
-# reset folders
-#----------------------------------------------------------------------------#
-cd ${raw_order_path}
-rm *.txt
-rm *.pdf
-rm *.docx
 
-cd "${mod_order_path}"
-rm *.txt
-rm *.pdf
-rm *.docx
-
-cd "${parsed_order_path}" 
-rm *.txt
-rm *.pdf
-rm *.docx
-rm *.csv
-
-cd "${annotated_order_path}" 
-rm *.txt
-rm *.pdf
-rm *.docx
-rm *.csv
-
-cd "${verified_order_path}" 
-rm *.txt
-rm *.pdf
-rm *.docx
-rm *.csv
-
-
-cd "${verified_order_final_path}" 
-rm *.txt
-rm *.pdf
-rm *.docx
-rm *.csv
-
-
-echo "reset all folders";
-
-# # execute email/parsing script ((a) php and (b) shell)
+# # rename (no spaces, etc)
 # #----------------------------------------------------------------------------#
-${php_path}/php "${extract_code_path}/email_extract.php"
+cd "${annotated_sample_hist_path}"
+
+for file in *; do
+
+	# file_name  mod
+	file_mod="${file//  / }"
+	file_mod="${file_mod// /_}"
+	echo $file_mod
+
+	# move
+	mv $file $file_mod 
+
+done
+
+# # execute parsing script
+# #----------------------------------------------------------------------------#
+cd ${annotated_hist_code_path}
+./parsing.sh 
+
+# # execute parsing/splitting script 
+# #----------------------------------------------------------------------------#
+python ${parse_code_path}/order_parse.py "${mod_annotated_sample_hist_path}" "${final_annotated_sample_hist_path}" &
+
+cd "${final_annotated_sample_hist_path}"
+
+for file in *; do
+
+	# extract 
+	pdftotext -layout "${file}" 
+
+done
+
+
+# # execute processing 
+# #----------------------------------------------------------------------------#
+cd ${annotated_hist_code_path}
+R CMD BATCH "--args ${final_annotated_sample_hist_path} ${doc_path} ${key_word_path}" order_clean.R
 
 #----------------------------------------------------------------------------#
 #                                     End                                    #

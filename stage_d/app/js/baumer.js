@@ -1,16 +1,38 @@
+//----------------------------------------------------------------------------//
+
+// Purpose:     Chicken window
+// Project:     NLP sales/order automation
+// Author:      Clara Marquardt
+// Date:        2017
+// Notes:       /
+
+//----------------------------------------------------------------------------//
+
+//----------------------------------------------------------------------------//
+//                               Control Section                              //
+//----------------------------------------------------------------------------//
+
+// set-up  & dependencies
+//-------------------------------------------------//
 'use strict';
-// var ipc= require('electron').ipcMain
 
-var closeButtons = document.querySelectorAll('.close');
+// variables
+//-------------------------------------------------//
+var close_button = document.querySelectorAll('.close');
 
-for (var i = 0; i < closeButtons.length; i++) {
-    var closeButton = closeButtons[i];
-    preparecloseButton(closeButton);
-}
+// helper functions
+//-------------------------------------------------//
+require(remote.getGlobal('shared_code_path').helper_function_js_script);
 
-function preparecloseButton(buttonEl) {
+//----------------------------------------------------------------------------//
+//                                    Code                                    //
+//----------------------------------------------------------------------------//
+// close buttons
+//----------------------------------------------------------------------------//
+prepare_button_ipc(close_button, 'close-baumer-window');
 
-     buttonEl.addEventListener('click', function () {
-      ipc.send('close-baumer-window');
-});
-}
+
+//----------------------------------------------------------------------------//
+//                                    End                                     //
+//----------------------------------------------------------------------------//
+
