@@ -77,11 +77,12 @@ for file in *; do
 	echo "parse order: "${total_file}" out of "${agg_file}
 	echo $file
 
+    find . -type f -name $file -exec perl -pi -e 's/Annots/ffffff/g' {} +
+
+
 	if [ "$file" != 'temp.pdf' ]; then
 
 		cp $file temp.pdf
-
-		find . -type f -name 'temp.pdf' -exec perl -pi -e 's/Annots/ffffff/g' {} +
 
 		file_fonts=''
 		file_fonts=$(pdffonts -l 5 "temp.pdf" | tail -n +3 | cut -d' ' -f1 | sort | uniq)

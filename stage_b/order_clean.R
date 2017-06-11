@@ -19,22 +19,16 @@ start_time <- Sys.time()
 
 # command line arguments
 #-------------------------------------------------#
-mod_order_path         <- commandArgs(trailingOnly = TRUE)[1]
-doc_path               <- commandArgs(trailingOnly = TRUE)[2]
-key_word_path          <- commandArgs(trailingOnly = TRUE)[3]
-log_path               <- commandArgs(trailingOnly = TRUE)[4]
-execution_id           <- commandArgs(trailingOnly = TRUE)[5]
-
-
-print(mod_order_path)
-print(doc_path)
-print(key_word_path)
-print(log_path)
-print(execution_id)
+mod_order_path           <- commandArgs(trailingOnly = TRUE)[1]
+output_path              <- commandArgs(trailingOnly = TRUE)[2]
+helper_path_keyword      <- commandArgs(trailingOnly = TRUE)[3]
+execution_id             <- commandArgs(trailingOnly = TRUE)[4]
+log_path                 <- commandArgs(trailingOnly = TRUE)[5]
+temp_path                <- commandArgs(trailingOnly = TRUE)[6]
+archive_path             <- commandArgs(trailingOnly = TRUE)[7]
 
 # dependencies
 #-------------------------------------------------#
-# install_github("claramarquardt/ehR",dependencies = TRUE)    
 library(ehR)
 package_list <-list( "dplyr", "data.table","stringr","lubridate", "icd", "taxize", 
   "tidyr", "reshape", "reshape2", "xlsxjars", "xlsx", "ggplot2", "RODBC", "knitr",
@@ -43,12 +37,12 @@ load_or_install(package_list)
 
 # parameters / helpers
 #-------------------------------------------------#
-key_word     <- as.data.table(read.xlsx(key_word_path, 1 , stringsAsFactors=F, 
+key_word     <- as.data.table(read.xlsx(helper_path_keyword, 1 , stringsAsFactors=F, 
     header=T,startRow=3))
 key_word[get(names(key_word[,c(1), with=F]))=="END", TYPE:="END"]
 key_word[, TYPE:=na.locf(TYPE)]
 
-product_id <- c(unlist(as.data.table(read.xlsx(key_word_path, 3 , stringsAsFactors=F, 
+product_id <- c(unlist(as.data.table(read.xlsx(helper_path_keyword, 3 , stringsAsFactors=F, 
     header=T))[, c(1),with=F]))
 
 
@@ -84,7 +78,6 @@ product_id_key <- paste0(product_id_key, collapse="|")
 
 product_id_ext_key <- unique(product_id)
 product_id_ext_key <- product_id_ext_key[!is.na(product_id_ext_key)]
-# product_id_ext_key <- paste0(product_id_ext_key, collapse="|")
 
 
 #----------------------------------------------------------------------------#
@@ -205,8 +198,6 @@ lapply(file_list[start_id:length(file_list)], function(file_name) {
     ## temp ensure that no duplicates
     text[hist_id_3==hist_id_1, hist_id_3:=NA]
     text[hist_id_2==hist_id_1, hist_id_2:=NA]
-
-
 
     # text[,c("hist_price_1","hist_price_2"):=tstrsplit(hist_price,"----"), by=1:nrow(text)]]
     text[,c("hist_price_1","hist_price_2"):="/", by=1:nrow(text)]
@@ -348,7 +339,7 @@ lapply(file_list[start_id:length(file_list)], function(file_name) {
     dt_final[, c("historical price #1", "historical price #2"):=NULL]
 
     # output_file <- paste0(doc_path, "/", "order_master_database.xlsx")
-    output_file <- paste0(doc_path, "/", "order_master_database.csv")
+    output_file   <- paste0(temp_path, "/", "order_master_database_",execution_id,".csv")
 
     if (file.exists (gsub("\\.csv", paste0("_identified_", output_id, ".csv"), 
         output_file))) {
@@ -393,8 +384,8 @@ lapply(file_list[start_id:length(file_list)], function(file_name) {
     #             sheetName = "Master Record - Raw", row.names = FALSE, append=TRUE)
     # write.csv(dt_final, gsub("\\.csv", "_all.csv", output_file), 
     #     row.names=FALSE)
-    write.csv(dt_final, paste0(mod_order_path,"/parse/", gsub("\\.txt", 
-        ".csv", file_name)),row.names=FALSE)
+    # write.csv(dt_final, paste0(mod_order_path,"/parse/", gsub("\\.txt", 
+    #     ".csv", file_name)),row.names=FALSE)
 
     }
 
@@ -409,7 +400,8 @@ lapply(file_list[start_id:length(file_list)], function(file_name) {
 
 
 # combine PDFs
-file_list_update <- list.files(doc_path)[ list.files(doc_path) %like% "csv"]
+file_list_update <- list.files(temp_path)[ list.files(temp_path) %like% "csv"]
+file_list_update <- file_list_update[file_list_update %like% execution_id]
 file_count <- length(file_list_update)
 file_id <- 1
 start_id <- 1
@@ -417,25 +409,57 @@ start_id <- 1
 output_id <- 1
 output_id_max <- 8
 
+email_file <- fread(paste0(temp_path, "/", "order_email_master_", execution_id, ".csv"), header=FALSE)
+
 for (i in seq(1:ceiling(file_count/output_id_max))) {
 
     min_file <- (i-1)*output_id_max+1
     max_file <- min(min_file+output_id_max-1,file_count )
 
-    temp <- lapply(min_file:max_file, function(x) as.data.table(read.csv(paste0(doc_path, "/", file_list_update[x]), 
+    temp <- lapply(min_file:max_file, function(x) as.data.table(read.csv(paste0(temp_path, "/", file_list_update[x]), 
         stringsAsFactors=F, check.names=FALSE)))
     temp_comb <- as.data.table(rbindlist(temp))
-    temp_comb[, master_product_id:=1:nrow(temp_comb)]
+    temp_comb[, master_order_id:=as.integer(gsub("(^[0-9]*)(_.*)", "\\1", 
+        get("source order file name"))),  by=1:nrow(temp_comb)]
+    temp_comb[, master_product_id:=NULL]
+    temp_comb[, master_id:=paste0(master_order_id, "_",  get("source order-item number")),  by=1:nrow(temp_comb)]
+
+
+    ## merge with id file
+    temp_comb[, name_temp:=paste0(get("source order file name"), ".pdf"), by=1:nrow(temp_comb)]
+    temp_comb[, name_temp:=gsub("(^[0-9]*_)", "", name_temp),  by=1:nrow(temp_comb)]
+    temp_comb <- email_file[, .(V1, V2)][temp_comb, on=c(V1="name_temp"), nomatch=NA]
+    temp_comb[, V1:=NULL]
+    setnames(temp_comb, "V2", "source_email")
+
+    temp_comb[, execution_id:=gsub("(.*)(RAW_)(.*)($)", "\\3", get("source order file name")), by=1:nrow(temp_comb)]
+
+    setcolorder(temp_comb, c("master_id", "master_order_id", 
+        setdiff(names(temp_comb), c("source_email","master_id", "master_order_id", "execution_id")), 
+        "source_email", "execution_id"))
+
     write.xlsx(x = temp_comb, file = gsub("\\.csv", paste0("_identified_", i, ".xlsx"), output_file), 
      sheetName = "Master Record - Identified", row.names = FALSE, append=TRUE)
 
 }
 
+inv_lapply(file_list_update, function(x) file.remove(paste0(temp_path, "/", x)))
+file.remove(paste0(temp_path, "/", "order_email_master_", execution_id, ".csv"))
+
+# move all files to archive
+move_list <- list.files(mod_order_path)
+inv_lapply(move_list, function(x) file.rename(paste0(mod_order_path, "/", x), paste0(archive_path, "/",  x)))
+
+
 
 # log
 end_time <-  Sys.time()
 
-sink(paste0(log_path, "/log_order_clean_R_", execution_id, ".txt"), split=TRUE)
+sink(paste0(log_path, "/log_order_clean_R.txt"), append=TRUE)
+
+cat(sprintf("\n\n##################\n"))
+cat(sprintf("Execution ID: %s\n", execution_id))
+cat(sprintf("Date: %s\n", current_date))
 
 cat(sprintf("Number of PDFs: %d\n", file_count))
 cat(sprintf("Runtime (minutes): %f\n\n", round(as.numeric(end_time - start_time)/60, 1)))

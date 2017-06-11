@@ -52,10 +52,10 @@ done
 
 # execute
 #---------------------------------------------------#
-# cd ${annotated_hist_code_path}
-# R CMD BATCH "--args ${final_annotated_sample_hist_path} ${doc_path} \
-# ${key_word_path} ${log_path} ${execution_id}" order_clean.R
+cd ${data_path_structured}
 
+R CMD BATCH "--args ${data_path_structured} ${vb_path_input} ${helper_path_keyword} \
+	${execution_id}  ${wd_path_log} ${data_path_temp} ${data_path_archived_structured}" order_clean.R
 
 
 #----------------------------------------------------------------------------#

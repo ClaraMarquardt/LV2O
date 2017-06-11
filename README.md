@@ -1,5 +1,5 @@
 # sales_automation
-
+#----------------------------------------------------------------------------#
 
 # SET-UP Instructions
 # --------------
@@ -10,14 +10,14 @@
 ## Terminal/Shell (IF not on Mac)
 
 ## Install R & Packages 
+* Note - currentlt no check for packages - assumes that they are installed
 
 ## Install Python & Packages
+* Note - currentlt no check for packages - assumes that they are installed
 
 ## Install PHP 
 
 ## Install the PDF parsing tools (pdftk, pdfsandwich, perl)
-
-## Libre Office(?)
 
 # [2] Pull repo from Github (contains dependencies & folder structure)
 # ---------------------------
@@ -32,7 +32,6 @@
 ## product_identification
 
 
-
 # [4] Update the xlsx file - link to vb input and output folders
 # ---------------------------
 
@@ -40,11 +39,22 @@
 # EXECUTION Instructions
 # --------------
 
+## start shell 
+
 ## navigate to wd
-cd /Users/claramarquardt/Google_Drive/Jobs/indep_project/herkules_nlp/tool
+cd [....]/tool
+
 
 ## execute - stage 1 (email -> vb input)
 ./code_base/machine_code/execution_master_stage_1.sh
 
+## [EXECUTE VB MACRO]
+
 ## execute - stage 2 (vb output -> email)
 ./code_base/machine_code/execution_master_stage_2.sh
+
+
+
+#----------------------------------------------------------------------------#
+#                                    End                                     #
+#----------------------------------------------------------------------------#
