@@ -1,11 +1,9 @@
-#----------------------------------------------------------------------------#
 ### SET-UP Instructions
-#----------------------------------------------------------------------------#
 
 #### [1] Install key programs (NOTE: Order in which programs are installed does NOT matter)
-# ---------------------------
+---------------------------
 
-* Note: Internet access is required for the entire set-up
+* Note: Internet access is required for the entire set-up_
 
 ####Set-up environment (IF not on Mac)
 
