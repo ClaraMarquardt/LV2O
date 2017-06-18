@@ -1,8 +1,10 @@
 #----------------------------------------------------------------------------#
 
-# Purpose:     Parse 
-# Author:      Clara Marquardt
+# Purpose:     Annotate orders with product ids, etc.
+# Author:      CM
 # Date:        2016
+# Language:    Python (.py)
+
 
 #----------------------------------------------------------------------------#
 
@@ -238,8 +240,8 @@ for x in range(0, len(file_list_final)):
     output.write(outputStream)
     outputStream.close()
 
-    # save email list
-    #----------------------------------------------------------------------------#
+# save email list
+#----------------------------------------------------------------------------#
 email_dt=order_dt[['email','order_name']]
 email_dt=email_dt.drop_duplicates()
 email_dt['order_name_mod'] = [re.sub("^[0-9]*_", "",x) for x in  email_dt['order_name']]
@@ -248,12 +250,12 @@ email_dt['order_name_mod'] = [re.sub("_", " ",x) for x in  email_dt['order_name_
 # save
 email_dt.to_csv(output_path + "/" + "email_list_" +execution_id + ".csv", encoding="utf8")
 
-end_time = time.time()
 
 # move files to archive
+#----------------------------------------------------------------------------#
+
 
 ## vb input
-
 input_file_list = glob.glob(vb_input_path +"/*"+execution_id+"*")
 
 for x in range(0, len(input_file_list)):
@@ -271,7 +273,11 @@ for x in range(0, len(output_file_list)):
     shutil.move(output_file_list[x], archive_file_path)
 
 
-# status
+# status & log file
+#----------------------------------------------------------------------------#
+
+end_time = time.time()
+
 print "Number of PDFs: " + str(file_count)
 print "Runtime (minutes):" + str((end_time - start_time))
 

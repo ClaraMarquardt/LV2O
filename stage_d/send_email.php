@@ -1,9 +1,11 @@
 // #-------------------------------------------------------------------------#
 
-// # Purpose:     Extract Attachments from email
-// # Author:      Clara Marquardt
+// # Purpose:     Send formatted attachments via email
+// # Author:      CM
 // # Date:        Nov 2016
-// # Notes:       see http://stackoverflow.com/questions/5335273/how-to-send-an-email-using-php
+// # Language:    PHP (.php)
+
+
 // #----------------------------------------------------------------------------#
 
 // #----------------------------------------------------------------------------#

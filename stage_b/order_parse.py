@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 #----------------------------------------------------------------------------#
 
-# Purpose:     Parse 
-# Author:      Clara Marquardt
+# Purpose:     Parse orders and generate master order file
+# Author:      CM
 # Date:        2016
+# Language:    Python (.py)
 
 #----------------------------------------------------------------------------#
 
@@ -53,7 +54,6 @@ for x in range(0, len(input_file_path_list)):
         fname_abb = fname.split("/")[len(fname.split("/"))-1]
         print "parse order: " + str(x) + " out of " + str(len(input_file_path_list))
         print(fname)
-        # print(fname_abb)
 
         # parse PDF 
         #----------------------------------------------------------------------------#
@@ -64,8 +64,6 @@ for x in range(0, len(input_file_path_list)):
         # parse
         position_class   = pdfPositionHandling()
         position         = position_class.parsepdf(fname, 0, existing_pdf_page_number)
-
-
 
         # extract products / product breaks
         #----------------------------------------------------------------------------#
@@ -105,13 +103,11 @@ for x in range(0, len(input_file_path_list)):
 
 
         max_step = np.sort(np.hstack(max_step))
-        # max_step = max_step[max_step!=0]
         tab=np.bincount(max_step)
         if(max(tab[:-1])>tab[len(tab)-1]):
             max_step=np.unique(max_step)[len(np.unique(max_step))-2]
         else:
             max_step=np.unique(max_step)[len(np.unique(max_step))-1]
-        # print(max_step)
 
         # identify breaks
         product_break =[]
@@ -137,7 +133,6 @@ for x in range(0, len(input_file_path_list)):
                 temp_length = max([len(y) for y in temp_length])
                 count.append(temp_length)
           
-            # temp_1["text_mod"]=[len(re.sub("[^\\.]","",x)) for x in temp_1.text_mod]
             temp_1["text_mod"] = count
             temp_1 = temp_1.ix[temp_1.text_mod>=max_step]
             temp_1_index = temp_1.index
@@ -151,8 +146,6 @@ for x in range(0, len(input_file_path_list)):
             temp = np.concatenate([temp_1], axis=0)
             if (len(temp_date)>0):
                 temp = np.setdiff1d(temp, temp_date)[::-1]
-            # temp = np.concatenate([temp_1, temp_2], axis=0)
-            # temp_index = np.concatenate([temp_1_index, temp_2_index], axis=0)
             temp_index = np.concatenate([temp_1_index], axis=0)
             temp_index = np.setdiff1d(temp_index, temp_date_index)
             if (len(temp)>0):
@@ -228,6 +221,9 @@ for x in range(0, len(input_file_path_list)):
         archive_file_path=archive_path + "/"+ fname_abb
         shutil.move(fname, archive_file_path)
 
+
+# Generate log file
+# -----------------------------------------
 
 end_time = time.time()
 
