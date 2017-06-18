@@ -1,11 +1,12 @@
 ### SET-UP Instructions
 
-#### [1] Install key programs (NOTE: Order in which programs are installed does NOT matter)
+#### [1] Install key programs 
 ---------------------------
 
 _Note: Internet access is required for the entire set-up_
+_Note: Order in which programs are installed does NOT matter_
 
-Set-up environment (IF not on Mac)
+[-] Set-up environment (IF not on Mac)
 ````
 	## * Confirm that can access command line
 	[1] Press Start -> In Search/Run line enter "cmd" -> command line window should open
@@ -15,7 +16,7 @@ Set-up environment (IF not on Mac)
 	[2] Integrate cygwin with the windows command line - see: https://www.howtogeek.com/howto/41382/how-to-use-linux-commands-in-windows-with-cygwin/
 ````
 
-Install R  
+[-] Install R  
 ````	
 	## * Install R
 	[1] Install R - see: https://cran.r-project.org/bin/windows/base/
@@ -24,7 +25,7 @@ Install R
 	[1] Open the command line window -> Enter "R" -> R should start
 ````
 
-Install Python 
+[-] Install Python 
 ````
 	## * Install Python
 	[1] Install Python - see: https://ipython.org/install.html
@@ -33,7 +34,7 @@ Install Python
 	[1] Open the command line window -> Enter "ipython" -> Python should start
 ````
 
-Install PHP 
+[-] Install PHP 
 ````
 	## * Install PHP
 	[1] Install PHP - see: http://windows.php.net/download#php-7.1
@@ -43,7 +44,7 @@ Install PHP
 	http://php.net/manual/en/install.windows.legacy.index.php#install.windows.legacy.commandline
 ````
 
-Install the PDF parsing tools (pdftk, pdftotext/pdffonts, perl)
+[-] Install the PDF parsing tools (pdftk, pdftotext/pdffonts, perl)
 ````
 	## * Install PDFTK
 	[1] Install PDFTK - see: https://www.pdflabs.com/tools/pdftk-server/
@@ -56,32 +57,42 @@ Install the PDF parsing tools (pdftk, pdftotext/pdffonts, perl)
 ````
 
 ##### [2] Obtain the code repository (code & dependencies & folder structure) 
-# ---------------------------
+---------------------------
 
-	## * Specify directory & Navigate to chosen directory
+[1] Specify directory & Navigate to chosen directory
 
-	## * OPTION A (Requires Git)
+[-] * OPTION A (Requires Git)
+````
 	git clone https://github.com/ClaraMarquardt/order_automation.git
+````
 
-	## * OPTION B (Requires local copy of repo)
-	[1] Unzip local copy of repo into the chosen directory
+[-] * OPTION B (Requires local copy of repo)
+````
+	Unzip local copy of repo into the chosen directory
+````
 
 ##### [3] Customise the settings
-# ---------------------------
+---------------------------
 
-	## * setting.sh (tool/code_base/machine_code/)
-	[1] Modify "wd_path" (All other settings are default settings and do NOT need to be modified)
+[1] setting.sh (tool/code_base/machine_code/)
+````
+[-] Modify "wd_path" (All other settings are default settings and do NOT need to be modified)
+````
 
-	## * email_password.txt and email_username.txt (tool/helper/email_id/)
-	[1] Modify the contents of both txt files - email address and password of the gmail account 
+[2] email_password.txt and email_username.txt (tool/helper/email_id/)
+````
+[-] Modify the contents of both txt files - email address and password of the gmail account 
 	which is to be used to receive and send emails
+````
 
-	## * Excel macro integration
-	[1] Modify the excel macro to (a) read in data from (.csv) from tool/vb_interface/input 
+[3] Excel macro integration
+````
+[-] Modify the excel macro to (a) read in data from (.csv) from tool/vb_interface/input 
 	and (b) output data (.xlsx and .pdf) to tool/vb_interface/output
+````
 
 ##### [4] Obtain the required R/Python packages
-# ---------------------------
+---------------------------
 
 	## * Obtain the required Python packages
 	[1] Start the command line window
@@ -93,9 +104,8 @@ Install the PDF parsing tools (pdftk, pdftotext/pdffonts, perl)
 	[2] Execute the following code 
 	R CMD BATCH --nosave [...]/tool/code_base/helper_code/R_dependency.R
 
-#----------------------------------------------------------------------------#
 ### EXECUTION Instructions
-#----------------------------------------------------------------------------#
+----------------------------------------------------------------------------
 
 ####[1] start the windows command window 
 
