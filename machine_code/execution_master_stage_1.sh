@@ -36,9 +36,9 @@ php email_extract.php
 #---------------------------------------------------#
 cd ${wd_path_code}/stage_b
 
-python order_parse.py "${init_path}", "${data_path_parsed}" \
+ipython order_parse.py "${init_path}" "${data_path_parsed}" \
 	"${data_path_structured}" "${error_path_parsed}" "${data_path_archived_parsed}" \
-	"${wd_path_log}" "${execution_id}" &
+	"${wd_path_log}" "${execution_id}" 
 
 cd "${data_path_structured}"
 

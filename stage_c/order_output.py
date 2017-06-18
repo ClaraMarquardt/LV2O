@@ -14,6 +14,7 @@
 
 # control parameters
 #-------------------------------------------------#
+import sys
 
 # paths
 init_path=sys.argv[1]
@@ -30,15 +31,13 @@ vb_input_path=sys.argv[10]
 
 # dependencies
 #-------------------------------------------------#
-import sys
 sys.path.append(init_path)
 
 from python_init import *
 
 # parameters
 #-------------------------------------------------#
-
-input_path=input_path+"/*"+execution_id+".xlsm"
+input_path=input_path+"/*.xlsm"
 
 #----------------------------------------------------------------------------#
 #                                    Code                                    #

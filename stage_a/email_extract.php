@@ -36,7 +36,7 @@ $filename_master = array();
 $inbox = imap_open($hostname,$username,$password) or die('Cannot connect to Gmail: ' . imap_last_error());
 
 /* extract emails */
-$emails = imap_search($inbox,'UNSEEN SUBJECT ' . "$subject");
+$emails = imap_search($inbox,'UNSEEN');
 echo "\n\n" . "number of emails: " . count($emails) . "\n\n";
 
 /* if emails are returned, cycle through each email */
@@ -152,14 +152,10 @@ if($emails) {
                 $filename = $filname_mod[1];
                 $filename = $filename . "_RAW_" . $execution_id . ".pdf";
 
-                echo $filename;
-        	    echo "attachment #: " . $j . "\n\n";
-
                 $filename_master[$attachment_number] = array();
                 $filename_master[$attachment_number]["filename"] = $filename;
                 $filename_master[$attachment_number]["address"] = $address[1];
                 $filename_master[$attachment_number]["date"] = $date;
-                echo $filename_master;
 
                 if($attachments[$j]['is_attachment'] == 1)
                 {
@@ -174,16 +170,14 @@ if($emails) {
         }
 
     }
-}
+
 
 
 /* close the connection */
 imap_close($inbox);
 
 /* generate master file */
-echo $filename_master;
-
-$filepath = $folder_temp ."/". "order_email_master_" . "$execution_id" . ".csv";
+$filepath = $folder_temp . "/" . "order_email_master_" . "$execution_id" . ".csv";
 $fp = fopen($filepath, 'w');
 
 foreach ($filename_master as $fields) {
@@ -196,6 +190,9 @@ fclose($fp);
 $shell_file =  'order_parse.sh';
 $shell_path = "$shell_root_path" . "/" . "stage_a" . "/" .  "$shell_file";
 shell_exec("sh $shell_path");
+
+}
+
 
 ?>
 

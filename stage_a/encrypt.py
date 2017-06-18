@@ -15,6 +15,7 @@
 
 # control parameters
 #-------------------------------------------------#
+import sys
 
 # paths
 init_path=sys.argv[1]
@@ -22,7 +23,6 @@ file_name=sys.argv[2]
 
 # dependencies
 #-------------------------------------------------#
-import sys
 sys.path.append(init_path)
 
 from python_init import *

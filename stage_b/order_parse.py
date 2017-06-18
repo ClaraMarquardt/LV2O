@@ -14,6 +14,7 @@
 
 # control parameters
 #-------------------------------------------------#
+import sys
 
 # paths
 init_path=sys.argv[1]
@@ -26,7 +27,6 @@ execution_id=sys.argv[7]
 
 # dependencies
 #-------------------------------------------------#
-import sys
 sys.path.append(init_path)
 
 from python_init import *
@@ -65,6 +65,9 @@ for x in range(0, len(input_file_path_list)):
         position_class   = pdfPositionHandling()
         position         = position_class.parsepdf(fname, 0, existing_pdf_page_number)
 
+        if (len(position[position['text'].str.contains("cid")])>len(position)-50):
+            print error
+        
         # extract products / product breaks
         #----------------------------------------------------------------------------#
         
@@ -104,7 +107,8 @@ for x in range(0, len(input_file_path_list)):
 
         max_step = np.sort(np.hstack(max_step))
         tab=np.bincount(max_step)
-        if(max(tab[:-1])>tab[len(tab)-1]):
+
+        if(len(tab)>1 and max(tab[:-1])>tab[len(tab)-1]):
             max_step=np.unique(max_step)[len(np.unique(max_step))-2]
         else:
             max_step=np.unique(max_step)[len(np.unique(max_step))-1]

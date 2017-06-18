@@ -1,6 +1,6 @@
 #----------------------------------------------------------------------------#
 
-# Purpose:     Settings
+# Purpose:     Master Settings
 # Author:      CM
 # Date:        Jan 2017
 # Language:    Shell (.sh)
@@ -70,15 +70,8 @@ export helper_path_keyword=${wd_path_helper}"/product_identification/master_keyw
 
 export email_address=`cat helper/email_id/email_username.txt`
 export email_pwd=`cat helper/email_id/email_password.txt`
-export email_subject=""
 
 
 #----------------------------------------------------------------------------#
 #                                    End                                     #
-#----------------------------------------------------------------------------#
-
-
-
-#----------------------------------------------------------------------------#
-#                                  Ends                                      #
 #----------------------------------------------------------------------------#
