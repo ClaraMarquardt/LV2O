@@ -5,23 +5,24 @@
 
 * Note: Internet access is required for the entire set-up_
 
-####Set-up environment (IF not on Mac)
-
+* Set-up environment (IF not on Mac)
+````
 	## * Confirm that can access command line
 	[1] Press Start -> In Search/Run line enter "cmd" -> command line window should open
 
 	## * Install cygwin
 	[1] Install cygwin - see: https://www.cygwin.com/
 	[2] Integrate cygwin with the windows command line - see: https://www.howtogeek.com/howto/41382/how-to-use-linux-commands-in-windows-with-cygwin/
+````
 
-####Install R  
-	
+* Install R  
+````	
 	## * Install R
 	[1] Install R - see: https://cran.r-project.org/bin/windows/base/
 
 	## * Confirm that R can be accessed from the command line
 	[1] Open the command line window -> Enter "R" -> R should start
-
+````
 ####Install Python 
 
 	## * Install Python
