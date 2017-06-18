@@ -58,8 +58,8 @@ R CMD BATCH --nosave "--args ${init_path} ${data_path_structured} ${vb_path_inpu
 	${data_path_archived_structured}" order_clean.R
 
 ## delete output file
-rm order_clean.Rout
 rm .RData
+rm order_clean.Rout
 
 #----------------------------------------------------------------------------#
 #----------------------------------------------------------------------------#

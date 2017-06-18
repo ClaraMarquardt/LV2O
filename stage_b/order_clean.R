@@ -41,9 +41,6 @@ key_word     <- as.data.table(read.xlsx(helper_path_keyword, 1 ,
 key_word[get(names(key_word[,c(1), with=F]))=="END", TYPE:="END"]
 key_word[, TYPE:=na.locf(TYPE)]
 
-product_id <- c(unlist(as.data.table(read.xlsx(helper_path_keyword, 3 , 
-    stringsAsFactors=F, header=T))[, c(1),with=F]))
-
 # generate regx patterns - product type
 temp_key     <- unique(key_word[TYPE=="Temperature" & !(is.na(Keyword)) & 
     Keyword %like% "[^ ]" ]$Keyword)
@@ -63,22 +60,6 @@ for (i in product_type_list) {
     assign(i, temp)
 
 }
-
-#generate regx patterns - product id
-product_id_sep <- "-|/|\\.|\\(|\\)| |,|\\&"
-
-product_id_orig <- copy(product_id)
-product_id      <- gsub(product_id_sep, "", product_id)
-
-product_id_xwalk <-data.table(id=product_id, id_orig=product_id_orig)
-product_id_xwalk <- unique(product_id_xwalk, by=c("id"))
-
-product_id_key <- unique(gsub("(....)(.*)", "\\1", product_id))
-product_id_key <- product_id_key[!is.na(product_id_key)]
-product_id_key <- paste0(product_id_key, collapse="|")
-
-product_id_ext_key <- unique(product_id)
-product_id_ext_key <- product_id_ext_key[!is.na(product_id_ext_key)]
 
 
 #----------------------------------------------------------------------------#
@@ -138,73 +119,8 @@ lapply(file_list[start_id:length(file_list)], function(file_name) {
     text[, text_line_mod:=gsub("((Stck|Stk|St)( )[0-9]*)(.*)", "\\1", text_line_mod), 
         by=1:nrow(text)]
 
-    # identify product id
-    text[, detail_id:=""]
-    text[, detail_price:=""]
-    text[, text_line_mod_temp:=gsub("[ ]*", "", text_line_mod)]
-    text[, text_line_mod_temp:=gsub("-|/|\\.|\\(|\\)|,|\\&", "", text_line_mod_temp)]
-
-    text[text_line_mod_temp %like% product_id_key, ':='(detail_id=text_line_mod_temp)]  
-    text[text_line_mod %like% "[0-9]{1,},[0-9]{1,}", ':='(detail_price=text_line_mod)]
-
-    text[detail_id=="", detail_id:=NA]
-    text[detail_price=="", detail_price:=NA]
-
-    if (nrow(text[!(is.na(detail_id))])>0) {
-        text[!(is.na(detail_id)), c("hist_id"):=gsub(paste0("(",  
-            paste0(product_id_ext_key[which(sapply(gsub("(....)(.*)", "\\1", 
-            product_id_ext_key), function(x) as.logical(grep(x,detail_id)))==TRUE)],
-            collapse="|"), ")"), "----\\1_---", 
-            detail_id), by=1:nrow(text[!(is.na(detail_id))])]
-    } else {
-        text[, hist_id:=NA]
-    }
-    text[!(hist_id %like% "---_|_---"), ':='(hist_id=NA, detail_id=NA)]
-
-    text[, hist_id:=gsub("_---[^\\-]*----", "----", hist_id)]
-    text[, hist_id:=gsub("^[^\\-]*----", "", hist_id)]
-    text[, hist_id:=gsub("_---[^\\-]*$", "", hist_id)]
-    text[, text_line_mod_temp:=NULL]
-
-    text[, c("hist_price"):="/"]
-
-    text[, hist_id:=gsub("^[ ]*|[ ]*$", "", hist_id)]
-    text[, hist_price:=gsub("^[ ]*|[ ]*$", "", hist_price)]
-
-    text[, hist_id:=hist_id[!is.na(hist_id)], by=c("item")]
-    text[, hist_price:=hist_price[!is.na(hist_price)], by=c("item")]
-
-    # split product ids and prices  (simple for now - 2 max)
-    text[hist_id %like% "----",c("hist_id_1","hist_id_2","hist_id_3"):=
-        unique(tstrsplit(hist_id,"----")), 
-        by=1:nrow(text[hist_id %like% "----"])]
-
-    text[!(hist_id %like% "----"),':='(hist_id_1=hist_id, hist_id_2="", hist_id_3=""), 
-        by=1:nrow(text[!(hist_id %like% "----")])]
-
-    ## temp ensure that no duplicates
-    text[hist_id_3==hist_id_1, hist_id_3:=NA]
-    text[hist_id_2==hist_id_1, hist_id_2:=NA]
-
-    text[,c("hist_price_1","hist_price_2"):="/", by=1:nrow(text)]
-    text[, c("hist_id", "hist_price"):=NULL]
-    text[,c(grep("hist",names(text),value=T)):=lapply(.SD,function(x) 
-        gsub("^[ ]*|[ ]*$", "",x)),.SDcols=grep("hist",names(text),value=T)]
-
-    # merge in orignal product ids
-    text <- product_id_xwalk[!is.na(id)][text, on=c(id="hist_id_1"), nomatch=NA]
-    text[, id:=NULL]
-    setnames(text, "id_orig","hist_id_1")
-    if (sum(is.na(text$hist_id_2))<nrow(text)) {
-        text <- product_id_xwalk[!is.na(id)][text, on=c(id="hist_id_2"), nomatch=NA]
-        text[, id:=NULL]
-        setnames(text, "id_orig","hist_id_2")
-    }
-    if (sum(is.na(text$hist_id_3))<nrow(text)) {
-        text <- product_id_xwalk[!is.na(id)][text, on=c(id="hist_id_3"), nomatch=NA]
-        text[, id:=NULL]
-        setnames(text, "id_orig","hist_id_3")
-    }
+    # process
+    #-----------------------------------------#
 
     # record origin file
     text[, origin_file_name:=gsub("\\.txt", "", file_name)]
@@ -215,9 +131,7 @@ lapply(file_list[start_id:length(file_list)], function(file_name) {
     # clean
     text[!(text_line_mod %like% "[a-zA-Z]{3,}") & !(text_line_mod %like% "(Stck|Stk|St)( |$)"), 
         text_line_mod:=""]
-    text <- text[!(text_line_mod=="" & is.na(detail_id))]
-    text[, detail_id:=NULL]
-    text[, detail_price:=NULL]
+    text <- text[!(text_line_mod=="")]
 
     text <- text[!(text_line_mod %like% "Seite|Datum|Ubertrag|Projekt|@|Mail|Fax|Tel|GmbH|Str\\.")]
     text[,text_line_mod:=gsub("[\\* ]*Eventualposition", "", text_line_mod),by=1:nrow(text)]
@@ -226,14 +140,9 @@ lapply(file_list[start_id:length(file_list)], function(file_name) {
 
     # location clean
     location_header <- c("Karlsruhe|Datum|Seite")
-
     location_header_pattern <- gsub("\\|$", "", paste0(location_header, sep="|"))
     text <- text[!(text_line_mod %like% location_header_pattern)]
 
-
-    # identify non products 
-    #-----------------------------------------#
-    text[, st_sum:=sum(text_line_mod %like% "(Stck|Stk|St)( |$)"), by=c("item")]
 
     # identify product count
     text[, piece_count:="/"]
@@ -247,14 +156,12 @@ lapply(file_list[start_id:length(file_list)], function(file_name) {
     text <- text[!(text_line_mod %like% "(Stck|Stk|St)( |$)")]
     text[, text_line_mod:=gsub("Übertrag:", "",text_line_mod )]
 
-    # text[st_sum==0, item:=NA]
-    # text <- text[!is.na(item)]
-
-
-    # merge
+    # collapse
     #-----------------------------------------#
     text[, prod_desc:=paste0(text_line_mod[!(text_line_mod %like% "^#")], 
         collapse="\n"), by=c("item")]
+    text[, c("hist_id_1","hist_price_1", 
+        "hist_id_2", "hist_price_2", "hist_id_3"):=""]
     dt_final <- text[, .(date_processed, prod_desc, hist_id_1, hist_price_1, 
         hist_id_2, hist_price_2, hist_id_3,
         origin_file_name, item, piece_count)]
@@ -281,43 +188,6 @@ lapply(file_list[start_id:length(file_list)], function(file_name) {
     dt_final[!is.na(get("historical product ID #1")) & prod_desc %like% zubehoer_key, 
         product_type:=paste0(product_type, "zubehoer ")]
 
-    #remove id from text 
-    #-----------------------------------------#
-    dt_final[!is.na(get("historical product ID #1")), id_temp:=gsub(" ", 
-        "",get("historical product ID #1")),
-        by=1:nrow(dt_final[!is.na(get("historical product ID #1"))])]
-    dt_final[!is.na(get("historical product ID #1")), id_temp:=
-        paste0(strsplit(get("id_temp"),"")[[1]], 
-        collapse=paste0("(",product_id_sep, ")*")),by=1:nrow(dt_final[
-        !is.na(get("historical product ID #1"))])]
-    dt_final[!is.na(get("historical product ID #1")), c("prod_desc"):=gsub(
-        id_temp, "", get("prod_desc")),
-        by=1:nrow(dt_final[!is.na(get("historical product ID #1"))])]
-
-    dt_final[!is.na(get("historical product ID #2")), id_temp:=gsub(" ", "",
-        get("historical product ID #2")),
-        by=1:nrow(dt_final[!is.na(get("historical product ID #2"))])]
-    dt_final[!is.na(get("historical product ID #2")), id_temp:=paste0(
-        strsplit(get("id_temp"),"")[[1]], 
-        collapse=paste0("(",product_id_sep, ")*")),by=1:nrow(dt_final[
-        !is.na(get("historical product ID #2"))])]
-    dt_final[!is.na(get("historical product ID #2")), c("prod_desc"):=
-    gsub(id_temp, "", get("prod_desc")),
-        by=1:nrow(dt_final[!is.na(get("historical product ID #2"))])]
-
-    dt_final[!is.na(get("historical product ID #3")), id_temp:=gsub(" ", "",
-        get("historical product ID #3")),
-        by=1:nrow(dt_final[!is.na(get("historical product ID #3"))])]
-    dt_final[!is.na(get("historical product ID #3")), id_temp:=paste0(
-        strsplit(get("id_temp"),"")[[1]], 
-        collapse=paste0("(",product_id_sep, ")*")),by=1:nrow(dt_final[
-        !is.na(get("historical product ID #3"))])]
-    dt_final[!is.na(get("historical product ID #3")), c("prod_desc"):=
-    gsub(id_temp, "", get("prod_desc")),
-        by=1:nrow(dt_final[!is.na(get("historical product ID #3"))])]
-
-    dt_final[, id_temp:=NULL]
-
     # identify item ID (internal)
     #-----------------------------------------#
     dt_final[, c("item number"):=gsub("(^[0-9\\.]*) (.*)", "\\1", get("prod_desc")), 
@@ -329,25 +199,31 @@ lapply(file_list[start_id:length(file_list)], function(file_name) {
     #-----------------------------------------#
     print(dt_final)
 
-    dt_final_identified <- dt_final[!is.na(get("historical product ID #1"))]
+    dt_final_identified <- dt_final
     dt_final_identified[, master_product_id:=0]
-    dt_final[, master_product_id:=0]
-
-    # drop prices - not important for now
-    dt_final[, c("historical price #1", "historical price #2"):=NULL]
 
     output_file   <- paste0(temp_path, "/", "order_master_database_",
         execution_id,".csv")
     
+    if (file.exists (gsub("\\.csv", paste0("_identified_", output_id, ".csv"), 
+        output_file))) {
+
+        dt_final_identified_orig      <- as.data.table(read.csv(gsub("\\.csv", 
+                paste0("_identified_", output_id, ".csv"), output_file), 
+                stringsAsFactors=F, check.names=FALSE))
+
+        dt_final_identified <- rbindlist(list(dt_final_identified_orig, 
+            dt_final_identified), use.names=T,fill=T)
+
+    }
+
+
     # generate master product id
     dt_final_identified[,master_product_id:=1:nrow(dt_final_identified)]
     setcolorder(dt_final_identified, c("master_product_id", setdiff(names(
         dt_final_identified), "master_product_id")))
 
-    dt_final[,master_product_id:=1:nrow(dt_final)]
-    setcolorder(dt_final, c("master_product_id", setdiff(names(dt_final), 
-        "master_product_id")))
-
+    set_na_zero(dt_final_identified, "  ")
     write.csv(dt_final_identified, gsub("\\.csv", paste0("_identified_", 
         output_id, ".csv"), output_file), row.names=FALSE, quote=TRUE)
     }
@@ -426,8 +302,9 @@ for (i in seq(1:ceiling(file_count_final/output_id_max))) {
 # ---------------------------
 
 # delete temp files
-inv_lapply(file_list_update, function(x) file.remove(paste0(temp_path, "/", x)))
-file.remove(paste0(temp_path, "/", "order_email_master_", execution_id, ".csv"))
+temp_list <- list.files(temp_path)
+inv_lapply(temp_list, function(x) file.rename(paste0(temp_path, "/", x), 
+     paste0(archive_path, "/",  x)))
 
 # move files to archive
 move_list <- list.files(mod_order_path)
