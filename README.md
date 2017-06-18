@@ -72,6 +72,13 @@ http://php.net/manual/en/install.windows.legacy.index.php#install.windows.legacy
 [1] Unzip local copy of repo into the chosen directory
 ````
 
+[2] Ensure that the appropriate access permissions are set to allow for batch-mode execution
+````
+[1] Execute the follwing code
+takeown /r /d y /f [....]/tool
+icacls [....]/tool /t /grant Everyone:F
+`````
+
 ##### [3] Customise the settings
 ---------------------------
 
