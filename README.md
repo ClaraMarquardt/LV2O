@@ -1,6 +1,6 @@
 ### SET-UP Instructions
 
-#### [1] Install key programs 
+##### [1] Install key programs
 ---------------------------
 
 _Note: Internet access is required for the entire set-up_
