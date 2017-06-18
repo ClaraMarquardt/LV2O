@@ -3,9 +3,9 @@
 #### [1] Install key programs (NOTE: Order in which programs are installed does NOT matter)
 ---------------------------
 
-* Note: Internet access is required for the entire set-up_
+_Note: Internet access is required for the entire set-up_
 
-* Set-up environment (IF not on Mac)
+Set-up environment (IF not on Mac)
 ````
 	## * Confirm that can access command line
 	[1] Press Start -> In Search/Run line enter "cmd" -> command line window should open
@@ -15,7 +15,7 @@
 	[2] Integrate cygwin with the windows command line - see: https://www.howtogeek.com/howto/41382/how-to-use-linux-commands-in-windows-with-cygwin/
 ````
 
-* Install R  
+Install R  
 ````	
 	## * Install R
 	[1] Install R - see: https://cran.r-project.org/bin/windows/base/
@@ -23,26 +23,28 @@
 	## * Confirm that R can be accessed from the command line
 	[1] Open the command line window -> Enter "R" -> R should start
 ````
-####Install Python 
 
+Install Python 
+````
 	## * Install Python
 	[1] Install Python - see: https://ipython.org/install.html
 
 	## * Confirm that Python can be accessed from the command line
 	[1] Open the command line window -> Enter "ipython" -> Python should start
+````
 
-####Install PHP 
-
+Install PHP 
+````
 	## * Install PHP
 	[1] Install PHP - see: http://windows.php.net/download#php-7.1
 
 	## * Confirm that PHP can be accessed from the command line
 	[1] Configure and confirm - see: 
 	http://php.net/manual/en/install.windows.legacy.index.php#install.windows.legacy.commandline
+````
 
-
-####Install the PDF parsing tools (pdftk, pdftotext/pdffonts, perl)
-
+Install the PDF parsing tools (pdftk, pdftotext/pdffonts, perl)
+````
 	## * Install PDFTK
 	[1] Install PDFTK - see: https://www.pdflabs.com/tools/pdftk-server/
 
@@ -51,7 +53,7 @@
 
 	## * Install Perl
 	[1] Install Perl - see: https://www.perl.org/get.html
-
+````
 
 ##### [2] Obtain the code repository (code & dependencies & folder structure) 
 # ---------------------------
