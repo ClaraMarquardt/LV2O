@@ -1,8 +1,9 @@
 #----------------------------------------------------------------------------#
 
-# Project:     Herkules_NLP - Master Control Settings
-# Author:      Clara Marquardt
+# Purpose:     Parse 'raw' orders
+# Author:      CM
 # Date:        Nov 2016
+# Language:    Shell (.sh)
 
 #----------------------------------------------------------------------------#
 
@@ -14,8 +15,8 @@ start=`date +%s`
 #                                   Code                                     #
 #----------------------------------------------------------------------------#
 
-# # initialise file_ids
-# #----------------------------------------------------------------------------#
+# initialise file_ids
+#----------------------------------------------------------------------------#
 
 cd "${data_path_archived_raw}"
 
@@ -99,7 +100,7 @@ for file in *; do
 
 		else 
 
-			check=`python ${wd_path_code}/stage_a/encrypt.py "${data_path_raw}"/"${file}"`
+			check=`python ${wd_path_code}/stage_a/encrypt.py "${init_path}" "${data_path_raw}"/"${file}"`
 
 			if [ "$check" = 'False' ]; then
 

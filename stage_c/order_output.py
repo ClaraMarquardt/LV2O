@@ -1,7 +1,6 @@
 #----------------------------------------------------------------------------#
 
-# Purpose:     Parse & fill out background
-# Project:     NLP Tool/Christmas Present
+# Purpose:     Parse 
 # Author:      Clara Marquardt
 # Date:        2016
 
@@ -11,159 +10,43 @@
 #                               Control Section                              #
 #----------------------------------------------------------------------------#
 
-# dependencies
-#-------------------------------------------------#
-import pdfminer
-
-from pdfminer.pdfparser import PDFParser
-from pdfminer.pdfdocument import PDFDocument
-from pdfminer.pdfpage import PDFPage
-from pdfminer.pdfpage import PDFTextExtractionNotAllowed
-from pdfminer.pdfinterp import PDFResourceManager
-from pdfminer.pdfinterp import PDFPageInterpreter
-from pdfminer.pdfdevice import PDFDevice
-from pdfminer.layout import LAParams
-from pdfminer.converter import PDFPageAggregator
-
-from openpyxl import load_workbook
-from openpyxl import Workbook
-
-import os
-import sys
-
-import re
-
-import glob
-
-from random import randint
-
-
-from PyPDF2 import PdfFileWriter, PdfFileReader
-
-import StringIO
-
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter
-from reportlab.graphics.shapes import Rect
-from reportlab.pdfgen.canvas import Canvas
-from reportlab.lib.colors import PCMYKColor, PCMYKColorSep, Color, black, blue, red, white, green
-
-import numpy as np
-import pandas as pd
-import math 
-
 # control parameters
 #-------------------------------------------------#
-print 'Number of arguments:', len(sys.argv), 'arguments.'
-# print 'Argument List:', str(sys.argv)
 
 # paths
-input_path=sys.argv[1]
-print input_path
-
-# paths
-mod_path=sys.argv[2]
-print mod_path
-
-output_path=sys.argv[3]
-print output_path
-
-doc_path=sys.argv[4]
-print doc_path
-
-doc_path=doc_path+"/output/*.xlsm"
-
-#----------------------------------------------------------------------------#
-#                          Methods/Functions                                 #
-#----------------------------------------------------------------------------#
-
-# pdfPositionHandling - parse & extract line positions
-#----------------------------------------------------------------------------#
-class pdfPositionHandling:
-
-    def parse_obj(self, lt_objs, pos_list, page_num):
-    	position_list_new=pos_list
-
-        # loop over the object list
-        for obj in lt_objs:
-
-            if isinstance(obj, pdfminer.layout.LTTextLine):
-            	# print(obj.get_text().replace('\n', '_'))
-                # print "%6d, %6d, %s" % (obj.bbox[0], obj.bbox[1], obj.get_text().replace('\n', '_'))
-				# append to list
-             	position_list_new.append([obj.bbox[0], obj.bbox[1], page_num,obj.get_text().replace('\n', '')])
-
-            # if it's a textbox, also recurse
-            if isinstance(obj, pdfminer.layout.LTTextBoxHorizontal):
-                self.parse_obj(obj._objs, position_list_new, page_num)
-
-            # if it's a container, recurse
-            elif isinstance(obj, pdfminer.layout.LTFigure):
-                self.parse_obj(obj._objs,position_list_new, page_num)
-
-    def parsepdf(self, filename, startpage, endpage):
-
-        # Open a PDF file.
-        fp = open(filename, 'rb')
-
-        # Create Position List
-        position_list=[]
-
-        # Create a PDF parser object associated with the file object.
-        parser = PDFParser(fp)
-
-        # Create a PDF document object that stores the document structure.
-        # Password for initialization as 2nd parameter
-        document = PDFDocument(parser)
-
-        # Check if the document allows text extraction. If not, abort.
-        if not document.is_extractable:
-            raise PDFTextExtractionNotAllowed
-
-        # Create a PDF resource manager object that stores shared resources.
-        rsrcmgr = PDFResourceManager()
-
-        # Create a PDF device object.
-        device = PDFDevice(rsrcmgr)
-
-        # BEGIN LAYOUT ANALYSIS
-        # Set parameters for analysis.
-        laparams = LAParams()
-
-        # Create a PDF page aggregator object.
-        device = PDFPageAggregator(rsrcmgr, laparams=laparams)
-
-        # Create a PDF interpreter object.
-        interpreter = PDFPageInterpreter(rsrcmgr, device)
+init_path=sys.argv[1]
+input_path=sys.argv[2]
+raw_input_path=sys.argv[3]
+annotated_input_path=sys.argv[4]
+execution_id=sys.argv[5]
+output_path=sys.argv[6]
+log_path=sys.argv[7]
+archive_path_input=sys.argv[8]
+archive_path_output=sys.argv[9]
+vb_input_path=sys.argv[10]
 
 
-        i = 0
-        # loop over all pages in the document
-        for page in PDFPage.create_pages(document):
-            if i >= startpage and i <= endpage:
-                # read the page into a layout object
-                interpreter.process_page(page)
-                layout = device.get_result()
+# dependencies
+#-------------------------------------------------#
+import sys
+sys.path.append(init_path)
 
-                # extract text from this object
-                # print(position_list)
-                self.parse_obj(layout._objs,position_list, i)
-                i += 1
+from python_init import *
 
-        position_list = pd.DataFrame(position_list)
-        position_list.columns=["pos_x", "pos_y", "page", "text"]
+# parameters
+#-------------------------------------------------#
 
-        return(position_list)
-
+input_path=input_path+"/*"+execution_id+".xlsm"
 
 #----------------------------------------------------------------------------#
 #                                    Code                                    #
 #----------------------------------------------------------------------------#
 
+start_time = time.time()
 
 # read in xlsx 
 #----------------------------------------------------------------------------#
-output_file_list = glob.glob(doc_path)
+output_file_list = glob.glob(input_path)
 
 order_name=[]
 order_product_code_1=[]
@@ -224,12 +107,13 @@ order_dt=pd.DataFrame({'order_name': order_name[0][1:],
 #----------------------------------------------------------------------------#
 file_list_final = order_dt['order_name']
 file_list_final = file_list_final.unique()
+file_count=len(file_list_final)
 
 for x in range(0, len(file_list_final)):
 
 
-    file_name_mod=mod_path + "/" + file_list_final[x] + '.pdf'
-    file_name_raw=input_path + "/" + file_list_final[x] + '.pdf'
+    file_name_mod=annotated_input_path + "/" + file_list_final[x] + '.pdf'
+    file_name_raw=raw_input_path + "/" + file_list_final[x] + '.pdf'
 
     print file_name_mod 
 
@@ -283,14 +167,14 @@ for x in range(0, len(file_list_final)):
         price_3=order_dt_subset['order_price_3'][y]
 
         text_1 = str(id_1) + " / " + str(price_1)
-        text_1=     re.sub("None|nan|#N/A", "", text_1)
-        text_1=     re.sub("^ / $", "", text_1)
+        text_1=  re.sub("None|nan|#N/A", "", text_1)
+        text_1=  re.sub("^ / $", "", text_1)
         text_2 = str(id_2) + " / " + str(price_2)
-        text_2=     re.sub("None|nan|#N/A", "", text_2)
-        text_2=     re.sub("^ / $", "", text_2)
+        text_2=  re.sub("None|nan|#N/A", "", text_2)
+        text_2=  re.sub("^ / $", "", text_2)
         text_3 = str(id_3) + " / " + str(price_3)
-        text_3=     re.sub("None|nan|#N/A", "", text_3)
-        text_3=     re.sub("^ / $", "", text_3)
+        text_3=  re.sub("None|nan|#N/A", "", text_3)
+        text_3=  re.sub("^ / $", "", text_3)
 
         order_id=order_dt_subset['order_id'][y]
 
@@ -362,7 +246,48 @@ email_dt['order_name_mod'] = [re.sub("^[0-9]*_", "",x) for x in  email_dt['order
 email_dt['order_name_mod'] = [re.sub("_", " ",x) for x in  email_dt['order_name_mod']]
 
 # save
-email_dt.to_csv(output_path + "/" + "email_list.csv", encoding="utf8")
+email_dt.to_csv(output_path + "/" + "email_list_" +execution_id + ".csv", encoding="utf8")
+
+end_time = time.time()
+
+# move files to archive
+
+## vb input
+
+input_file_list = glob.glob(vb_input_path +"/*"+execution_id+"*")
+
+for x in range(0, len(input_file_list)):
+
+    archive_file_path=archive_path_input
+    shutil.move(input_file_list[x], archive_file_path)
+
+
+## vb output 
+output_file_list = glob.glob(input_path)
+
+for x in range(0, len(output_file_list)):
+
+    archive_file_path=archive_path_output
+    shutil.move(output_file_list[x], archive_file_path)
+
+
+# status
+print "Number of PDFs: " + str(file_count)
+print "Runtime (minutes):" + str((end_time - start_time))
+
+orig_stdout = sys.stdout
+log_file  = open(log_path+'/log_order_output'+'.txt','a+')
+sys.stdout = log_file
+
+print "\n\n###############" 
+print "Execution ID: " + execution_id
+print "Date: " + str(datetime.date.today())
+
+print "\n\nNumber of PDFs: " + str(file_count)
+print "Runtime (minutes):" + str(end_time - start_time) 
+
+sys.stdout = orig_stdout
+log_file.close()
 
 
 #----------------------------------------------------------------------------#

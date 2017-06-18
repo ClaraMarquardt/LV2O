@@ -1,8 +1,9 @@
 // #-------------------------------------------------------------------------#
 
-// # Project:     Herkules_NLP - Extract Attachments from email
-// # Author:      Clara Marquardt
+// # Purpose:     Extract and download incoming mail attachments
+// # Author:      CM
 // # Date:        Nov 2016
+// # Language:    PHP (.php)
 
 // #----------------------------------------------------------------------------#
 
@@ -12,27 +13,31 @@
 
 <?php
 
+/* initialise */
 date_default_timezone_set('EST');
 
-/* connect to gmail */
+/* obtain environment arguments - email related */
 $hostname = '{imap.gmail.com:993/imap/ssl}INBOX';
 $username = getenv("email_address");
 $password = getenv("email_pwd");
 $subject = getenv("email_subject");
 
+/* obtain environment arguments - misc */
+$folder_output = getenv("data_path_raw");  // output folder
+$folder_temp = getenv("data_path_temp");   // temp path
+$shell_root_path = getenv("wd_path_code"); // code path
 $execution_id = getenv("execution_id");
-
-$filename_master = array();
-
 $date =  getenv("current_date");
 
-/* try to connect */
+/* initialise variables */ 
+$filename_master = array();
+
+/* try to connect to gmail */
 $inbox = imap_open($hostname,$username,$password) or die('Cannot connect to Gmail: ' . imap_last_error());
 
 /* extract emails */
 $emails = imap_search($inbox,'UNSEEN SUBJECT ' . "$subject");
-echo "number of emails: " . count($emails);
-echo "\n\n";
+echo "\n\n" . "number of emails: " . count($emails) . "\n\n";
 
 /* if emails are returned, cycle through each email */
 if($emails) {
@@ -46,10 +51,7 @@ if($emails) {
 	/* for every email... */
 	foreach($emails as $email_number) {
 
-        echo "\n\n";
-		echo "email #: " . $email_number;
-        echo "\n\n";
-
+        echo "\n\n" . "email #: " . $email_number . "\n\n";
 
         /* mark as read */
         $status = imap_setflag_full($inbox, "1", "\\Seen \\Flagged", ST_UID); 
@@ -60,28 +62,20 @@ if($emails) {
 		/* get information specific to this email */
         $message=imap_fetchbody($inbox,$email_number,1.1);
 
-        // echo $message;
-
+        /* extract email address of sender */ 
         $address = array();
 
         if (preg_match('/(.*@.*)(<mailto.*)/', $message, $address)) {
-            // echo "match";
         };
-
-        // echo $address[1];
-
-		// #----------------------------------------------#
-		// START script to extract and download attachments
-		// #----------------------------------------------#
 
         /* get information specific to this email */
         $overview = imap_fetch_overview($inbox,$email_number,0);
 
+        /* initialise attachment array */ 
         $attachments = array();
 
         /* if any attachments found... */
         if(isset($structure->parts) && count($structure->parts)) 
-
 
         {
             for($i = 0; $i < count($structure->parts); $i++) 
@@ -138,15 +132,9 @@ if($emails) {
 
         }
 
-        echo "number of attachments: ".count($attachments);
-        echo "\n\n";
+        echo "number of attachments: ".count($attachments) . "\n\n";
 
         /* iterate through each attachment and save it */
-        $folder = getenv("data_path_raw");
-        if(!is_dir($folder)) {
-            mkdir($folder);
-		}
-
         for($j = 0; $j < count($attachments); $j++) {
 
             $attachment_number=$email_number+$j;
@@ -154,7 +142,7 @@ if($emails) {
             $filename_raw = iconv_mime_decode($attachments[$j]["filename"]);
             $ext = pathinfo($filename_raw, PATHINFO_EXTENSION);
    
-           if( $ext == 'PDF' | $ext == 'pdf') {
+            if( $ext == 'PDF' | $ext == 'pdf') {
                 
                 echo iconv_mime_decode($attachments[$j]["filename"]);
 
@@ -165,10 +153,8 @@ if($emails) {
                 $filename = $filename . "_RAW_" . $execution_id . ".pdf";
 
                 echo $filename;
-        	    echo "attachment #: " . $j;
-                echo "\n\n";
+        	    echo "attachment #: " . $j . "\n\n";
 
-                #push to arrays
                 $filename_master[$attachment_number] = array();
                 $filename_master[$attachment_number]["filename"] = $filename;
                 $filename_master[$attachment_number]["address"] = $address[1];
@@ -178,7 +164,7 @@ if($emails) {
                 if($attachments[$j]['is_attachment'] == 1)
                 {
 
-                    $filepath = $folder ."/". $filename;
+                    $filepath = $folder_output ."/". $filename;
 
                     $fp = fopen($filepath,"w+");
                     fwrite($fp, $attachments[$j]['attachment']);
@@ -186,11 +172,6 @@ if($emails) {
                 }
             }
         }
-
-        // #----------------------------------------------#
-		// END script to extract and download attachments
-		// #----------------------------------------------#
-
 
     }
 }
@@ -202,9 +183,7 @@ imap_close($inbox);
 /* generate master file */
 echo $filename_master;
 
-$folder = getenv("data_path_temp");
-$filepath = $folder ."/". "order_email_master_" . "$execution_id" . ".csv";
-
+$filepath = $folder_temp ."/". "order_email_master_" . "$execution_id" . ".csv";
 $fp = fopen($filepath, 'w');
 
 foreach ($filename_master as $fields) {
@@ -213,17 +192,12 @@ foreach ($filename_master as $fields) {
 
 fclose($fp);
 
-
 /* parse all attachments - shell script */
 $shell_file =  'order_parse.sh';
-$shell_root_path = getenv("wd_path_code");
-
 $shell_path = "$shell_root_path" . "/" . "stage_a" . "/" .  "$shell_file";
-echo $shell_path;
 shell_exec("sh $shell_path");
 
-
- ?>
+?>
 
 // #----------------------------------------------------------------------------#
 // #                                    End                                     #

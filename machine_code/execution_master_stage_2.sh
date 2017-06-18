@@ -1,8 +1,7 @@
 #----------------------------------------------------------------------------#
 
 # Purpose:     Master Execution Script - Stage 2
-# Project:     Sales_Tool
-# Author:      Clara Marquardt
+# Author:      CM
 # Date:        Jan 2017
 # Language:    Shell (.sh)
 
@@ -10,7 +9,7 @@
 
 # Settings
 #----------------------------------------------------------------------------#
-source helper/setting/setting.sh
+source code_base/machine_code/setting.sh
 
 #----------------------------------------------------------------------------#
 #----------------------------------------------------------------------------#
@@ -25,40 +24,32 @@ source helper/setting/setting.sh
 #----------------------------------------------------------------------------#
 
 # Stage-c: Annotate PDFs
-#----------------------------------------------------------------------------#
-# cd ${annotated_hist_code_path}
-# python order_output.py "${annotated_sample_raw_hist_path}" ${final_annotated_sample_hist_path} \
-# 	"${final_output_sample_hist_path}" "${doc_path}"
+# ----------------------------------------------------------------------------#
+cd ${wd_path_code}/stage_c
 
-# execute
-#---------------------------------------------------#
-# cd ${wd_code_path}/stage_d
-# npm start
+ipython order_output.py "${init_path}" "${vb_path_output}" "${data_path_archived_raw}" \
+	"${data_path_archived_structured}" "${execution_id}" \
+	"${data_path_annotated}" "${wd_path_log}" "${data_path_archived_vb_input}" \
+	"${data_path_archived_vb_output}" "$vb_path_input"
 
-#----------------------------------------------------------------------------#
-#----------------------------------------------------------------------------#
-# Execution Commmand #3
-#----------------------------------------------------------------------------#
-#----------------------------------------------------------------------------#
 
 # Stage-d: Generate and mail out identified PDFs
 # ----------------------------------------------------------------------------#
 
 # execute
 #---------------------------------------------------#
+cd ${wd_path_code}/stage_d
 
-# cd ${annotated_hist_code_path}
+php "send_email.php"
 
-# ${php_path}/php "send_email.php"
+## move processed files to archive
+cd "${data_path_annotated}"
 
-# Stage-e: Generate and mail out identified PDFs
-# ----------------------------------------------------------------------------#
+for file in *; do
 
-# compile log files
-#---------------------------------------------------#
+	mv $file $data_path_archived_annotated
 
-# cd ${annotated_hist_code_path}
-
+done
 
 #----------------------------------------------------------------------------#
 #                                    End                                     #

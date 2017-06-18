@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 #----------------------------------------------------------------------------#
 
-# Purpose:     Parse & fill out background
-# Project:     NLP Tool/Christmas Present
+# Purpose:     Parse 
 # Author:      Clara Marquardt
 # Date:        2016
 
@@ -12,169 +11,31 @@
 #                               Control Section                              #
 #----------------------------------------------------------------------------#
 
-# dependencies
-#-------------------------------------------------#
-import pdfminer
-
-from pdfminer.pdfparser import PDFParser
-from pdfminer.pdfdocument import PDFDocument
-from pdfminer.pdfpage import PDFPage
-from pdfminer.pdfpage import PDFTextExtractionNotAllowed
-from pdfminer.pdfinterp import PDFResourceManager
-from pdfminer.pdfinterp import PDFPageInterpreter
-from pdfminer.pdfdevice import PDFDevice
-from pdfminer.layout import LAParams
-from pdfminer.converter import PDFPageAggregator
-
-import os, shutil
-import sys
-import datetime
-
-import re
-
-import glob
-
-from random import randint
-
-
-from PyPDF2 import PdfFileWriter, PdfFileReader
-import StringIO
-
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter
-from reportlab.graphics.shapes import Rect
-from reportlab.pdfgen.canvas import Canvas
-from reportlab.lib.colors import PCMYKColor, PCMYKColorSep, Color, black, blue, red, white, green
-
-import time
-
-import numpy as np
-import pandas as pd
-
-## ignore warnings
-import warnings
-warnings.filterwarnings("ignore")
-
-
 # control parameters
 #-------------------------------------------------#
-# print 'Number of arguments:', len(sys.argv), 'arguments.'
-# print 'Argument List:', str(sys.argv)
 
 # paths
-input_path=sys.argv[1]
-# print input_path
+init_path=sys.argv[1]
+input_path=sys.argv[2]
+output_path=sys.argv[3]
+error_path=sys.argv[4]
+archive_path=sys.argv[5]
+log_path=sys.argv[6]
+execution_id=sys.argv[7]
 
-# input_file_path=input_path+"/*_[0-9].pdf"
+# dependencies
+#-------------------------------------------------#
+import sys
+sys.path.append(init_path)
+
+from python_init import *
+
+# parameters
+#-------------------------------------------------#
+
+# input path
 input_file_path=input_path+"/*.pdf"
 input_file_path_list= glob.glob(input_file_path)
-
-output_path=sys.argv[2]
-# print output_path
-
-error_path=sys.argv[3]
-# print error_path
-
-archive_path=sys.argv[4]
-# print error_path
-
-log_path=sys.argv[5]
-execution_id=sys.argv[6]
-# # set wd
-# os.chdir(wd_path)
-
-
-#----------------------------------------------------------------------------#
-#                          Methods/Functions                                 #
-#----------------------------------------------------------------------------#
-
-# pdfPositionHandling - parse & extract line positions
-#----------------------------------------------------------------------------#
-class pdfPositionHandling:
-
-    def parse_obj(self, lt_objs, pos_list, page_num):
-    	position_list_new=pos_list
-
-        # loop over the object list
-        for obj in lt_objs:
-
-            if isinstance(obj, pdfminer.layout.LTTextLine):
-            	# print(obj.get_text().replace('\n', '_'))
-             #    print "%6d, %6d, %s" % (obj.bbox[0], obj.bbox[1], obj.get_text().replace('\n', '_'))
-				# append to list
-             	position_list_new.append([obj.bbox[0], obj.bbox[1], page_num,obj.get_text().replace('\n', '')])
-
-            # if it's a textbox, also recurse
-            if isinstance(obj, pdfminer.layout.LTTextBoxHorizontal):
-                # print "textbox"
-                self.parse_obj(obj._objs, position_list_new, page_num)
-
-            # if it's a container, recurse
-            elif isinstance(obj, pdfminer.layout.LTFigure):
-                # print "container"
-                self.parse_obj(obj._objs,position_list_new, page_num)
-
-    def parsepdf(self, filename, startpage, endpage):
-
-        # Open a PDF file.
-        fp = open(filename, 'rb')
-
-        # Create Position List
-        position_list=[]
-
-        # Create a PDF parser object associated with the file object.
-        parser = PDFParser(fp)
-
-        # Create a PDF document object that stores the document structure.
-        # Password for initialization as 2nd parameter
-        document = PDFDocument(parser)
-
-        # Check if the document allows text extraction. If not, abort.
-        if not document.is_extractable:
-            raise PDFTextExtractionNotAllowed
-
-        # Create a PDF resource manager object that stores shared resources.
-        rsrcmgr = PDFResourceManager()
-
-        # Create a PDF device object.
-        device = PDFDevice(rsrcmgr)
-
-        # BEGIN LAYOUT ANALYSIS
-        # Set parameters for analysis.
-        laparams = LAParams()
-
-        # Create a PDF page aggregator object.
-        device = PDFPageAggregator(rsrcmgr, laparams=laparams)
-
-        # Create a PDF interpreter object.
-        interpreter = PDFPageInterpreter(rsrcmgr, device)
-
-
-        i = 0
-        # loop over all pages in the document
-        for page in PDFPage.create_pages(document):
-            if i >= startpage and i <= endpage:
-                # read the page into a layout object
-                interpreter.process_page(page)
-                layout = device.get_result()
-
-                # extract text from this object
-                # print(position_list)
-                self.parse_obj(layout._objs,position_list, i)
-                i += 1
-
-        position_list = pd.DataFrame(position_list)
-        position_list.columns=["pos_x", "pos_y", "page", "text"]
-
-        return(position_list)
-
-def flatten_list(container):
-    for i in container:
-        if isinstance(i, (list,tuple)):
-            for j in flatten_list(i):
-                yield j
-        else:
-            yield i
 
 #----------------------------------------------------------------------------#
 #                                    Code                                    #
@@ -211,7 +72,6 @@ for x in range(0, len(input_file_path_list)):
         
         # coordinates
         x_min = min(position.ix[position.page==existing_pdf_page_number-1][position.pos_x>0]["pos_x"])
-        # x_min = min(position[position.pos_x>0]["pos_x"])
         x_min_min = x_min-15
         x_min_max = x_min+15
 
@@ -229,9 +89,6 @@ for x in range(0, len(input_file_path_list)):
             if(len(temp_1)==0):
                 temp_1 = np.array(position_page[position_page.pos_x<=x_min_max][:-1][
                     position_page["text"].str.contains("(^[0-9]+(\\.)*)")].text)
-            # temp_date = np.array(position_page[position_page.pos_x<=x_min_max][
-            #          position_page["text"].str.contains("(^[0-9]+(\\.)+[0-9]+(\\.|[0-9])+(2016|2017))"+
-            #          "|([0-9]+(\\.)+[0-9]+(\\.|[0-9])+(2016|2017)$)")].text)
             temp_date = np.array(position_page[position_page.pos_x<=x_min_max][
                      position_page["text"].str.contains("(^[ ]*[0-9][0-9](\\.)+[0-9][0-9](\\.)+(20)*(16|17))"+
                      "|([0-9][0-9](\\.)+[0-9][0-9](\\.)+(20)*(16|17))[ ]*$")].text)
@@ -285,10 +142,6 @@ for x in range(0, len(input_file_path_list)):
             temp_1 = temp_1.ix[temp_1.text_mod>=max_step]
             temp_1_index = temp_1.index
             temp_1 = np.array(temp_1.pos_y)+10 
-            # temp_2 = np.array(position_page[
-            #         position_page["text"].str.contains("[0-9,\\.’ ]*Stck|Stk|St")].pos_y)-10
-            # temp_2_index = position_page[
-            #         position_page["text"].str.contains("[0-9,\\.’ ]*Stck|Stk|St")].index
             temp_date = np.array(position_page[position_page.pos_x<=x_min_max][
                         position_page["text"].str.contains("([0-9]+([^A-Za-z])*(2016|2017))|"
                         "([0-9]+([^A-Za-z])*(2016|2017))")].pos_y)+10  
@@ -371,7 +224,6 @@ for x in range(0, len(input_file_path_list)):
         print "Error encountered"
 
         error_file_path = error_path + "/"+ fname_abb
-        # os.rename(fname, error_file_path)
         shutil.copyfile(fname, error_file_path)
         archive_file_path=archive_path + "/"+ fname_abb
         shutil.move(fname, archive_file_path)

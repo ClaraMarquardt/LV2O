@@ -1,8 +1,7 @@
 #----------------------------------------------------------------------------#
 
 # Purpose:     Master Execution Script - Stage 1
-# Project:     Sales_Tool
-# Author:      Clara Marquardt
+# Author:      CM
 # Date:        Jan 2017
 # Language:    Shell (.sh)
 
@@ -10,7 +9,7 @@
 
 # Settings
 #----------------------------------------------------------------------------#
-source helper/setting/setting.sh
+source code_base/machine_code/setting.sh
 
 #----------------------------------------------------------------------------#
 #                         Step-by-Step Tool Execution                        #
@@ -22,13 +21,13 @@ source helper/setting/setting.sh
 #----------------------------------------------------------------------------#
 #----------------------------------------------------------------------------#
 
-# Stage-a: Extract relevant PDFs from emails
+# Stage-a: Extract relevant PDFs from all incoming emails
 #----------------------------------------------------------------------------#
 
 # execute
 #---------------------------------------------------#
 cd ${wd_path_code}/stage_a
-${php_path}/php  email_extract.php
+php email_extract.php
 
 # Stage-b: Split PDFs
 #----------------------------------------------------------------------------#
@@ -37,7 +36,7 @@ ${php_path}/php  email_extract.php
 #---------------------------------------------------#
 cd ${wd_path_code}/stage_b
 
-python order_parse.py "${data_path_parsed}" \
+python order_parse.py "${init_path}", "${data_path_parsed}" \
 	"${data_path_structured}" "${error_path_parsed}" "${data_path_archived_parsed}" \
 	"${wd_path_log}" "${execution_id}" &
 
@@ -52,11 +51,15 @@ done
 
 # execute
 #---------------------------------------------------#
-cd ${data_path_structured}
+cd ${wd_path_code}/stage_b
 
-R CMD BATCH "--args ${data_path_structured} ${vb_path_input} ${helper_path_keyword} \
-	${execution_id}  ${wd_path_log} ${data_path_temp} ${data_path_archived_structured}" order_clean.R
+R CMD BATCH --nosave "--args ${init_path} ${data_path_structured} ${vb_path_input} ${helper_path_keyword} \
+	${execution_id}  ${wd_path_log} ${data_path_temp} \
+	${data_path_archived_structured}" order_clean.R
 
+## delete output file
+rm order_clean.Rout
+rm .RData
 
 #----------------------------------------------------------------------------#
 #----------------------------------------------------------------------------#

@@ -1,6 +1,6 @@
 // #-------------------------------------------------------------------------#
 
-// # Project:     Herkules_NLP - Extract Attachments from email
+// # Purpose:     Extract Attachments from email
 // # Author:      Clara Marquardt
 // # Date:        Nov 2016
 // # Notes:       see http://stackoverflow.com/questions/5335273/how-to-send-an-email-using-php
@@ -14,16 +14,18 @@
 require 'PHPMailerAutoload.php';
 
 date_default_timezone_set('EST');
-$file_path = getenv("final_output_sample_hist_path");
+$file_path = getenv("data_path_annotated");
 $username = getenv("email_address");
 $password = getenv("email_pwd");
+$execution_id = getenv("execution_id");
+$log_path = getenv("wd_path_log");
 
 /* obtain email list & product list - read in txt file */
 $file_list = array("xx");
 $email_list = array("xx");
 $file_list_mod = array("xx");
 
-$csvFile = $file_path . "/" . 'email_list.csv';
+$csvFile = $file_path . "/" . 'email_list_' . $execution_id . '.csv';
 
 $file = fopen($csvFile,"r");
 
@@ -51,11 +53,16 @@ fclose($file);
 
 
 $length = count($file_list);
-echo $length;
+// echo $length;
 for ($i = 1; $i < $length-1; $i++) {
+
+
 
     /* obtain data */
     $file = $file_list[$i+1];
+
+    if(!($file === ".pdf")) {
+    // echo $file;
     $email_to = $email_list[$i+1];
     $file_mod = $file_list_mod[$i+1];
 
@@ -68,17 +75,17 @@ for ($i = 1; $i < $length-1; $i++) {
 
     $email->IsSMTP();                           
     $email->Host       = "smtp.gmail.com"; 
-    $email->SMTPDebug  = 2;                     
+    $email->SMTPDebug  = 0;                     
     $email->SMTPAuth   = true;                  
     $email->SMTPSecure = "tls";                       
     $email->Port       = 587;                       
     $email->Username   = $username;  
     $email->Password   = $password;           
 
-    $email->SetFrom('marquardt.clara@gmail.com', 'Supperhuhn Company');
+    $email->SetFrom($username, 'XXXXX Company');
     
     /* body */ 
-    $msg = "Please see the attached product information. We look forward to hearing back from you.\n\n Should you have any further questions please feel free to reach out to us.\n\nSupperhuhn Company";
+    $msg = "Please see the attached product information. We look forward to hearing back from you.\n\n Should you have any further questions please feel free to reach out to us.\n\nXXXX Company";
     $msg=wordwrap($msg,70);
 
     /* create email */ 
@@ -87,11 +94,10 @@ for ($i = 1; $i < $length-1; $i++) {
     $email->AddAddress($email_to);
 
     $email->AddAttachment( $file_path . "/" . $file , $file_mod);
-    $email->AddAttachment( $file_path . "/" . 'chicken.jpg');
 
 
     /* print status */ 
-    echo "sent " . $file . "to " . $email_to;
+    echo "sent " . $file . " to " . $email_to;
     echo "\n\n";
     $email->send();
     if(!$email->send()) {
@@ -101,6 +107,23 @@ for ($i = 1; $i < $length-1; $i++) {
         echo 'Message has been sent';
     }
 
+
+    ## save to log file
+    $log_path = $log_path . '/' . 'send_email.txt';   
+    $fp = fopen($log_path,"a");
+
+    
+    $execution_id = "########\n\nExecution ID: " . $execution_id . "\n";
+    fwrite($fp,$execution_id);
+    
+    $date_text =  "Date: " . date('Y-m-d H:i:s') . "\n\n";
+    fwrite($fp,$date_text);
+    
+    $content = "sent " . $file . " to " . $email_to . "\n";
+    fwrite($fp,$content);
+
+    fclose($fp);
+}
 
 };
 
