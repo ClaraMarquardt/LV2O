@@ -31,7 +31,8 @@ pdftotext # should return description of tool
 into a new file named 'php.ini' (in the same directory)
 
 [2] Check that php has been succesfully configured to use the above created php.ini' file: 
-Execute the below code (command line) and confirm that the line ~ "Loaded Configuration File =>" points to the 'php.ini' file created above
+Execute the below code (command line) and confirm that the line ~ "Loaded Configuration File =>" 
+points to the 'php.ini' file created above
 php -r 'phpinfo();'
 
 [3] Open the newly created 'php.ini' file and find the line ";extension=php_imap.dll" - 
