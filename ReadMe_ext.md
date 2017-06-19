@@ -27,13 +27,17 @@ pdftotext # should return description of tool
 
 [2] Enable the imap extension
 ````
-[1] Copy the contents of the 'php.ini-production' file (stored in the unzipped directory) into a new file named 'php.ini' (in the same directory)
+[1] Copy the contents of the 'php.ini-production' file (stored in the unzipped directory) 
+into a new file named 'php.ini' (in the same directory)
 
-[2] Check that php has been succesfully configured to use the above created php.ini' file: Execute the below code (command line) and confirm that the line ~ "Loaded Configuration File =>" points to the 'php.ini' file created above
+[2] Check that php has been succesfully configured to use the above created php.ini' file: 
+Execute the below code (command line) and confirm that the line ~ "Loaded Configuration File =>" points to the 'php.ini' file created above
 php -r 'phpinfo();'
 
-[3] Open the newly created 'php.ini' file and find the line ";extension=php\_imap.dll" - uncomment this line by removing the semicolon (the line should read: "extension=php_imap.dll")
+[3] Open the newly created 'php.ini' file and find the line ";extension=php_imap.dll" - 
+uncomment this line by removing the semicolon (the line should read: "extension=php_imap.dll")
 
-[4] Confirm that the imap extension has been enabled by executing the below code (command line). Confirm that 'imap' is returned as one of the loaded extensions
+[4] Confirm that the imap extension has been enabled by executing the below code (command line). 
+Confirm that 'imap' is returned as one of the loaded extensions
 php -r 'print_r(get_loaded_extensions());
 ````
