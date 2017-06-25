@@ -188,10 +188,6 @@ foreach ($filename_master as $fields) {
 
 fclose($fp);
 
-/* parse all attachments - shell script */
-$shell_file =  'order_parse.sh';
-$shell_path = "$shell_root_path" . "/" . "stage_a" . "/" .  "$shell_file";
-shell_exec("sh $shell_path");
 
 }
 

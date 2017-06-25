@@ -49,6 +49,7 @@ cd "${data_path_raw}"
 for file in *; do
 
 	# file_name  mod
+    # echo $file
 	file_mod="${file//  / }"
 	file_mod="${file_mod// /_}"
 	file_mod="${file_mod//-/_}"
@@ -67,10 +68,13 @@ for file in *; do
 
 	# move
 	mv $file $file_mod 
+	sleep 1
 
 	((file_id++))
 
 done
+
+sleep 1
 
 # parse
 #----------------------------------------------------------------------------#
@@ -136,9 +140,8 @@ for file in *; do
 			fi
 		fi 
 
-		rm temp.pdf
-
-		mv $file $data_path_archived_raw/$file
+		[ -e temp.pdf ] && rm temp.pdf
+		[ -e $file ] && mv $file $data_path_archived_raw/$file
 
 	((total_file++))
 	fi

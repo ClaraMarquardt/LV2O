@@ -29,6 +29,9 @@ source code_base/machine_code/setting.sh
 cd ${wd_path_code}/stage_a
 php email_extract.php
 
+cd ${wd_path_code}/stage_a
+source order_parse.sh
+
 # Stage-b: Split PDFs
 #----------------------------------------------------------------------------#
 
