@@ -42,3 +42,11 @@ uncomment this line by removing the semicolon (the line should read: "extension=
 Confirm that 'imap' is returned as one of the loaded extensions
 php -r 'print_r(get_loaded_extensions());
 ````
+
+##### [3] Install Windows compatible tesseract pipeline (ocrmypdf)
+---------------------------
+[1] Install ocrmypdf
+````
+[0] Follow the instructions provided here: https://ocrmypdf.readthedocs.io/en/latest/installation.html ("Installing the Docker Image"). Select the "ocrmypdf-tess4" docker image to ensure that german language support is installed
+[1] Set-up the docker alias & test that can convert pdf from the command line
+````

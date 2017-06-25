@@ -111,7 +111,7 @@ pip install -r [...]/tool/code_base/helper_code/python_dependency.txt
 ````
 [1] Start the command line window
 [2] Execute the following code 
-R CMD BATCH --nosave [...]/tool/code_base/helper_code/R_dependency.R
+R CMD BATCH --no-save [...]/tool/code_base/helper_code/R_dependency.R
 ````
 
 ### EXECUTION Instructions

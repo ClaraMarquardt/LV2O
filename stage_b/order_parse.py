@@ -36,6 +36,7 @@ from python_init import *
 
 # input path
 input_file_path=input_path+"/*.pdf"
+input_file_path=os.path.normpath(input_file_path)
 input_file_path_list= glob.glob(input_file_path)
 
 #----------------------------------------------------------------------------#
@@ -72,7 +73,10 @@ for x in range(0, len(input_file_path_list)):
         #----------------------------------------------------------------------------#
         
         # coordinates
-        x_min = min(position.ix[position.page==existing_pdf_page_number-1][position.pos_x>0]["pos_x"])
+        x_min = min(position.ix[position.page==existing_pdf_page_number-1][position["text"].str.contains(":")==False][ 
+            position["text"].str.contains("^[ ]*[0-9]")==True][position.pos_x>0 ]["pos_x"])
+        if (x_min>np.mean(position["pos_x"])): 
+            print error
         x_min_min = x_min-15
         x_min_max = x_min+15
 
@@ -91,11 +95,9 @@ for x in range(0, len(input_file_path_list)):
                 temp_1 = np.array(position_page[position_page.pos_x<=x_min_max][:-1][
                     position_page["text"].str.contains("(^[0-9]+(\\.)*)")].text)
             temp_date = np.array(position_page[position_page.pos_x<=x_min_max][
-                     position_page["text"].str.contains("(^[ ]*[0-9][0-9](\\.)+[0-9][0-9](\\.)+(20)*(16|17))"+
-                     "|([0-9][0-9](\\.)+[0-9][0-9](\\.)+(20)*(16|17))[ ]*$")].text)
-        
+                     position_page["text"].str.contains("((^[ ]*[0-9][0-9](\\.)+[0-9][0-9](\\.)+(20)*(16|17))"+
+                     "|([0-9][0-9](\\.)+[0-9][0-9](\\.)+(20)*(16|17))|([0-9][0-9](\\.|-)+[0-9][0-9].*:.*)[ ]*$)|(Tel\\.|Fax\\.)")].text)
             temp = np.setdiff1d(temp_1, temp_date)
-
             if(len(temp)>0):
                 temp_step = np.hstack(np.array([re.sub("^[ ]*|[ ]$","", x).split(" ") for x in temp]))
                 regex = re.compile('[0-9]')
@@ -146,7 +148,7 @@ for x in range(0, len(input_file_path_list)):
                         "([0-9]+([^A-Za-z])*(2016|2017))")].pos_y)+10  
             temp_date_index = position_page[position_page.pos_x<=x_min_max][
                          position_page["text"].str.contains("([0-9]+([^A-Za-z])+[0-9]*(2016|2017))|"
-                         "([0-9]+([^A-Za-z])+[0-9]\*(2016|2017))")].index        
+                         "([0-9]+([^A-Za-z])+[0-9]\*(2016|2017))|(Tel\\.|Fax\\.)")].index        
             temp = np.concatenate([temp_1], axis=0)
             if (len(temp_date)>0):
                 temp = np.setdiff1d(temp, temp_date)[::-1]
@@ -205,7 +207,9 @@ for x in range(0, len(input_file_path_list)):
             output.addPage(page)
 
         # save 
-        outputStream = file(output_path + "/"+ fname_abb, "wb")
+        file_name = output_path + "/"+ fname_abb
+        file_name = os.path.normpath(file_name)
+        outputStream = file(file_name, "wb")
         output.write(outputStream)
         outputStream.close()
 
@@ -214,6 +218,7 @@ for x in range(0, len(input_file_path_list)):
 
         # move file
         archive_file_path=archive_path + "/"+ fname_abb
+        archive_file_path=os.path.normpath(archive_file_path)
         shutil.move(fname, archive_file_path)
 
 
@@ -221,8 +226,10 @@ for x in range(0, len(input_file_path_list)):
         print "Error encountered"
 
         error_file_path = error_path + "/"+ fname_abb
+        error_file_path=os.path.normpath(error_file_path)
         shutil.copyfile(fname, error_file_path)
         archive_file_path=archive_path + "/"+ fname_abb
+        archive_file_path=os.path.normpath(archive_file_path)
         shutil.move(fname, archive_file_path)
 
 
@@ -237,7 +244,9 @@ print "Number of PDFs parsed succesfully: " + str(file_count_sucess)
 print "Runtime (minutes):" + str((end_time - start_time))
 
 orig_stdout = sys.stdout
-log_file  = open(log_path+'/log_order_parse_py'+'.txt','a+')
+file_name=log_path+'/log_order_parse_py'+'.txt'
+file_name=os.path.normpath(file_name)
+log_file  = open(file_name,'a+')
 sys.stdout = log_file
 
 print "\n\n###############" 

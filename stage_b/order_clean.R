@@ -93,22 +93,22 @@ lapply(file_list[start_id:length(file_list)], function(file_name) {
     # identify product breaks
     #-----------------------------------------#
     text[,item:=""]
-    text[which(text_line %like% "^#"), item:=1:length(which(text_line %like% "^#"))]
+    text[which(text_line %like% "^[ ]*#"), item:=1:length(which(text_line %like% "^[ ]*#"))]
     text[, item:=as.integer(item)]
 
     if (is.na(text[1]$item)) text[1, item:=0]
     text[, item:=na.locf(item)]
     text <- text[!(item==0)]
 
-    if (nrow(text)>0){
+    if (nrow(text)>0 && nrow(text[!(text_line %like% "^#")])>0) {
 
     # clean 
     #-----------------------------------------#
     text[,text_line_mod:=""]
-    text[!(text_line %like% "^#"), text_line_mod:=gsub("(.*)([ ]{15,})([a-zA-Z*]{1,}.*)", 
-        "\\3", text_line), by=1:nrow(text[!(text_line %like% "^#")])]
-    text[(text_line %like% "^#"), text_line_mod:=gsub("(#order-item: [0-9]*)(.*)", 
-        "\\1", text_line), by=1:nrow(text[(text_line %like% "^#")])]
+    text[!(text_line %like% "^[ ]*#"), text_line_mod:=gsub("(.*)([ ]{15,})([a-zA-Z*]{1,}.*)", 
+        "\\3", text_line), by=.I]
+    text[(text_line %like% "^[ ]*#"), text_line_mod:=gsub("(#order-item: [0-9]*)(.*)", 
+        "\\1", text_line), by=.I]
 
     print(head(text))
 
@@ -146,11 +146,12 @@ lapply(file_list[start_id:length(file_list)], function(file_name) {
 
     # identify product count
     text[, piece_count:="/"]
-    text[text_line_mod %like% "(Stck|Stk|St)( |$)", 
-        c("piece_count"):=gsub("[^0-9,]","", text_line_mod), 
-        by=1:nrow(text[text_line_mod %like% "(Stck|Stk|St)( |$)"])]
-    text[, c("piece_count"):=paste0(get("piece_count")[!(get("piece_count")=="/")], 
-        collapse=" --- "), by=c("item")]
+    if (nrow(text[text_line_mod %like% "(Stck|Stk|St)( |$)"])>0) {
+        text[text_line_mod %like% "(Stck|Stk|St)( |$)", 
+            c("piece_count"):=gsub("[^0-9,]","", text_line_mod), by=.I]
+        text[, c("piece_count"):=paste0(get("piece_count")[!(get("piece_count")=="/")], 
+          collapse=" --- "), by=c("item")]
+    } 
 
     # clean extended
     text <- text[!(text_line_mod %like% "(Stck|Stk|St)( |$)")]
@@ -158,7 +159,7 @@ lapply(file_list[start_id:length(file_list)], function(file_name) {
 
     # collapse
     #-----------------------------------------#
-    text[, prod_desc:=paste0(text_line_mod[!(text_line_mod %like% "^#")], 
+    text[, prod_desc:=paste0(text_line_mod[!(text_line_mod %like% "^[ ]*#")], 
         collapse="\n"), by=c("item")]
     text[, c("hist_id_1","hist_price_1", 
         "hist_id_2", "hist_price_2", "hist_id_3"):=""]
@@ -255,6 +256,7 @@ output_id_max <- 8
 # import email master (to be merged in)
 email_file <- fread(paste0(temp_path, "/", "order_email_master_", 
     execution_id, ".csv"), header=FALSE)
+email_file[, name_temp:=gsub("(.*_)(RAW)(.*)", "\\2\\3", V1), by=1:nrow(email_file)]
 
 # loop over files
 for (i in seq(1:ceiling(file_count_final/output_id_max))) {
@@ -274,9 +276,9 @@ for (i in seq(1:ceiling(file_count_final/output_id_max))) {
 
     # merge in email master
     temp_comb[, name_temp:=paste0(get("source order file name"), ".pdf"), by=1:nrow(temp_comb)]
-    temp_comb[, name_temp:=gsub("(^[0-9]*_)", "", name_temp),  by=1:nrow(temp_comb)]
-    temp_comb <- email_file[, .(V1, V2)][temp_comb, on=c(V1="name_temp"), nomatch=NA]
-    temp_comb[, V1:=NULL]
+    temp_comb[, name_temp:=gsub("(.*_)(RAW_)(.*)", "\\2\\3", name_temp),  by=1:nrow(temp_comb)]
+    temp_comb <- email_file[, .(name_temp, V2)][temp_comb, on=c(name_temp="name_temp"), nomatch=NA]
+    temp_comb[, name_temp:=NULL]
     setnames(temp_comb, "V2", "source_email")
 
     # format

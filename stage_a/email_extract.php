@@ -150,12 +150,14 @@ if($emails) {
                 $filname_mod = array();
                 preg_match('/(.*)(.pdf)/', $filename_raw, $filname_mod);
                 $filename = $filname_mod[1];
-                $filename = $filename . "_RAW_" . $execution_id . ".pdf";
+                $filename = $filename . "_RAW_" . $email_number . $j . "_" . $execution_id . ".pdf";
 
-                $filename_master[$attachment_number] = array();
-                $filename_master[$attachment_number]["filename"] = $filename;
-                $filename_master[$attachment_number]["address"] = $address[1];
-                $filename_master[$attachment_number]["date"] = $date;
+                $attachment_number_id = sizeof($filename_master);
+                $attachment_number_id = $attachment_number_id + 1;
+                $filename_master[$attachment_number_id] = array();
+                $filename_master[$attachment_number_id]["filename"] = $filename;
+                $filename_master[$attachment_number_id]["address"] = $address[1];
+                $filename_master[$attachment_number_id]["date"] = $date;
 
                 if($attachments[$j]['is_attachment'] == 1)
                 {

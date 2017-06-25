@@ -51,9 +51,19 @@ for file in *; do
 	# file_name  mod
 	file_mod="${file//  / }"
 	file_mod="${file_mod// /_}"
+	file_mod="${file_mod//-/_}"
+	file_mod="${file_mod//._/_}"
+	file_mod="${file_mod//ä/a}"
+	file_mod="${file_mod//ü/u}"
+	file_mod="${file_mod//ö/o}"
+	file_mod="${file_mod//Ä/a}"
+	file_mod="${file_mod//Ü//U}"
+	file_mod="${file_mod//Ö/O}"
+	file_mod="${file_mod//Ü//U}"
+	file_mod="${file_mod//ß/s}"
 	file_mod="${file_mod//PDF/pdf}"
 	file_mod=${file_id}_${file_mod}
-	echo $file_mod
+	# echo $file_mod
 
 	# move
 	mv $file $file_mod 
@@ -80,8 +90,19 @@ for file in *; do
 
     find . -type f -name $file -exec perl -pi -e 's/Annots/ffffff/g' {} +
 
-
 	if [ "$file" != 'temp.pdf' ]; then
+
+	    # pdfsandwich -lang deu $file -o $file [GOOD QUALITY & TESTED  vs. NO WINDOWS]
+		# pypdfocr -l deu $file [WINDOWS vs. BAD QUALITY]
+		
+		if [ "${thorough_mode}" = 'TRUE' ]; then
+			
+			echo "ocr recognition" 
+
+			ocrmypdf  -l deu --force-ocr --pdf-renderer sandwich --clean \
+				--tesseract-config ${wd_path_code}/stage_a/tesseract_config.cfg $file $file
+
+		fi 
 
 		cp $file temp.pdf
 
@@ -90,12 +111,8 @@ for file in *; do
 	
 		if [ "$file_fonts" = '' ] || [ "$file_fonts" = '[none]' ]; then
     	
-    		echo "non ocr - parse"
+    		echo "non ocr (fonts)"
     		
-    		# parse -- ocr recognition
-			# pdfsandwich -lang deu $file -o "${mod_annotated_sample_hist_path}/${file}" 
-			# pdfsandwich -lang deu -coo "-contrast -unsharp 0" $file -o "${mod_annotated_sample_hist_path}/${file}" 
-
 			cp $file ${error_path_ocr}/$file
 
 		else 
@@ -104,21 +121,16 @@ for file in *; do
 
 			if [ "$check" = 'False' ]; then
 
-				echo "ocr - non parse"
+				echo "ocr OK"
 
-	 			# cp $file ${mod_annotated_sample_hist_path}/$file
 	 			pdftk $file output ${data_path_parsed}/$file
 	  			sleep 5
 
 	  			((ocr_file++))
 
 	  		else
-	  			echo "non ocr - parse (python)"
+	  			echo "non ocr (python)"
     		
-    			# parse -- ocr recognition
-				# pdfsandwich -lang deu $file -o "${mod_annotated_sample_hist_path}/${file}" 
-				# pdfsandwich -lang deu -coo "-contrast -unsharp 0" $file -o "${mod_annotated_sample_hist_path}/${file}" 
-
 				cp $file ${error_path_raw}/$file
 
 			fi

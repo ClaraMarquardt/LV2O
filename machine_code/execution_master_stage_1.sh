@@ -53,13 +53,14 @@ done
 #---------------------------------------------------#
 cd ${wd_path_code}/stage_b
 
-R CMD BATCH --nosave "--args ${init_path} ${data_path_structured} ${vb_path_input} ${helper_path_keyword} \
+R CMD BATCH --no-save "--args ${init_path} ${data_path_structured} ${vb_path_input} ${helper_path_keyword} \
 	${execution_id}  ${wd_path_log} ${data_path_temp} \
 	${data_path_archived_structured}" order_clean.R
 
 ## delete output file
-rm .RData
-rm order_clean.Rout
+[ -e .RData ] && rm .RData
+[ -e order_clean.Rout ] && rm order_clean.Rout
+
 
 #----------------------------------------------------------------------------#
 #----------------------------------------------------------------------------#

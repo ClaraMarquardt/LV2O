@@ -38,6 +38,7 @@ from python_init import *
 # parameters
 #-------------------------------------------------#
 input_path=input_path+"/*.xlsm"
+input_path=os.path.normpath(input_path)
 
 #----------------------------------------------------------------------------#
 #                                    Code                                    #
@@ -114,7 +115,9 @@ for x in range(0, len(file_list_final)):
 
 
     file_name_mod=annotated_input_path + "/" + file_list_final[x] + '.pdf'
+    file_name_mod=os.path.normpath(file_name_mod)
     file_name_raw=raw_input_path + "/" + file_list_final[x] + '.pdf'
+    file_name_raw=os.path.normpath(file_name_raw)
 
     print file_name_mod 
 
@@ -235,7 +238,9 @@ for x in range(0, len(file_list_final)):
         output.addPage(page)
 
     # save 
-    outputStream = file(output_path + "/"+  file_list_final[x] + '.pdf', "wb")
+    file_name=output_path + "/"+  file_list_final[x] + '.pdf'
+    file_name=os.path.normpath(file_name)
+    outputStream = file(file_name, "wb")
     output.write(outputStream)
     outputStream.close()
 
@@ -247,7 +252,9 @@ email_dt['order_name_mod'] = [re.sub("^[0-9]*_", "",x) for x in  email_dt['order
 email_dt['order_name_mod'] = [re.sub("_", " ",x) for x in  email_dt['order_name_mod']]
 
 # save
-email_dt.to_csv(output_path + "/" + "email_list_" +execution_id + ".csv", encoding="utf8")
+file_name=output_path + "/" + "email_list_" +execution_id + ".csv"
+file_name=os.path.normpath(file_name)
+email_dt.to_csv(file_name, encoding="utf8")
 
 
 # move files to archive
@@ -255,7 +262,9 @@ email_dt.to_csv(output_path + "/" + "email_list_" +execution_id + ".csv", encodi
 
 
 ## vb input
-input_file_list = glob.glob(vb_input_path +"/*"+execution_id+"*")
+file_name=vb_input_path +"/*"+execution_id+"*"
+file_name=os.path.normpath(file_name)
+input_file_list = glob.glob(file_name)
 
 for x in range(0, len(input_file_list)):
 
@@ -281,7 +290,9 @@ print "Number of PDFs: " + str(file_count)
 print "Runtime (minutes):" + str((end_time - start_time))
 
 orig_stdout = sys.stdout
-log_file  = open(log_path+'/log_order_output'+'.txt','a+')
+file_name=log_path+'/log_order_output'+'.txt'
+file_name=os.path.normpath(file_name)
+log_file  = open(file_name,'a+')
 sys.stdout = log_file
 
 print "\n\n###############" 
