@@ -96,15 +96,16 @@ for file in *; do
 
 	if [ "$file" != 'temp.pdf' ]; then
 
-	    # pdfsandwich -lang deu $file -o $file [GOOD QUALITY & TESTED  vs. NO WINDOWS]
+		# ALTERNATIVES
 		# pypdfocr -l deu $file [WINDOWS vs. BAD QUALITY]
-		
+		# ocrmypdf  -l deu --force-ocr --pdf-renderer sandwich --clean \
+		# 		--tesseract-config ${wd_path_code}/stage_a/tesseract_config.cfg $file $file [WINDOWS vs. GOOD QUALITY]
+
 		if [ "${thorough_mode}" = 'TRUE' ]; then
 			
 			echo "ocr recognition" 
 
-			ocrmypdf  -l deu --force-ocr --pdf-renderer sandwich --clean \
-				--tesseract-config ${wd_path_code}/stage_a/tesseract_config.cfg $file $file
+	        pdfsandwich -lang deu $file -o $file 
 
 		fi 
 

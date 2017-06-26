@@ -41,9 +41,6 @@ from openpyxl import Workbook
 import numpy as np
 import pandas as pd
 
-
-
-
 # ---------------------------------------
 # functions & methods
 # ---------------------------------------

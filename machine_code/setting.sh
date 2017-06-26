@@ -24,8 +24,8 @@ echo $current_date
 #-------------------------------------------------#
 
 # directories [CUSTOMISE]
-# export wd_path="/Users/claramarquardt/Google_Drive/Jobs/indep_project/herkules_nlp/tool" ## DEV mode
-export wd_path="C:/HLK_tool/tool"                                                          ## PRODUCTION mode
+export wd_path="/Users/claramarquardt/Google_Drive/Jobs/indep_project/herkules_nlp/tool" ## DEV mode
+# export wd_path="/Users/[username]/..../tool"                                           ## PRODUCTION mode
 
 # directories [* DEFAULT SETTINGS]
 export wd_path_helper=$wd_path"/helper"
@@ -68,8 +68,8 @@ export helper_path_keyword=${wd_path_helper}"/product_identification/master_keyw
 
 # parsing settings [DEFAULT]
 #-------------------------------------------------#
-export thorough_mode="FALSE"
-# export thorough_mode="TRUE"
+# export thorough_mode="FALSE"
+export thorough_mode="TRUE"
 
 # email settings [DEFAULT]
 #-------------------------------------------------#
