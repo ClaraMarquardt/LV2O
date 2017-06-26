@@ -6,7 +6,7 @@
 _Note: Internet access is required for the entire set-up_
 _Note: The Oorder in which programs are installed does NOT matter_
 
-[-] Set-up environment (IF not on Mac)
+[-] Set-up environment
 ````
 ## * Confirm that can open terminal
 [1] Search for 'terminal' (application folder) - confirm that can open
@@ -23,7 +23,8 @@ _Note: The Oorder in which programs are installed does NOT matter_
 [1] Install R - install: dependencies/R/R-3.4.0.pkg
 
 ## * Enable the xcode command line integration
-[1] Download & install Xcode (may take some time / may require a one time set-up of an apple id): https://itunes.apple.com/us/app/xcode/id497799835?mt=12 ("click - view in mac app store") 
+[1] Download & install Xcode (may take some time / may require a one time set-up of an apple id): 
+https://itunes.apple.com/us/app/xcode/id497799835?mt=12 ("click - view in mac app store") 
 [2] Open the Xcode application to verify its installation
 [3] Execute the following command in the terminal:
 xcode-select --install
@@ -38,7 +39,8 @@ xcode-select --install
 [1] Install Python  - install: dependencies/python/Anaconda2-4.4.0-MacOSX-x86_64
 
 ## * Confirm that Python can be accessed from the command line
-[1] Open the terminal -> Test these commands: "which python" / "python --version" (confirm - 2.7 NOT 3.x) / "which pip" / "python"
+[1] Open the terminal -> Test these commands: 
+"which python" / "python --version" (confirm - 2.7 NOT 3.x) / "which pip" / "python"
 
 ## * Install iPython
 [1] Open the terminal -> Execute this command: "pip install ipython"
@@ -65,7 +67,8 @@ brew install tesseract --all-languages
 brew install imagemagick ghostscript exact-image unpaper ocaml 
 [2] Navigate into the pdfsandwich directory (dependency/pdfsandwich) and execute the below command:
 sudo ./configure && make && make install 
-[4] Open the terminal -> Test these commands: "which pdfsandwich" / "pdfsandwich --version" / "pdfsandwich -list_langs" / "pdfsandwich"
+[4] Open the terminal -> Test these commands: 
+"which pdfsandwich" / "pdfsandwich --version" / "pdfsandwich -list_langs" / "pdfsandwich"
 ````
 
 [-] Verify that PHP & Perl are installed (_Should be pre-installed by default_)
@@ -78,6 +81,7 @@ sudo ./configure && make && make install
 ##### [2] Obtain the tool codebase/folder structure 
 ---------------------------
 
+````
 [1] Specify the directory in which the tool is to be stored
 
 [2] Unzip the tool into the selected directory
@@ -85,7 +89,7 @@ sudo ./configure && make && make install
 [3] Open the terminal -> execute the following commands
 cd [...]/tool
 sudo chmod -R a+x code_base/
-
+````
 
 ##### [3] Customise the settings
 ---------------------------
