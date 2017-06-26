@@ -52,11 +52,6 @@ xcode-select --install
 
 [-] Install the PDF parsing tools (xpdf / pdfsandwich /pdftk )
 ````
-## * Install XPdf (pdftotext command - convert pdfs to txt files)
-[1] Install XPdf - execute the below command:
-brew install xpdf
-[2] Open the terminal -> Test these commands: "which pdftotext" / "pdftotext"
-
 ## * Install pdftk (pdftotext command - convert pdfs to txt files)
 [1] Install pdftk - install: dependencies/pdftk/pdftk_server-2.02-mac_osx-10.6-setup.pkg
 [2] Open the terminal -> Test these commands: "which pdftk" / "pdftk"
@@ -64,11 +59,16 @@ brew install xpdf
 ## * Install PDFsandwich (pdfsandwich command - ocr recognition)
 [1] Install all depdencies - execute the following commands:
 brew install tesseract --all-languages                           
-brew install imagemagick ghostscript exact-image unpaper ocaml 
+brew install imagemagick ghostscript exact-image unpaper ocaml poppler
 [2] Navigate into the pdfsandwich directory (dependency/pdfsandwich) and execute the below command:
 sudo ./configure && make && make install 
 [4] Open the terminal -> Test these commands: 
 "which pdfsandwich" / "pdfsandwich --version" / "pdfsandwich -list_langs" / "pdfsandwich"
+
+## * Install XPdf (pdftotext command - convert pdfs to txt files)
+[1] Install XPdf - execute the below command:
+brew install xpdf
+[2] Open the terminal -> Test these commands: "which pdftotext" / "pdftotext"
 ````
 
 [-] Verify that PHP & Perl are installed (_Should be pre-installed by default_)
