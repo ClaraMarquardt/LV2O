@@ -93,7 +93,7 @@ load_or_install <- function(package_names, custom_lib_path=FALSE,
 
   })
 
-
+}
 # ---------------------------------------
 # external dependencies
 # ---------------------------------------

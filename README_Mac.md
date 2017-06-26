@@ -53,7 +53,7 @@ xcode-select --install
 [-] Install the PDF parsing tools (xpdf / pdfsandwich /pdftk )
 ````
 ## * Install pdftk (pdftotext command - convert pdfs to txt files)
-[1] Install pdftk - install: dependencies/pdftk/pdftk_server-2.02-mac_osx-10.6-setup.pkg
+[1] Install pdftk - install: dependencies/pdftk/pdftk_server-2.02-mac_osx-10.11-setup.pkg
 [2] Open the terminal -> Test these commands: "which pdftk" / "pdftk"
 
 ## * Install PDFsandwich (pdfsandwich command - ocr recognition)
