@@ -257,6 +257,8 @@ output_id_max <- 8
 email_file <- fread(paste0(temp_path, "/", "order_email_master_", 
     execution_id, ".csv"), header=FALSE)
 email_file[, name_temp:=gsub("(.*_)(RAW)(.*)", "\\2\\3", V1), by=1:nrow(email_file)]
+email_file[V2 %like% "Content", V2:=""]
+email_file[, V2:=gsub("<<|>>| "), "", V2]
 
 # loop over files
 for (i in seq(1:ceiling(file_count_final/output_id_max))) {

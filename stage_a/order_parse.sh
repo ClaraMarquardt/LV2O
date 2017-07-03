@@ -40,9 +40,9 @@ done
 
 echo "starting ID: "${file_id}
 
-
 # # rename (no spaces, etc)
 # #----------------------------------------------------------------------------#
+
 
 cd "${data_path_raw}"
 
@@ -75,6 +75,10 @@ for file in *; do
 done
 
 sleep 1
+
+# # ensure that filenames are  unique (has based)
+# #----------------------------------------------------------------------------#
+md5 -r * | sort -t ' ' -k 4 -r | awk 'BEGIN{lasthash = ""} $1 == lasthash {print $2} {lasthash = $1}' |xargs rm
 
 # parse
 #----------------------------------------------------------------------------#
@@ -122,7 +126,7 @@ for file in *; do
 
 		else 
 
-			check=`python ${wd_path_code}/stage_a/encrypt.py "${init_path}" "${data_path_raw}"/"${file}"`
+			check=`ipython ${wd_path_code}/stage_a/encrypt.py "${init_path}" "${data_path_raw}"/"${file}"`
 
 			if [ "$check" = 'False' ]; then
 

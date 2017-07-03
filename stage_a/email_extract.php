@@ -39,6 +39,75 @@ $inbox = imap_open($hostname,$username,$password) or die('Cannot connect to Gmai
 $emails = imap_search($inbox,'UNSEEN');
 echo "\n\n" . "number of emails: " . count($emails) . "\n\n";
 
+/************ HELPER FUNCTIONS
+
+/* Define flatten function */
+function flattenParts($messageParts, $flattenedParts = array(), $prefix = '', $index = 1, $fullPrefix = true) {
+
+    foreach($messageParts as $part) {
+        $flattenedParts[$prefix.$index] = $part;
+        if(isset($part->parts)) {
+            if($part->type == 2) {
+                $flattenedParts = flattenParts($part->parts, $flattenedParts, $prefix.$index.'.', 0, false);
+            }
+            elseif($fullPrefix) {
+                $flattenedParts = flattenParts($part->parts, $flattenedParts, $prefix.$index.'.');
+            }
+            else {
+                $flattenedParts = flattenParts($part->parts, $flattenedParts, $prefix);
+            }
+            unset($flattenedParts[$prefix.$index]->parts);
+        }
+        $index++;
+    }
+
+    return $flattenedParts;
+            
+}
+
+/* Define getPart function */
+function getPart($connection, $messageNumber, $partNumber, $encoding) {
+    
+    $data = imap_fetchbody($connection, $messageNumber, $partNumber);
+    switch($encoding) {
+        case 0: return $data; // 7BIT
+        case 1: return $data; // 8BIT
+        case 2: return $data; // BINARY
+        case 3: return base64_decode($data); // BASE64
+        case 4: return quoted_printable_decode($data); // QUOTED_PRINTABLE
+        case 5: return $data; // OTHER
+    }
+    
+    
+}
+
+/* Define getFilenameFromPart function */
+function getFilenameFromPart($part) {
+
+    $filename = '';
+    
+    if($part->ifdparameters) {
+        foreach($part->dparameters as $object) {
+            if(strtolower($object->attribute) == 'filename') {
+                $filename = $object->value;
+            }
+        }
+    }
+
+    if(!$filename && $part->ifparameters) {
+        foreach($part->parameters as $object) {
+            if(strtolower($object->attribute) == 'name') {
+                $filename = $object->value;
+            }
+        }
+    }
+    
+    return $filename;
+    
+}
+
+/************ END HELPER FUNCTIONS
+
 /* if emails are returned, cycle through each email */
 if($emails) {
 	
@@ -54,94 +123,110 @@ if($emails) {
         echo "\n\n" . "email #: " . $email_number . "\n\n";
 
         /* mark as read */
-        $status = imap_setflag_full($inbox, "1", "\\Seen \\Flagged", ST_UID); 
+        $status = imap_setflag_full($inbox, $email_number, "\\Seen \\Flagged"); 
 
         /* get mail structure */
-        $structure = imap_fetchstructure($inbox, $email_number);
+        $structure_raw = imap_fetchstructure($inbox, $email_number);
+        // echo print_r($structure_raw);
 
+        $structure_flat = flattenParts($structure_raw->parts);
+        // echo print_r($structure_flat);
+     
 		/* get information specific to this email */
-        $message=imap_fetchbody($inbox,$email_number,1.1);
+        $message=imap_fetchbody($inbox,$email_number,1);
+        // print_r( $message);
+
+         /* get information specific to this email */
+        $overview = imap_fetch_overview($inbox,$email_number,0);
 
         /* extract email address of sender */ 
         $address = array();
+        $address_simple = array();
 
-        if (preg_match('/(.*@.*)(<mailto.*)/', $message, $address)) {
+        $address[1] =  $overview[0]->from;
+        echo "address";
+        print_r($address[1]);
+
+        if (preg_match('/(.*@.*)(<mailto.*)/', $message, $address_simple)) {
         };
 
-        /* get information specific to this email */
-        $overview = imap_fetch_overview($inbox,$email_number,0);
+        echo "address";
+        print_r($address_simple[1]);
+
+        if($address_simple[1]!="") 
+        {
+        $address[1]=$address_simple[1];
+        }
+
+        echo "address";
+        print_r($address[1]);
+     
 
         /* initialise attachment array */ 
         $attachments = array();
 
         /* if any attachments found... */
-        if(isset($structure->parts) && count($structure->parts)) 
+        $i = 0;
 
-        {
-            for($i = 0; $i < count($structure->parts); $i++) 
-            {
-                $attachments[$i] = array(
+   
+
+        foreach($structure_flat as $partNumber => $part) {
+
+
+            $attachments[$i] = array(
                     'is_attachment' => false,
                     'filename' => '',
-                    'name' => '',
                     'attachment' => ''
-                );
+            );
 
-                if($structure->parts[$i]->ifdparameters) 
-                {
-                    foreach($structure->parts[$i]->dparameters as $object) 
-                    {
-                        if(strtolower($object->attribute) == 'filename') 
-                        {
-                            $attachments[$i]['is_attachment'] = true;
-                            $attachments[$i]['filename'] = $object->value;
-                        }
-                    }
-                }
+            switch($part->type) {
+        
+            case 0:
+            // the HTML or plain text part of the email
+            $message = getPart($inbox, $email_number, $partNumber, $part->encoding);
+            break;
+    
+            case 1:
+            // multi-part headers, can ignore
+            break;
+        
+            case 2:
+            // attached message headers, can ignore
+            break;
+    
+            case 3: // application
+            case 4: // audio
+            case 5: // image
+            case 6: // video
+            case 7: // other
+            $filename = getFilenameFromPart($part);
+            
+            if($filename) {
+                // attachment
+                $attachment = getPart($inbox, $email_number, $partNumber, $part->encoding);
 
-                if($structure->parts[$i]->ifparameters) 
-                {
-                    foreach($structure->parts[$i]->parameters as $object) 
-                    {
-                        if(strtolower($object->attribute) == 'name') 
-                        {
-                            $attachments[$i]['is_attachment'] = true;
-                            $attachments[$i]['name'] = $object->value;
-                        }
-                    }
-                }
-
-                if($attachments[$i]['is_attachment']) 
-                {
-                    $attachments[$i]['attachment'] = imap_fetchbody($inbox, $email_number, $i+1);
-
-                    /* 3 = BASE64 encoding */
-                    if($structure->parts[$i]->encoding == 3) 
-                    { 
-                        $attachments[$i]['attachment'] = base64_decode($attachments[$i]['attachment']);
-                    }
-                    /* 4 = QUOTED-PRINTABLE encoding */
-                    elseif($structure->parts[$i]->encoding == 4) 
-                    { 
-                        $attachments[$i]['attachment'] = quoted_printable_decode($attachments[$i]['attachment']);
-                    }
-                }
+                $attachments[$i]['is_attachment'] = 1;
+                $attachments[$i]['attachment'] = $attachment;
+                $attachments[$i]['filename']  = $filename;
+                
             }
 
+        break;
+    
+    }
 
-
-        }
-
+    $i++;
+}
         echo "number of attachments: ".count($attachments) . "\n\n";
 
         /* iterate through each attachment and save it */
         for($j = 0; $j < count($attachments); $j++) {
-
+            echo $j;
             $attachment_number=$email_number+$j;
-
             $filename_raw = iconv_mime_decode($attachments[$j]["filename"]);
             $ext = pathinfo($filename_raw, PATHINFO_EXTENSION);
-   
+            
+
             if( $ext == 'PDF' | $ext == 'pdf') {
                 
                 echo iconv_mime_decode($attachments[$j]["filename"]);
@@ -172,7 +257,6 @@ if($emails) {
         }
 
     }
-
 
 
 /* close the connection */
