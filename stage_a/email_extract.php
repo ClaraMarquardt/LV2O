@@ -134,41 +134,37 @@ if($emails) {
      
 		/* get information specific to this email */
         $message=imap_fetchbody($inbox,$email_number,1);
-        // print_r( $message);
-
-         /* get information specific to this email */
+        
+        /* get information specific to this email */
         $overview = imap_fetch_overview($inbox,$email_number,0);
 
         /* extract email address of sender */ 
         $address = array();
-        $address_simple = array();
+        // $address_simple = array();
 
         $address[1] =  $overview[0]->from;
         echo "address";
         print_r($address[1]);
 
-        if (preg_match('/(.*@.*)(<mailto.*)/', $message, $address_simple)) {
-        };
+        // if (preg_match('/(.*@.*)(<mailto.*)/', $message, $address_simple)) {
+        // };
 
-        echo "address";
-        print_r($address_simple[1]);
+        // echo "address";
+        // print_r($address_simple[1]);
 
-        if($address_simple[1]!="") 
-        {
-        $address[1]=$address_simple[1];
-        }
+        // if($address_simple[1]!="") 
+        // {
+        // $address[1]=$address_simple[1];
+        // }
 
         echo "address";
         print_r($address[1]);
      
-
         /* initialise attachment array */ 
         $attachments = array();
 
         /* if any attachments found... */
         $i = 0;
-
-   
 
         foreach($structure_flat as $partNumber => $part) {
 
@@ -184,6 +180,19 @@ if($emails) {
             case 0:
             // the HTML or plain text part of the email
             $message = getPart($inbox, $email_number, $partNumber, $part->encoding);
+            // print_r($message);
+
+            $address_simple = array();
+
+            if (preg_match('/(Von:.*)(mailto)(.*@.*)/', $message, $address_simple)) {
+                print_r($address_simple);
+                $address[1] = $address_simple[3];
+
+                echo "address";
+                print_r($address[1]);
+
+            };
+
             break;
     
             case 1:
