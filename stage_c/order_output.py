@@ -37,7 +37,7 @@ from python_init import *
 
 # parameters
 #-------------------------------------------------#
-input_path=input_path+"/*.xlsm"
+input_path=input_path+"/*.xlsx"
 input_path=os.path.normpath(input_path)
 
 #----------------------------------------------------------------------------#
@@ -64,20 +64,20 @@ for x in range(0, len(output_file_list)):
 
     # read in 
     temp=load_workbook(output_file_list[x])
-    temp_ws=temp['MASTER RECORD']
+    temp_ws=temp['Master Record']
 
     # obtain relevant values
-    temp_order_name=[temp_ws.cell(row=i,column=9).value for i in range(1,temp_ws.max_row)]
-    temp_order_product_code_1=[temp_ws.cell(row=i,column=3).value for i in range(1,temp_ws.max_row)]
-    temp_order_product_code_2=[temp_ws.cell(row=i,column=5).value for i in range(1,temp_ws.max_row)]
-    temp_order_product_code_3=[temp_ws.cell(row=i,column=7).value for i in range(1,temp_ws.max_row)]
-    temp_order_price_1=[temp_ws.cell(row=i,column=4).value for i in range(1,temp_ws.max_row)]
-    temp_order_price_2=[temp_ws.cell(row=i,column=6).value for i in range(1,temp_ws.max_row)]
-    temp_order_price_3=[temp_ws.cell(row=i,column=8).value for i in range(1,temp_ws.max_row)]
+    temp_order_name=[temp_ws.cell(row=i,column=11).value for i in range(1,temp_ws.max_row)]
+    temp_order_product_code_1=[temp_ws.cell(row=i,column=5).value for i in range(1,temp_ws.max_row)]
+    temp_order_product_code_2=[temp_ws.cell(row=i,column=7).value for i in range(1,temp_ws.max_row)]
+    temp_order_product_code_3=[temp_ws.cell(row=i,column=9).value for i in range(1,temp_ws.max_row)]
+    temp_order_price_1=[temp_ws.cell(row=i,column=6).value for i in range(1,temp_ws.max_row)]
+    temp_order_price_2=[temp_ws.cell(row=i,column=8).value for i in range(1,temp_ws.max_row)]
+    temp_order_price_3=[temp_ws.cell(row=i,column=10).value for i in range(1,temp_ws.max_row)]
 
-    temp_order_id=[temp_ws.cell(row=i,column=10).value for i in range(1,temp_ws.max_row)]
+    temp_order_id=[temp_ws.cell(row=i,column=12).value for i in range(1,temp_ws.max_row)]
 
-    temp_email=[temp_ws.cell(row=i,column=13).value for i in range(1,temp_ws.max_row)]
+    temp_email=[temp_ws.cell(row=i,column=16).value for i in range(1,temp_ws.max_row)]
 
     # append
     order_name.append(temp_order_name)
@@ -104,6 +104,10 @@ order_dt=pd.DataFrame({'order_name': order_name[0][1:],
      'email': email[0][1:]
     })
 
+
+# subset
+order_dt=order_dt[pd.notnull(order_dt["order_product_code_1"]) | pd.notnull(order_dt["order_product_code_2"]) | 
+    pd.notnull(order_dt["order_product_code_3"]) ]
 
 # loop over
 #----------------------------------------------------------------------------#
@@ -170,43 +174,52 @@ for x in range(0, len(file_list_final)):
         price_2=order_dt_subset['order_price_2'][y]
         price_3=order_dt_subset['order_price_3'][y]
 
-        text_1 = str(id_1) + " / " + str(price_1)
+        text_1 = str(id_1) + " ( " + str(price_1) + " € / St )"
         text_1=  re.sub("None|nan|#N/A", "", text_1)
-        text_1=  re.sub("^ / $", "", text_1)
-        text_2 = str(id_2) + " / " + str(price_2)
+        text_1=  re.sub("^[ ]*\\(.*", "", text_1)
+        if (len(filter(str.isdigit, text_1))==0):
+            text_1 = ''
+        text_1=  re.sub("\( \xe2\x82\xac / St \)", "", text_1)
+        text_2 = str(id_2) + " ( " + str(price_2) + " € / St )"
         text_2=  re.sub("None|nan|#N/A", "", text_2)
-        text_2=  re.sub("^ / $", "", text_2)
-        text_3 = str(id_3) + " / " + str(price_3)
+        text_2=  re.sub("^[ ]*\\(.*", "", text_2)
+        if (len(filter(str.isdigit, text_2))==0):
+            text_2 = ''
+        text_3 = str(id_3) + " ( " + str(price_3) + " € / St )"
         text_3=  re.sub("None|nan|#N/A", "", text_3)
-        text_3=  re.sub("^ / $", "", text_3)
+        text_3=  re.sub("^[ ]*\\(.*", "", text_3)
+        if (len(filter(str.isdigit, text_3))==0):
+            text_3 = ''
 
         order_id=order_dt_subset['order_id'][y]
-
+        
         # identify the correct position 
         position_prod_subset=position_sort.copy()
-        position_prod_subset.ix[position_prod_subset["text"].str.contains("#order-item: " + str(order_id) + "([^0-9]|$)"), "min"]=0
+        position_prod_subset.ix[position_prod_subset["text"].str.contains("#order-item: " + str(int(order_id)) + "([^0-9]|$)"), "min"]=0
         position_prod_subset.ix[position_prod_subset["text"].str.contains("#order-item: " + str(order_id+1) + "([^0-9]|$)"), "min"]=1
         position_prod_subset.fillna(method="ffill", inplace=True)
         position_prod_subset=position_prod_subset.ix[position_prod_subset["min"]==0]
 
-
         min_index=position_prod_subset.index.min()
         max_index=position_prod_subset.index.max()
         id_line = position_prod_subset[position_prod_subset["text"].str.contains("(Stck( |$))|(Stk( |$))|(St( |$))")].index
-        
+                    
         if (id_line.shape[0]>0):
             position_line=np.array(id_line)[0]
-            x1    = position_sort.ix[(position_line)]["pos_x"]+60
+            x1    = position_sort.ix[(position_line)]["pos_x"]+50
             y1    = position_sort.ix[(position_line)]["pos_y"]+1
             y_1   = y1-10
             y_2   = y1-20
 
-        else:
+        elif (len(position_prod_subset["pos_x"])>0):
             position_line=min_index
-            x1    = max(position_prod_subset["pos_x"])+10
+            x1    = max(position_prod_subset["pos_x"])+5
             y1    = position_sort.ix[(min_index)]["pos_y"] - 20
             y_1   = y1-10
             y_2   = y1-20
+
+        else:
+            break
 
         page_num = position_sort.ix[(position_line)]["page"]   
 
@@ -248,7 +261,11 @@ for x in range(0, len(file_list_final)):
 #----------------------------------------------------------------------------#
 email_dt=order_dt[['email','order_name']]
 email_dt=email_dt.drop_duplicates()
+
+email_dt['email'] = [re.sub("_x[^_]*_$", "",x) for x in email_dt['email']]
 email_dt['order_name_mod'] = [re.sub("^[0-9]*_", "",x) for x in  email_dt['order_name']]
+email_dt['order_name_mod'] = [re.sub("_RAW.*$", "",x) for x in  email_dt['order_name_mod']]
+email_dt['order_name_mod'] = [x + ".pdf" for x in  email_dt['order_name_mod']]
 email_dt['order_name_mod'] = [re.sub("_", " ",x) for x in  email_dt['order_name_mod']]
 
 # save
@@ -260,7 +277,6 @@ email_dt.to_csv(file_name, encoding="utf8")
 # move files to archive
 #----------------------------------------------------------------------------#
 
-
 ## vb input
 file_name=vb_input_path +"/*"+execution_id+"*"
 file_name=os.path.normpath(file_name)
@@ -268,8 +284,10 @@ input_file_list = glob.glob(file_name)
 
 for x in range(0, len(input_file_list)):
 
-    archive_file_path=archive_path_input
-    shutil.move(input_file_list[x], archive_file_path)
+    archive_file_path=archive_path_input 
+    filename=input_file_list[x]
+    shutil.move(filename, archive_file_path)
+
 
 
 ## vb output 
@@ -278,7 +296,8 @@ output_file_list = glob.glob(input_path)
 for x in range(0, len(output_file_list)):
 
     archive_file_path=archive_path_output
-    shutil.move(output_file_list[x], archive_file_path)
+    filename=output_file_list[x]
+    shutil.move(filename, archive_file_path)
 
 
 # status & log file

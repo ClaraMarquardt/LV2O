@@ -64,7 +64,7 @@ export data_path_archived_annotated=$wd_path_data"/archived_data/annotated_data"
 export init_path=$wd_path_code"/helper_code"
 
 ## helper paths
-export helper_path_keyword=${wd_path_helper}"/product_identification/master_keyword.xlsm"
+export helper_path_keyword=${wd_path_helper}"/product/master_keyword.xlsm"
 
 # parsing settings [DEFAULT]
 #-------------------------------------------------#
@@ -74,9 +74,15 @@ export thorough_mode="TRUE"
 # email settings [DEFAULT]
 #-------------------------------------------------#
 
-export email_address=`cat helper/email_id/email_username.txt`
-export email_pwd=`cat helper/email_id/email_password.txt`
+export email_address=`cat helper/email/email_username.txt`
+export email_pwd=`cat helper/email/email_password.txt`
+export email_sender=`cat helper/email/email_sender.txt`
+export email_text=`cat helper/email/email_text.txt`
 
+# testing settings [DEFAULT]
+#-------------------------------------------------#
+export test_mode="TRUE"
+export email_target='cmarquardt@bwh.harvard.edu'
 
 #----------------------------------------------------------------------------#
 #                                    End                                     #

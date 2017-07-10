@@ -21,11 +21,14 @@ $username = getenv("email_address");
 $password = getenv("email_pwd");
 $execution_id = getenv("execution_id");
 $log_path = getenv("wd_path_log");
+$email_text = getenv("email_text");
+$email_sender = getenv("email_sender");
 
 /* obtain email list & product list - read in txt file */
 $file_list = array("xx");
 $email_list = array("xx");
 $file_list_mod = array("xx");
+$file_list_mod_no_ext = array("xx");
 
 $csvFile = $file_path . "/" . 'email_list_' . $execution_id . '.csv';
 
@@ -40,10 +43,12 @@ while(! feof($file))
   $temp_email = $temp_array[1];
   $temp_file = $temp_array[2] . '.pdf';
   $temp_file_mod = $temp_array[3] . '.pdf';
+  $temp_file_mod_no_ext = $temp_array[3];
 
   array_push($email_list, $temp_email);
   array_push($file_list, $temp_file);
   array_push($file_list_mod, $temp_file_mod);
+  array_push($file_list_mod_no_ext, $temp_file_mod_no_ext);
 
   }
 
@@ -67,6 +72,7 @@ for ($i = 1; $i < $length-1; $i++) {
     // echo $file;
     $email_to = $email_list[$i+1];
     $file_mod = $file_list_mod[$i+1];
+    $file_mod_no_ext = $file_list_mod_no_ext[$i+1];
 
     /* print status */ 
     echo "process: " . $file;
@@ -84,18 +90,18 @@ for ($i = 1; $i < $length-1; $i++) {
     $email->Username   = $username;  
     $email->Password   = $password;           
 
-    $email->SetFrom($username, 'XXXXX Company');
+    $email->SetFrom($username, $email_sender);
     
     /* body */ 
-    $msg = "Please see the attached product information. We look forward to hearing back from you.\n\n Should you have any further questions please feel free to reach out to us.\n\nXXXX Company";
-    $msg=wordwrap($msg,70);
+    $msg = $email_text;
+    $msg = wordwrap($msg,80);
 
     /* create email */ 
-    $email->Subject   = "Re. " . $file_mod . " - Product Information";
+    $email->Subject   = "Re. " . $file_mod_no_ext;
     $email->Body      = $msg;
     $email->AddAddress($email_to);
 
-    $email->AddAttachment( $file_path . "/" . $file , $file_mod);
+    $email->AddAttachment( $file_path . "/" . $file , $file_mod_no_ext);
 
 
     /* print status */ 

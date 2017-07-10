@@ -162,16 +162,16 @@ lapply(file_list[start_id:length(file_list)], function(file_name) {
     text[, prod_desc:=paste0(text_line_mod[!(text_line_mod %like% "^[ ]*#")], 
         collapse="\n"), by=c("item")]
     text[, c("hist_id_1","hist_price_1", 
-        "hist_id_2", "hist_price_2", "hist_id_3"):=""]
+        "hist_id_2", "hist_price_2", "hist_id_3","hist_price_3"):=""]
     dt_final <- text[, .(date_processed, prod_desc, hist_id_1, hist_price_1, 
-        hist_id_2, hist_price_2, hist_id_3,
+        hist_id_2, hist_price_2, hist_id_3,hist_price_3,
         origin_file_name, item, piece_count)]
     dt_final <- unique(dt_final, by=c("item"))
     setnames(dt_final, c("date_processed", "prod_desc", 
         "historical product ID #1", "historical price #1", 
         "historical product ID #2", "historical price #2",
-        "historical product ID #3","source order file name",
-        "source order-item number", "piece count"))
+        "historical product ID #3","historical price #3",
+        "source order file name","source order-item number", "piece count"))
 
     # clean
     dt_final[, prod_desc:=gsub("\n$", "",prod_desc )]

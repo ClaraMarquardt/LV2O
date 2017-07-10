@@ -36,6 +36,21 @@ ipython order_output.py "${init_path}" "${vb_path_output}" "${data_path_archived
 # Stage-d: Generate and mail out identified PDFs
 # ----------------------------------------------------------------------------#
 
+
+# replace source emails with test email (TEEST MODE only)
+# ----------------------------------------------------------------------------#
+if [ test_mode="TRUE" ]; then
+
+	echo "TEST MODE - using test email target"
+
+	cd ${data_path_annotated}
+
+	file=$(ls *email_list*.csv*)
+	awk -v var="$email_target" '$2=var' FS=, OFS=, ${file} > "temp_${file}"
+	mv temp_${file} ${file}
+
+fi
+
 # execute
 #---------------------------------------------------#
 cd ${wd_path_code}/stage_d
