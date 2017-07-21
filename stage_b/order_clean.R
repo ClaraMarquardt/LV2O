@@ -37,7 +37,7 @@ source(paste0(init_path, "/R_init.R"))
 
 # import the keyword file
 key_word     <- as.data.table(read.xlsx(helper_path_keyword, 1 , 
-    stringsAsFactors=F, header=T,startRow=3))
+    stringsAsFactors=F, header=T,startRow=1))
 key_word[get(names(key_word[,c(1), with=F]))=="END", TYPE:="END"]
 key_word[, TYPE:=na.locf(TYPE)]
 
@@ -55,6 +55,9 @@ for (i in product_type_list) {
 
     temp <- get(i)
     temp <- gsub("^[ ]*|[ ]*$", "", temp)
+    temp <- gsub(" ", "", temp)
+    temp <- gsub("-", "", temp)
+    temp <- tolower(temp)
     temp <- paste0(temp, collapse="|")
 
     assign(i, temp)
@@ -182,12 +185,19 @@ lapply(file_list[start_id:length(file_list)], function(file_name) {
     #-----------------------------------------#
     dt_final[, product_type:=""]
 
-    dt_final[!is.na(get("historical product ID #1")) & prod_desc %like% temp_key, 
+    dt_final[, prod_desc_temp:=tolower(prod_desc)]
+    dt_final[, prod_desc_temp:=gsub(" ","", prod_desc_temp), by=1:nrow(dt_final)]
+    dt_final[, prod_desc_temp:=gsub("-","", prod_desc_temp), by=1:nrow(dt_final)]
+
+    print(dt_final)
+    dt_final[!is.na(get("historical product ID #1")) & prod_desc_temp %like% temp_key, 
         product_type:="temperature "]
-    dt_final[!is.na(get("historical product ID #1")) & prod_desc %like% pressure_key, 
+    dt_final[!is.na(get("historical product ID #1")) & prod_desc_temp %like% pressure_key, 
         product_type:=paste0(product_type, "pressure ")]
-    dt_final[!is.na(get("historical product ID #1")) & prod_desc %like% zubehoer_key, 
+    dt_final[!is.na(get("historical product ID #1")) & prod_desc_temp %like% zubehoer_key, 
         product_type:=paste0(product_type, "zubehoer ")]
+
+    dt_final[,prod_desc_temp:=NULL]
 
     # identify item ID (internal)
     #-----------------------------------------#
@@ -195,7 +205,10 @@ lapply(file_list[start_id:length(file_list)], function(file_name) {
         by=1:nrow(dt_final)]
     dt_final[get("item number") %like% "[a-zA-Z]", c("item number"):="/"]
 
-
+    # subset to identified products
+    #-----------------------------------------#
+    dt_final <- dt_final[product_type!=""]
+    
     # output
     #-----------------------------------------#
     print(dt_final)

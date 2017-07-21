@@ -92,18 +92,20 @@ for x in range(0, len(output_file_list)):
     
     email.append(temp_email)
 
+
 ## create final dt
-order_dt=pd.DataFrame({'order_name': order_name[0][1:],
-     'order_product_code_1': order_product_code_1[0][1:],
-     'order_product_code_2': order_product_code_2[0][1:],
-     'order_product_code_3': order_product_code_3[0][1:],
-     'order_price_1': order_price_1[0][1:],
-     'order_price_2': order_price_2[0][1:],
-     'order_price_3': order_price_3[0][1:],
-     'order_id': order_id[0][1:], 
-     'email': email[0][1:]
+order_dt=pd.DataFrame({'order_name': sum(order_name,[])[1:],
+     'order_product_code_1': sum(order_product_code_1,[])[1:],
+     'order_product_code_2': sum(order_product_code_2,[])[1:],
+     'order_product_code_3': sum(order_product_code_3,[])[1:],
+     'order_price_1': sum(order_price_1,[])[1:],
+     'order_price_2': sum(order_price_2,[])[1:],
+     'order_price_3': sum(order_price_3,[])[1:],
+     'order_id': sum(order_id,[])[1:], 
+     'email': sum(email,[])[1:]
     })
 
+order_dt=order_dt[pd.notnull(order_dt["order_name"])]
 
 # subset
 order_dt=order_dt[pd.notnull(order_dt["order_product_code_1"]) | pd.notnull(order_dt["order_product_code_2"]) | 
