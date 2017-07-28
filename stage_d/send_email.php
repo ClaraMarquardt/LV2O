@@ -36,10 +36,7 @@ $file = fopen($csvFile,"r");
 
 while(! feof($file))
   {
-  $temp_array = fgetcsv($file);
-  // print_r($temp_array);
-
-  
+  $temp_array = fgetcsv($file);  
   $temp_email = $temp_array[1];
   $temp_file = $temp_array[2] . '.pdf';
   $temp_file_mod = $temp_array[3] . '.pdf';
@@ -54,13 +51,8 @@ while(! feof($file))
 
 fclose($file);
 
-// print_r($file_list);
-// print_r($email_list);
-// print_r($file_list_mod);
-
-
 $length = count($file_list);
-// echo $length;
+
 for ($i = 1; $i < $length-1; $i++) {
 
 
@@ -107,7 +99,6 @@ for ($i = 1; $i < $length-1; $i++) {
     /* print status */ 
     echo "sent " . $file . " to " . $email_to;
     echo "\n\n";
-    $email->send();
     if(!$email->send()) {
         echo 'Message could not be sent.';
         echo 'Mailer Error: ' . $email->ErrorInfo;

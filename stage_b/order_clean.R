@@ -88,10 +88,32 @@ lapply(file_list[start_id:length(file_list)], function(file_name) {
     print(sprintf("parse order: %d out of %d (file: %d)", file_id, file_count, output_id))
     print(file_name)
 
+    file_name_pdf <- gsub("txt$", "pdf", file_name)
+    print(file_name_pdf)
+
     # import text & identify products
     #-----------------------------------------#
     text <- readLines(paste0(mod_order_path, "/",file_name))
     text <- data.table(text_line=text)
+
+    # identify project name
+    #-----------------------------------------#
+    project_raw <- ""
+    text[, project:=project_raw]
+
+    if (nrow( text[text_line %like% "Projekt:|LV:|BV:"])>0) {
+        project_raw <- text[text_line %like% "Projekt:|LV:|BV:"]
+        project_raw <- project_raw[which.max(nchar(project_raw$text_line))]$text_line
+        project_raw <- gsub("(Projekt:|LV:|BV:)(.*)", "\\2", project_raw)
+        project_raw <- gsub("Sachbearbeiter|Datum", "", project_raw)
+        project_raw <- gsub("[ ]{2,}", " ", project_raw)
+        project_raw <- gsub(" |-|/|,|:", "_",project_raw)
+        project_raw <- gsub("\\.", "", project_raw)
+        project_raw <- gsub("^_|_{2,}|_$", "", project_raw)
+        if (nchar(project_raw)>0)  text[, project:=paste0("_", project_raw)]
+    }
+    
+    print(project_raw)
     
     # identify product breaks
     #-----------------------------------------#
@@ -168,13 +190,13 @@ lapply(file_list[start_id:length(file_list)], function(file_name) {
         "hist_id_2", "hist_price_2", "hist_id_3","hist_price_3"):=""]
     dt_final <- text[, .(date_processed, prod_desc, hist_id_1, hist_price_1, 
         hist_id_2, hist_price_2, hist_id_3,hist_price_3,
-        origin_file_name, item, piece_count)]
+        origin_file_name, item, piece_count, project)]
     dt_final <- unique(dt_final, by=c("item"))
     setnames(dt_final, c("date_processed", "prod_desc", 
         "historical product ID #1", "historical price #1", 
         "historical product ID #2", "historical price #2",
         "historical product ID #3","historical price #3",
-        "source order file name","source order-item number", "piece count"))
+        "source order file name","source order-item number", "piece count", "project"))
 
     # clean
     dt_final[, prod_desc:=gsub("\n$", "",prod_desc )]
@@ -248,6 +270,15 @@ lapply(file_list[start_id:length(file_list)], function(file_name) {
         output_id <<- output_id + 1
     }
 
+    # rename original pdf
+    file_name_pdf_updated <- gsub("\\.pdf$", paste0(project_raw, ".pdf"), 
+        file_name_pdf)
+    file_name_text_updated <- gsub("\\.txt$", paste0(project_raw, ".txt"), 
+        file_name)
+    file.rename(paste0(mod_order_path, "/",file_name_pdf),
+        paste0(mod_order_path, "/",file_name_pdf_updated))
+    file.rename(paste0(mod_order_path, "/",file_name),
+        paste0(mod_order_path, "/",file_name_text_updated))
 })
 
 
@@ -304,7 +335,7 @@ for (i in seq(1:ceiling(file_count_final/output_id_max))) {
 
     setcolorder(temp_comb, c("master_id", "master_order_id", 
         setdiff(names(temp_comb), c("source_email","master_id", 
-        "master_order_id", "execution_id")),  "source_email", "execution_id"))
+        "master_order_id", "execution_id", "project")),  "source_email", "project","execution_id"))
 
     output_file <- paste0(output_path, "/", "order_master_database_",
         execution_id,"_",i,".xlsx")

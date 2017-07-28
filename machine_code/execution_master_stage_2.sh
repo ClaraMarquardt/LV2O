@@ -55,7 +55,7 @@ fi
 #---------------------------------------------------#
 cd ${wd_path_code}/stage_d
 
-php "send_email.php"
+# php "send_email.php"
 
 ## move processed files to archive
 cd "${data_path_annotated}"

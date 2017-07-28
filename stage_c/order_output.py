@@ -59,6 +59,7 @@ order_price_2=[]
 order_price_3=[]
 order_id=[]
 email=[]
+project=[]
 
 for x in range(0, len(output_file_list)):
 
@@ -78,7 +79,8 @@ for x in range(0, len(output_file_list)):
     temp_order_id=[temp_ws.cell(row=i,column=12).value for i in range(1,temp_ws.max_row)]
 
     temp_email=[temp_ws.cell(row=i,column=16).value for i in range(1,temp_ws.max_row)]
-
+    temp_project=[temp_ws.cell(row=i,column=17).value for i in range(1,temp_ws.max_row)]
+    
     # append
     order_name.append(temp_order_name)
     order_product_code_1.append(temp_order_product_code_1)
@@ -91,6 +93,8 @@ for x in range(0, len(output_file_list)):
     order_id.append(temp_order_id)
     
     email.append(temp_email)
+    project.append(temp_project)
+
 
 
 ## create final dt
@@ -102,7 +106,8 @@ order_dt=pd.DataFrame({'order_name': sum(order_name,[])[1:],
      'order_price_2': sum(order_price_2,[])[1:],
      'order_price_3': sum(order_price_3,[])[1:],
      'order_id': sum(order_id,[])[1:], 
-     'email': sum(email,[])[1:]
+     'email': sum(email,[])[1:], 
+     'project': sum(project,[])[1:], 
     })
 
 order_dt=order_dt[pd.notnull(order_dt["order_name"])]
@@ -110,28 +115,35 @@ order_dt=order_dt[pd.notnull(order_dt["order_name"])]
 # subset
 order_dt=order_dt[pd.notnull(order_dt["order_product_code_1"]) | pd.notnull(order_dt["order_product_code_2"]) | 
     pd.notnull(order_dt["order_product_code_3"]) ]
+order_dt=order_dt[order_dt["project"]!="project"]
 
 # loop over
 #----------------------------------------------------------------------------#
-file_list_final = order_dt['order_name']
+file_list_raw = order_dt['order_name'][1:]
+project_list_final = order_dt['project'][1:]
+project_list_final=[max(x,'') for x in project_list_final]
+file_list_final=file_list_raw + project_list_final
+
+file_list_raw = file_list_raw.unique()
 file_list_final = file_list_final.unique()
+print file_list_final
+print file_list_raw
 file_count=len(file_list_final)
 
 for x in range(0, len(file_list_final)):
 
-
     file_name_mod=annotated_input_path + "/" + file_list_final[x] + '.pdf'
     file_name_mod=os.path.normpath(file_name_mod)
-    file_name_raw=raw_input_path + "/" + file_list_final[x] + '.pdf'
+    file_name_raw=raw_input_path + "/" + file_list_raw[x] + '.pdf'
     file_name_raw=os.path.normpath(file_name_raw)
 
     print file_name_mod 
+    print file_name_raw 
 
     # obtain order_dt_subset
     #----------------------------------------------------------------------------#
     order_dt_subset=order_dt.ix[order_dt['order_name']==file_list_final[x]]
     order_dt_subset.reset_index(inplace=True, drop=True)
-    
 
     # parse PDF 
     #----------------------------------------------------------------------------#

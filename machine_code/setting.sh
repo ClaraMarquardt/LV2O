@@ -74,10 +74,13 @@ export thorough_mode="TRUE"
 # email settings [DEFAULT]
 #-------------------------------------------------#
 
-export email_address=`cat helper/email/email_username.txt`
-export email_pwd=`cat helper/email/email_password.txt`
+## basic settings
 export email_sender=`cat helper/email/email_sender.txt`
 export email_text=`cat helper/email/email_text.txt`
+export email_pwd=`cat helper/email/email_password.txt`
+export email_address=`cat helper/email/email_username.txt`
+
+
 
 # testing settings [DEFAULT]
 #-------------------------------------------------#

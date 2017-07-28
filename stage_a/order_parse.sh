@@ -54,6 +54,7 @@ for file in *; do
 	file_mod="${file_mod// /_}"
 	file_mod="${file_mod//-/_}"
 	file_mod="${file_mod//._/_}"
+	file_mod="${file_mod//,/_}"
 	file_mod="${file_mod//ä/a}"
 	file_mod="${file_mod//ü/u}"
 	file_mod="${file_mod//ö/o}"
