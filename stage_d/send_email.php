@@ -16,7 +16,7 @@
 require 'PHPMailerAutoload.php';
 
 date_default_timezone_set('EST');
-$file_path = getenv("data_path_annotated");
+$file_path = getenv("send_path");
 $username = getenv("email_address");
 $password = getenv("email_pwd");
 $execution_id = getenv("execution_id");
@@ -27,6 +27,7 @@ $email_sender = getenv("email_sender");
 /* obtain email list & product list - read in txt file */
 $file_list = array("xx");
 $email_list = array("xx");
+$project_list = array("xx");
 $file_list_mod = array("xx");
 $file_list_mod_no_ext = array("xx");
 
@@ -39,11 +40,13 @@ while(! feof($file))
   $temp_array = fgetcsv($file);  
   $temp_email = $temp_array[1];
   $temp_file = $temp_array[2] . '.pdf';
-  $temp_file_mod = $temp_array[3] . '.pdf';
-  $temp_file_mod_no_ext = $temp_array[3];
+  $temp_project = $temp_array[3] 
+  $temp_file_mod = $temp_array[4] . '.pdf';
+  $temp_file_mod_no_ext = $temp_array[4];
 
   array_push($email_list, $temp_email);
   array_push($file_list, $temp_file);
+  array_push($project_list, $temp_project);
   array_push($file_list_mod, $temp_file_mod);
   array_push($file_list_mod_no_ext, $temp_file_mod_no_ext);
 
@@ -55,14 +58,13 @@ $length = count($file_list);
 
 for ($i = 1; $i < $length-1; $i++) {
 
-
-
     /* obtain data */
     $file = $file_list[$i+1];
 
     if(!($file === ".pdf")) {
     // echo $file;
     $email_to = $email_list[$i+1];
+    $project_name=project_list[$i+1];
     $file_mod = $file_list_mod[$i+1];
     $file_mod_no_ext = $file_list_mod_no_ext[$i+1];
 
@@ -85,7 +87,7 @@ for ($i = 1; $i < $length-1; $i++) {
     $email->SetFrom($username, $email_sender);
     
     /* body */ 
-    $msg = $email_text;
+    $msg = $email_text . . $project_name
     $msg = wordwrap($msg,80);
 
     /* create email */ 

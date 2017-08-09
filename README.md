@@ -1,137 +1,100 @@
-### SET-UP Instructions
+### **LV20 - Leistungs-Verzeichnis-to-Order** 
 
-##### [1] Install key programs
----------------------------
+#### # OVERVIEW
 
-_Note: Internet access is required for the entire set-up_
+##### **## Stages**  
+- ExtractToExcel: 
+- WriteToPDF: 
+- SendToCustomer: 
 
-_Note: Order in which programs are installed does NOT matter_
+* Timing - 1st step take time
 
-[-] Set-up environment (IF not on Mac)
+##### **## Output & Interface**  
+
+
+##### **## Notes**  
+- Execution: Bash Script + Platypus App 
+
+##### **## Licenses**  
+- Execution: Bash Script + Platypus App 
+- Documentation: All documents & log files stored///Helper files & arhived data &code - within app (e.g. change settings .....)
+
+
+#### # SET-UP & EXECUTION
+
+##### **## Requirements & Dependencies**  
+
 ````
-## * Confirm that can access command line
-[1] Press Start -> In Search/Run line enter "cmd" -> command line window should open
+The tool is designed to run on MacOSx (Testing has been performed on MaxOSx Sierra and El Capitan)
 
-## * Install cygwin
-[1] Install cygwin - see: https://www.cygwin.com/
-[2] Integrate cygwin with the windows command line - see: https://www.howtogeek.com/howto/41382/how-to-use-linux-commands-in-windows-with-cygwin/
-````
+# Key
+* R & Set of R Packages (Installed as part of the set-up process)
+* IPython & Set of Python Packages (Installed as part of the set-up process)
+* php with imap support (Installed as part of the set-up process)
+* Supporting Dependencies: PDFSandwich (XXXXXXX), XPDF, PDFTK, Perl
+* Base Dependencies: Homebrew, Xcode (command line tools), gcc, awk (Installed as part of the set-up process)
 
-[-] Install R  
-````	
-## * Install R
-[1] Install R - see: https://cran.r-project.org/bin/windows/base/
+* Pre-installed: Perl
 
-## * Confirm that R can be accessed from the command line
-[1] Open the command line window -> Enter "R" -> R should start
-````
+# Other
+* Gmail account - configured (see below if need to change)
+* Excel integration
 
-[-] Install Python 
-````
-## * Install Python
-[1] Install Python - see: https://ipython.org/install.html
-
-## * Confirm that Python can be accessed from the command line
-[1] Open the command line window -> Enter "ipython" -> Python should start
-````
-
-[-] Install PHP 
-````
-## * Install PHP
-[1] Install PHP - see: http://windows.php.net/download#php-7.1
-
-## * Confirm that PHP can be accessed from the command line
-[1] Configure and confirm - see: 
-http://php.net/manual/en/install.windows.legacy.index.php#install.windows.legacy.commandline
 ````
 
-[-] Install the PDF parsing tools (pdftk, pdftotext/pdffonts, perl)
+##### **## Set-up (BASIC)**  
+
 ````
-## * Install PDFTK
-[1] Install PDFTK - see: https://www.pdflabs.com/tools/pdftk-server/
+# [1] Download the tool & Unzip to a selected path ('local path')
+Download the most up-to date version of the tool: XXXXXXXXXXXXXXX
 
-## * Install XPdf
-[1] Install XPdf - see: http://www.foolabs.com/xpdf/download.html
+- No spaces in path
+- cd [...]/tool
+sudo chmod -R a+x code_base/
 
-## * Install Perl
-[1] Install Perl - see: https://www.perl.org/get.html
-````
 
-##### [2] Obtain the code repository (code & dependencies & folder structure) 
----------------------------
+# [2] Execute the set-up script 
+Navigate to XXXX
+source code/machine_code/set_up_wrapper.sh && source code/machine_code/set_up.sh > log/set_up.txt 2>&1 
 
-[1] Specify directory & Navigate to chosen directory
+# [3] Additional manual install
 
-[-] * OPTION A (Requires Git)
-````
-[1] git clone https://github.com/ClaraMarquardt/order_automation.git
-````
 
-[-] * OPTION B (Requires local copy of repo)
-````
-[1] Unzip local copy of repo into the chosen directory
-````
+# [4] Excel intergation
+- See configuration log 
 
-[2] Ensure that the appropriate access permissions are set to allow for batch-mode execution
-````
-[1] Execute the follwing code
-takeown /r /d y /f [....]/tool
-icacls [....]/tool /t /grant Everyone:F
-`````
+## Notes:
+* You will need to be connected to the Internet during the set-up process
+* When asked whether to complete a Homebrew reset - enter 'No' unless you encounter problems during 
+set-up in which case it may help to re-run the set-up script with a Homebrew reset (enter 'Yes')
+* When asked for a password - enter the root password (required to install php)
+* Depending on whether or not e.g. Xcode (command line tools), are already installed installation may 
+take up to 30 minutes
 
-##### [3] Customise the settings
----------------------------
+# [5] Aliases
 
-[1] setting.sh (tool/code_base/machine_code/)
-````
-[-] Modify "wd_path" (All other settings are default settings and do NOT need to be modified)
 ````
 
-[2] email_password.txt and email_username.txt (tool/helper/email_id/)
-````
-[-] Modify the contents of both txt files - email address and password of the gmail account which is to be used to receive and send emails
+##### **## Set-up (EXTENDED)**  
+
 ````
 
-[3] Excel macro integration
-````
-[-] Modify the excel macro to (a) read in data from (.csv) from tool/vb_interface/input and (b) output data (.xlsx and .pdf) to tool/vb_interface/output
+# [X] Adjust the email account
+# [X] Reset the app
+
 ````
 
-##### [4] Obtain the required R/Python packages
----------------------------
+##### **## Execution**  
 
-[1] Obtain the required Python packages
 ````
-[1] Start the command line window
-[2] Execute the following code 
-pip install -r [...]/tool/code_base/helper_code/python_dependency.txt
-````
+# [1] Execute the tool
 
-[2] Obtain the required R packages
-````
-[1] Start the command line window
-[2] Execute the following code 
-R CMD BATCH --no-save [...]/tool/code_base/helper_code/R_dependency.R
+## Notes:
+* You will be asked a number of questions:
+** 'Enter the earliest email date (e.g. 03-July-2017):' - Enter the earliest date from which emails are to be 
+analyzed (date must be entered in the suggested format)
+** 'Enter email username (e.g. test@gmail.com):' / 'Enter email password' - Enter your gmail username and password 
+** 'Keep log files (Yes/No):' - Enter 'No' unless you wish to keep the log files generated 
+during execution (e.g. for the purposes of debugging)
 ````
 
-### EXECUTION Instructions
-----------------------------------------------------------------------------
-
-[1] start the windows command window 
-
-[2] navigate to wd
-````
-cd [....]/tool
-````
-
-[3] execute - stage 1 (email -> vb input)
-````
-./code_base/machine_code/execution_master_stage_1.sh
-````
-
-[*] EXECUTE VB MACRO
-
-[4] execute - stage 2 (vb output -> email)
-````
-./code_base/machine_code/execution_master_stage_2.sh
-````

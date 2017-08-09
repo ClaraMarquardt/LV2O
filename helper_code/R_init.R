@@ -1,137 +1,73 @@
-# R init
-
 # ---------------------------------------
 # external dependencies
 # ---------------------------------------
 
 ## ehR - load or install function
-load_or_install <- function(package_names, custom_lib_path=FALSE, 
-  custom_path=NA, verbose=FALSE, local_package=FALSE, 
-  local_package_path=NA) {  
-
+load_or_install <- function(package_names, verbose=FALSE, upgrade=FALSE) {  
 
   # obtain & save default path
   # -----------------------------
-  library(devtools)
-  dev_mode(FALSE)
-  default_path     <- .libPaths()[1]
+  print(.libPaths())
 
-  # dev tools & dev mode
+  # upgrade packages
   # -----------------------------
-  library(devtools)
-  # set to dev_mode 
-  dev_mode(TRUE)
+  if (upgrade==TRUE) {
 
-  # lib path
-  # -----------------------------
-  if (custom_lib_path==TRUE) {
+    print("Updating Packages")
 
-    if (!dir.exists(custom_path)) {
-      dir.create(custom_path)
-    }
-
-    if (!("dev" %in% list.files(custom_path))) {
-      dir.create(paste0(custom_path, "/dev"))
-    }
-
-    lib_path     <- custom_path
-    lib_dev_path <- paste0(custom_path, "/dev")
-
-    print(sprintf("lib_path: %s", lib_path))
-
-  } else if (custom_lib_path==FALSE) {
-
-    lib_path     <- default_path
-    lib_dev_path <- default_path
-
-    print(sprintf("lib_path: %s", lib_path))
-
+    tryCatch({update.packages(ask = FALSE, repos = "http://cran.cnr.berkeley.edu/", 
+      checkBuilt = TRUE, type="source")}, error=function(e) {print("Package update failed")})
+  
   }
 
-  if (local_package==FALSE) {
-
-     # install (if required, i.e. not yet installed)  
-     # -----------------------------
-     
-     ## extended - handle special cases
-     lapply(package_names, function(x) if(!x %in% c(installed.packages(
-       lib.loc=lib_path), installed.packages(lib.loc=lib_dev_path))) {
+  # install (if required, i.e. not yet installed)  
+  # -----------------------------
+  lapply(package_names, function(x) if(!x %in% c(
+      installed.packages()[,"Package"])) {
     
        print(sprintf("Fresh Install: %s", x))
     
-    
-       # install
-       if (x=="data.table") {
-    
-         suppressMessages(withr::with_libpaths(new = lib_path,
-           install_version("data.table", version = "1.9.6",
-           repos = "http://cran.us.r-project.org",
-           dependencies=TRUE)))
-    
-       } else {
-    
-         suppressMessages(install.packages(x,repos="http://cran.cnr.berkeley.edu/", 
-           dependencies=TRUE, lib=lib_path))
-    
-      }
-   
+       suppressMessages(install.packages(x,
+        repos="http://cran.cnr.berkeley.edu/", 
+        type="source"))
+
   })
  
- } 
-
   # load
   # -----------------------------
-
   packages_loaded <- lapply(package_names, function(x) {
     if (verbose==TRUE) {
       print(sprintf("Loading: %s", x))
     }
 
     suppressMessages(library(x,
-        character.only=TRUE, quietly=TRUE,verbose=FALSE, 
-        lib.loc=lib_path))
+        character.only=TRUE, quietly=TRUE,verbose=FALSE))
 
   })
 
-}
+} 
+
 # ---------------------------------------
 # external dependencies
 # ---------------------------------------
-package_list <-list("devtools", "dplyr", "data.table","stringr","lubridate",
-  "tidyr", "reshape", "reshape2", "xlsxjars", "xlsx","zoo")
-load_or_install(package_list)
+package_list <- list( "rJava","dplyr", "data.table","stringr","lubridate",
+  "tidyr","reshape", "reshape2", "xlsxjars", "xlsx","zoo")
+load_or_install(package_names=package_list, upgrade=TRUE)
 
 # ---------------------------------------
 # embedded dependencies
 # ---------------------------------------
 
+# set_zero_na
 #----------------------------------------------------------------------------#
-
-#' Replace (in place) zeros in in data.table with another value.
-#' @export
-#' @param name Name of data.table [character]
-#' @param replace Value with which to replace 0s  [any]
-#' @return Data.table modified in place
-#' @examples
-#' TBC
-
 set_zero_na <- function(dt, replace=NA) {
 
   for (j in seq_len(ncol(dt)))
     set(dt, which(dt[[j]] %in% c(0)), j, replace)
 }
 
+# set_na_zero
 #----------------------------------------------------------------------------#
-
-#----------------------------------------------------------------------------#
-
-#' Replace (in place) NAs/+inf/-inf in data.table with another value.
-#' @export
-#' @param name Name of data.table [character]
-#' @param replace Value with which to replace Nas/+inf/-inf  [any]
-#' @return Data.table modified in place
-#' @examples
-#' TBC
 
 set_na_zero <- function(dt, replace=0, subset_col=names(dt)) {
 
@@ -140,17 +76,8 @@ set_na_zero <- function(dt, replace=0, subset_col=names(dt)) {
 
 }
 
+# set_missing_na
 #----------------------------------------------------------------------------#
-
-#----------------------------------------------------------------------------#
-
-#' Replace (in place) empty values ("[ ]*" or "") in data.table with another value.
-#' @export
-#' @param name Name of data.table [character]
-#' @param replace Value with which to replace empty values  [any]
-#' @return Data.table modified in place
-#' @examples
-#' TBC
 
 set_missing_na <- function(dt, replace=NA, subset_col=names(dt)) {
 
@@ -158,38 +85,18 @@ set_missing_na <- function(dt, replace=NA, subset_col=names(dt)) {
     set(dt, which(gsub("[ ]*", "", dt[[j]])==""), j, replace)
 }
 
+# ps
 #----------------------------------------------------------------------------#
-
-#----------------------------------------------------------------------------#
-
-#' Print(sprintf(...).
-#' @export
-#' @param  TBC
-#' @return TBC
-#' @examples
-#' TBC
 
 ps <- function(char_string, ...) {
 
      print(sprintf(char_string, ...))
 }
 
+# out
 #----------------------------------------------------------------------------#
-
-#----------------------------------------------------------------------------#
-
-#' Save R objects to different formats.
-#' 
-#' @export
-#' @param  TBC
-#' @return TBC
-#' @examples
-#' TBC
 
 out <- function(obj, path) {
-
-  # purpose: 
-  # save .csv,.pdf,.Rds files
 
   if (path %like% "csv") {
 
@@ -211,16 +118,8 @@ out <- function(obj, path) {
 
 }
 
+# inv_lapply
 #----------------------------------------------------------------------------#
-
-#----------------------------------------------------------------------------#
-
-#' Invisible lapply.
-#' @export
-#' @param  TBC
-#' @return TBC
-#' @examples
-#' TBC
 
 inv_lapply <- function(X, FUN,...) {
 

@@ -60,6 +60,7 @@ order_price_3=[]
 order_id=[]
 email=[]
 project=[]
+project_ext=[]
 
 for x in range(0, len(output_file_list)):
 
@@ -76,11 +77,13 @@ for x in range(0, len(output_file_list)):
     temp_order_price_2=[temp_ws.cell(row=i,column=8).value for i in range(1,temp_ws.max_row)]
     temp_order_price_3=[temp_ws.cell(row=i,column=10).value for i in range(1,temp_ws.max_row)]
 
-    temp_order_id=[temp_ws.cell(row=i,column=12).value for i in range(1,temp_ws.max_row)]
+    temp_order_id=[temp_ws.cell(row=i,column=13).value for i in range(1,temp_ws.max_row)]
 
-    temp_email=[temp_ws.cell(row=i,column=16).value for i in range(1,temp_ws.max_row)]
-    temp_project=[temp_ws.cell(row=i,column=17).value for i in range(1,temp_ws.max_row)]
+    temp_email=[temp_ws.cell(row=i,column=17).value for i in range(1,temp_ws.max_row)]
     
+    temp_project=[temp_ws.cell(row=i,column=12).value for i in range(1,temp_ws.max_row)]
+    temp_project_ext=[temp_ws.cell(row=i,column=12).value for i in range(1,temp_ws.max_row)]
+
     # append
     order_name.append(temp_order_name)
     order_product_code_1.append(temp_order_product_code_1)
@@ -93,12 +96,13 @@ for x in range(0, len(output_file_list)):
     order_id.append(temp_order_id)
     
     email.append(temp_email)
+    
     project.append(temp_project)
-
-
+    project_ext.append(temp_project)
 
 ## create final dt
 order_dt=pd.DataFrame({'order_name': sum(order_name,[])[1:],
+     'project': sum(project,[])[1:],
      'order_product_code_1': sum(order_product_code_1,[])[1:],
      'order_product_code_2': sum(order_product_code_2,[])[1:],
      'order_product_code_3': sum(order_product_code_3,[])[1:],
@@ -107,7 +111,7 @@ order_dt=pd.DataFrame({'order_name': sum(order_name,[])[1:],
      'order_price_3': sum(order_price_3,[])[1:],
      'order_id': sum(order_id,[])[1:], 
      'email': sum(email,[])[1:], 
-     'project': sum(project,[])[1:], 
+     'project_ext': sum(project_ext,[])[1:], 
     })
 
 order_dt=order_dt[pd.notnull(order_dt["order_name"])]
@@ -273,7 +277,7 @@ for x in range(0, len(file_list_final)):
 
 # save email list
 #----------------------------------------------------------------------------#
-email_dt=order_dt[['email','order_name']]
+email_dt=order_dt[['email','order_name','project_ext']]
 email_dt=email_dt.drop_duplicates()
 
 email_dt['email'] = [re.sub("_x[^_]*_$", "",x) for x in email_dt['email']]
@@ -302,8 +306,6 @@ for x in range(0, len(input_file_list)):
     filename=input_file_list[x]
     shutil.move(filename, archive_file_path)
 
-
-
 ## vb output 
 output_file_list = glob.glob(input_path)
 
@@ -323,21 +325,21 @@ print "Number of PDFs: " + str(file_count)
 print "Runtime (minutes):" + str((end_time - start_time))
 
 orig_stdout = sys.stdout
-file_name=log_path+'/log_order_output'+'.txt'
-file_name=os.path.normpath(file_name)
-log_file  = open(file_name,'a+')
-sys.stdout = log_file
+for log_filename in [log_path+'/stage_c'+'.txt', log_path+'/stage_c_'+execution_id+'.txt']:
 
-print "\n\n###############" 
-print "Execution ID: " + execution_id
-print "Date: " + str(datetime.date.today())
+    file_name=os.path.normpath(log_filename)
+    log_file  = open(file_name,'a+')
+    sys.stdout = log_file
 
-print "\n\nNumber of PDFs: " + str(file_count)
-print "Runtime (minutes):" + str(end_time - start_time) 
+    print "\n\n###############" 
+    print "Execution ID: " + execution_id
+    print "Date: " + str(datetime.date.today())
 
-sys.stdout = orig_stdout
-log_file.close()
+    print "\n\nNumber of PDFs: " + str(file_count)
+    print "Runtime (minutes):" + str(end_time - start_time) 
 
+    sys.stdout = orig_stdout
+    log_file.close()
 
 #----------------------------------------------------------------------------#
 #                                    End                                     #

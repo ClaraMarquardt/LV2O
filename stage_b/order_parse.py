@@ -244,21 +244,23 @@ print "Number of PDFs parsed succesfully: " + str(file_count_sucess)
 print "Runtime (minutes):" + str((end_time - start_time))
 
 orig_stdout = sys.stdout
-file_name=log_path+'/log_order_parse_py'+'.txt'
-file_name=os.path.normpath(file_name)
-log_file  = open(file_name,'a+')
-sys.stdout = log_file
 
-print "\n\n###############" 
-print "Execution ID: " + execution_id
-print "Date: " + str(datetime.date.today())
+for log_filename in [log_path+'/stage_b_ii'+'.txt', log_path+'/stage_b_ii_'+execution_id+'.txt']:
 
-print "\n\nNumber of PDFs: " + str(file_count)
-print "Number of PDFs parsed succesfully: " + str(file_count_sucess)
-print "Runtime (minutes):" + str(end_time - start_time) 
+    file_name=os.path.normpath(log_filename)
+    log_file  = open(file_name,'a+')
+    sys.stdout = log_file
 
-sys.stdout = orig_stdout
-log_file.close()
+    print "\n\n###############" 
+    print "Execution ID: " + execution_id
+    print "Date: " + str(datetime.date.today())
+
+    print "\n\nNumber of PDFs: " + str(file_count)
+    print "Number of PDFs parsed succesfully: " + str(file_count_sucess)
+    print "Runtime (minutes):" + str(end_time - start_time) 
+
+    sys.stdout = orig_stdout
+    log_file.close()
 
 #----------------------------------------------------------------------------#
 #                                    End                                     #

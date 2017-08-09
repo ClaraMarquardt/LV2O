@@ -40,9 +40,8 @@ done
 
 echo "starting ID: "${file_id}
 
-# # rename (no spaces, etc)
-# #----------------------------------------------------------------------------#
-
+# rename (no spaces, etc)
+#----------------------------------------------------------------------------#
 
 cd "${data_path_raw}"
 
@@ -77,8 +76,8 @@ done
 
 sleep 1
 
-# # ensure that filenames are  unique (has based)
-# #----------------------------------------------------------------------------#
+# ensure that filenames are  unique (has based)
+#----------------------------------------------------------------------------#
 md5 -r * | sort -t ' ' -k 4 -r | awk 'BEGIN{lasthash = ""} $1 == lasthash {print $2} {lasthash = $1}' |xargs rm
 
 # parse
@@ -90,7 +89,8 @@ agg_file=$(ls -l | wc -l )
 total_file=0
 ocr_file=0
 
-log_file=${wd_path_log}'/log_parsing_sh.txt'
+log_file=${wd_path_log}'/stage_a.txt'
+log_file_specific=${wd_path_log}"/stage_a_${execution_id}.txt"
 
 for file in *; do
 
@@ -162,12 +162,12 @@ echo "Total number of orders: ${total_file}"
 echo "Parsed number of orders: ${ocr_file}"
 echo "Run time (minutes): $(((end-start)/60))"
 
-echo "\n\n###########" >> $log_file
-echo "\nExecution ID: ${execution_id}" >> $log_file
-echo "Date: ${current_date}" >> $log_file
-echo "\nTotal number of orders: ${total_file}" >> $log_file
-echo "Parsed number of orders: ${ocr_file}" >> $log_file
-echo "Run time (minutes): $(((end-start)/60))" >> $log_file
+echo "\n\n###########" | tee -a $log_file
+echo "\nExecution ID: ${execution_id}" | tee -a $log_file $log_file_specific
+echo "Date: ${current_date}" | tee -a $log_file $log_file_specific
+echo "\nTotal number of orders: ${total_file}" | tee -a $log_file $log_file_specific
+echo "Parsed number of orders: ${ocr_file}" | tee -a $log_file $log_file_specific
+echo "Run time (minutes): $(((end-start)/60))" | tee -a $log_file $log_file_specific
 
 
 #----------------------------------------------------------------------------#

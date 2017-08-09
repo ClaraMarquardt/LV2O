@@ -99,22 +99,27 @@ lapply(file_list[start_id:length(file_list)], function(file_name) {
     # identify project name
     #-----------------------------------------#
     project_raw <- ""
+    text[, project_ext:=project_raw]
     text[, project:=project_raw]
 
-    if (nrow( text[text_line %like% "Projekt:|LV:|BV:"])>0) {
-        project_raw <- text[text_line %like% "Projekt:|LV:|BV:"]
+    if (nrow( text[text_line %like% "Projekt:|LV:|BV:|Objekt:"])>0) {
+        project_raw <- text[text_line %like% "Projekt:|LV:|BV:|Objekt:"]
         project_raw <- project_raw[which.max(nchar(project_raw$text_line))]$text_line
-        project_raw <- gsub("(Projekt:|LV:|BV:)(.*)", "\\2", project_raw)
+        project_raw <- gsub("(Projekt:|LV:|BV:|Objekt:)(.*)", "\\2", project_raw)
         project_raw <- gsub("Sachbearbeiter|Datum", "", project_raw)
         project_raw <- gsub("[ ]{2,}", " ", project_raw)
         project_raw <- gsub(" |-|/|,|:", "_",project_raw)
         project_raw <- gsub("\\.", "", project_raw)
         project_raw <- gsub("^_|_{2,}|_$", "", project_raw)
-        if (nchar(project_raw)>0)  text[, project:=paste0("_", project_raw)]
+        if (nchar(project_raw)>0)  text[, project_ext:=paste0("_", project_raw)]
     }
     
     print(project_raw)
     
+    # generate shortened version
+    project_raw_short <- substring(project_raw, 1, min(15, nchar(project_raw)))
+    text[, project:=project_raw_short]
+
     # identify product breaks
     #-----------------------------------------#
     text[,item:=""]
@@ -190,13 +195,13 @@ lapply(file_list[start_id:length(file_list)], function(file_name) {
         "hist_id_2", "hist_price_2", "hist_id_3","hist_price_3"):=""]
     dt_final <- text[, .(date_processed, prod_desc, hist_id_1, hist_price_1, 
         hist_id_2, hist_price_2, hist_id_3,hist_price_3,
-        origin_file_name, item, piece_count, project)]
+        origin_file_name, project, item, piece_count, project_ext)]
     dt_final <- unique(dt_final, by=c("item"))
     setnames(dt_final, c("date_processed", "prod_desc", 
         "historical product ID #1", "historical price #1", 
         "historical product ID #2", "historical price #2",
         "historical product ID #3","historical price #3",
-        "source order file name","source order-item number", "piece count", "project"))
+        "source order file name","project","source order-item number", "piece count", "project name"))
 
     # clean
     dt_final[, prod_desc:=gsub("\n$", "",prod_desc )]
@@ -253,7 +258,6 @@ lapply(file_list[start_id:length(file_list)], function(file_name) {
 
     }
 
-
     # generate master product id
     dt_final_identified[,master_product_id:=1:nrow(dt_final_identified)]
     setcolorder(dt_final_identified, c("master_product_id", setdiff(names(
@@ -271,9 +275,9 @@ lapply(file_list[start_id:length(file_list)], function(file_name) {
     }
 
     # rename original pdf
-    file_name_pdf_updated <- gsub("\\.pdf$", paste0(project_raw, ".pdf"), 
+    file_name_pdf_updated <- gsub("\\.pdf$", paste0(project_raw_short, ".pdf"), 
         file_name_pdf)
-    file_name_text_updated <- gsub("\\.txt$", paste0(project_raw, ".txt"), 
+    file_name_text_updated <- gsub("\\.txt$", paste0(project_raw_short, ".txt"), 
         file_name)
     file.rename(paste0(mod_order_path, "/",file_name_pdf),
         paste0(mod_order_path, "/",file_name_pdf_updated))
@@ -335,7 +339,8 @@ for (i in seq(1:ceiling(file_count_final/output_id_max))) {
 
     setcolorder(temp_comb, c("master_id", "master_order_id", 
         setdiff(names(temp_comb), c("source_email","master_id", 
-        "master_order_id", "execution_id", "project")),  "source_email", "project","execution_id"))
+        "master_order_id", "execution_id", "project name", "project")), 
+        "source_email", "project name","execution_id"))
 
     output_file <- paste0(output_path, "/", "order_master_database_",
         execution_id,"_",i,".xlsx")
@@ -366,16 +371,20 @@ inv_lapply(move_list, function(x) file.rename(paste0(mod_order_path, "/", x),
 # -------------------------
 end_time <-  Sys.time()
 
-sink(paste0(log_path, "/log_order_clean_R.txt"), append=TRUE)
+for (log_file in c(paste0(log_path, "/stage_b_i.txt"), 
+    paste0(log_path, "/stage_b_i_",execution_id, ".txt"))) {
 
-cat(sprintf("\n\n##################\n"))
-cat(sprintf("Execution ID: %s\n", execution_id))
-cat(sprintf("Date: %s\n", current_date))
-cat("\n\n")
-cat(sprintf("Number of PDFs: %d\n", file_count))
-cat(sprintf("Runtime (minutes): %f\n\n", round(as.numeric(end_time - start_time)/60, 1)))
+    sink(log_file, append=TRUE)
 
-sink()
+    cat(sprintf("\n\n##################\n"))
+    cat(sprintf("Execution ID: %s\n", execution_id))
+    cat(sprintf("Date: %s\n", current_date))
+    cat("\n\n")
+    cat(sprintf("Number of PDFs: %d\n", file_count))
+    cat(sprintf("Runtime (minutes): %f\n\n", round(as.numeric(end_time - start_time)/60, 1)))
+
+    sink()
+}
 
 #----------------------------------------------------------------------------#
 #                                    End                                     #
