@@ -21,6 +21,7 @@ cd $output_folder
 mkdir log
 mkdir raw_order
 mkdir annotated_order
+mkdir non_processed_PDF
 
 #----------------------------------------------------------------------------#
 #----------------------------------------------------------------------------#
@@ -101,6 +102,24 @@ for file in *$execution_id*; do
 done
 
 cp ${vb_path_output}/*xlsx* $output_folder/annotated_order
+cp ${data_path_annotated}/*csv* $output_folder/annotated_order
+
+# non parsed 
+cd ${error_path_parsed}
+
+for file in *$execution_id*; do
+
+	cp $file $output_folder/non_processed_PDF
+
+done
+
+cd ${error_path_ocr}
+
+for file in *$execution_id*; do
+
+	cp $file $output_folder/non_processed_PDF
+
+done
 
 # log files
 cd ${wd_path_log}

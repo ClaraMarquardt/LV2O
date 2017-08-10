@@ -7,7 +7,7 @@
 
 #----------------------------------------------------------------------------#
 
-# Initialisation
+# Initialization
 #----------------------------------------------------------------------------#
 
 # WD
@@ -19,13 +19,10 @@ current_date=$(date +"%m_%d_%Y / %H:%M")
 
 # define log function
 status_file=${wd_path}/documentation_setup/installer/config_status.txt
-log_file=${wd_path}/documentation_setup/installer/install_log.txt
 
-[ -e $status_file ] && rm $status_file
-[ -e $log_file ] && rm $log_file
+[ -e ${status_file} ] && rm $status_file
 
 printf ${status_file}
-printf ${log_file}
 
 echolog()
 (
@@ -33,12 +30,11 @@ echo $1
 echo $1 >> ${status_file}
 )
 
-echolog_ext()
-(
-echo $1
-echo $1 >> ${status_file}
-echo $1 >> ${log_file}
-)
+
+# email files
+package_path_1=${wd_path}/LV2O-ExtractToExcel.app/Contents/Resources/helper/email
+package_path_2=${wd_path}/LV2O-WriteToPDF.app/Contents/Resources/helper/email
+package_path_3=${wd_path}/LV2O-SendToCustomer.app/Contents/Resources/helper/email
 
 # Configure function
 #----------------------------------------------------------------------------#
@@ -46,9 +42,9 @@ configure() {
 
 	# output
 	if [ "$1" = "status_log" ]; then
-		log_temp="echolog_ext";
-	else 
 		log_temp="echolog";
+	else 
+		log_temp="echo";
 	fi
 
 	# log
@@ -61,10 +57,10 @@ configure() {
 	$log_temp "# PATH: $PATH"
 
 	# interface paths - VB
-	$log_temp "## VB Interface Paths "
+	$log_temp "## Interface Paths "
 
-	$log_temp "# VB Input (Read into VB): $(cd $wd_path"/interface/vb_input"; pwd)"
-	$log_temp "# VB Output (Save from VB): $(cd $wd_path"/interface/vb_output"; pwd)"
+	$log_temp "# Product Code Mapping - Input (Read in): $(cd $wd_path"/interface/product_code_input"; pwd)"
+	$log_temp "# Product Code Mapping - Output (Save to): $(cd $wd_path"/interface/product_code_output"; pwd)"
 
 	# helper dependencues
 	$log_temp "## Devtools "
@@ -115,7 +111,16 @@ configure() {
 #----------------------------------------------------------------------------#
 configure "status"
 
-# install
+
+# User Settings - Save
+#----------------------------------------------------------------------------#
+
+## Store email settings
+echo $email_address | tee ${package_path_1}/email_username.txt ${package_path_2}/email_username.txt ${package_path_3}/email_username.txt
+echo $email_pwd | tee ${package_path_1}/email_username.txt ${package_path_2}/email_username.txt ${package_path_3}/email_password.txt
+
+
+# Install
 #----------------------------------------------------------------------------#
 
 # ----------------
@@ -133,8 +138,8 @@ sudo curl -s https://php-osx.liip.ch/install.sh | bash -s 7.1
 export php_custom_path="/usr/local/php5/bin/php"
 export php_custom_path_ini=$(${php_custom_path} -r "echo php_ini_loaded_file();")
 
-echolog "# PHP: $php_custom_path"
-echolog "# PHP .ini: $php_custom_path_ini"
+printf "# PHP: $php_custom_path"
+printf "# PHP .ini: $php_custom_path_ini"
 ${php_custom_path} -c ${php_custom_path_ini} -r "echo phpinfo();" 
 
 printf "\n# SUCCESS - PHP successfully installed & configured"
@@ -150,10 +155,9 @@ printf "\n# ----------------------\n"
 
 ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"</dev/null
 
-## Confirm that the Command Line Tools are correctly confgured
-echolog "# Homebrew Version: $(brew --version)"
-echolog "# Xcode: $(xcode-select --print-path)"
-
+## Confirm that the Command Line Tools are correctly configured
+printf "# Homebrew Version: $(brew --version)"
+printf "# Xcode: $(xcode-select --print-path)"
 
 ## Homebrew reset
 printf "brew_reset: $brew_reset\n"
@@ -195,20 +199,20 @@ brew tap homebrew/science && brew install r
 brew link --overwrite r
 
 # Check if R is correctly configured
-echolog "R: $(which R)"
-echolog "R Version: $(R --version)"
+printf "R: $(which R)"
+printf "R Version: $(R --version)"
 
 ## R Packages
 printf "Installing R Packages"
 printf "\n# ----------------------\n"
 
 ### java configuration
-sudo R CMD javareconf
+# sudo R CMD javareconf
 
 ### other packages
 cd ${wd_path}
-R CMD BATCH --no-save ${wd_path}/documentation_setup/installer/R_dependency.R \
-${wd_path}/documentation_setup/installer/R_dependency.Rout
+# R CMD BATCH --no-save ${wd_path}/documentation_setup/installer/R_dependency.R \
+# ${wd_path}/documentation_setup/installer/R_dependency.Rout
 
 printf "\n# SUCCESS - R successfully installed & configured"
 printf "\n# ----------------------\n"
@@ -222,30 +226,30 @@ printf "\n# ----------------------\n"
 
 ## - Uninstall
 brew uninstall --force python
-[ -e  /usr/local/lib/python2.7] && rm -rf /usr/local/lib/python2.7/*
+[ -e  /usr/local/lib/python2.7 ] && rm -rf /usr/local/lib/python2.7/*
 
 ## - Reinstall
 brew prune 
-brew install python
-brew link --overwrite python
+# brew install python
+# brew link --overwrite python
 
 # Check if Python is correctly configured
-echolog "Python: $(which python)"
-echolog "Python Version: $(python --version)"
-echolog "Pip: $(which pip)"
+printf "Python: $(which python)"
+printf "Python Version: $(python --version)"
+printf "Pip: $(which pip)"
 
 ## Ipython
-pip install ipython
+# pip install ipython
 
 # Check if Ipython is correctly configured
-echolog "Ipython: $(which ipython)"
-echolog "Ipython Version: $(ipython --version)"
+printf "Ipython: $(which ipython)"
+printf "Ipython Version: $(ipython --version)"
 
 ## Python Packages
 printf "Installing Python Packages"
 printf "\n# ----------------------\n"
 
-pip install -r ${wd_path}/documentation_setup/installer/python_dependency.txt
+# pip install -r ${wd_path}/documentation_setup/installer/python_dependency.txt
 
 printf "\n# SUCCESS - Python & Ipython successfully installed & configured"
 printf "\n# ----------------------\n"
@@ -255,53 +259,54 @@ printf "\n# ----------------------\n"
 # ----------------
 
 ### Tesseract
-brew uninstall --force tesseract
-brew install tesseract --all-languages
-brew link --overwrite tesseract
+# brew uninstall --force tesseract
+# brew install tesseract --all-languages
+# brew link --overwrite tesseract
 
 ### PDFSandwich dependencies
-brew uninstall --force imagemagick ghostscript exact-image unpaper ocaml poppler
-brew install imagemagick ghostscript exact-image unpaper ocaml poppler
-brew link --overwrite imagemagick ghostscript exact-image unpaper ocaml poppler
+# brew uninstall --force imagemagick ghostscript exact-image unpaper ocaml poppler
+# brew install imagemagick ghostscript exact-image unpaper ocaml poppler
+# brew link --overwrite imagemagick ghostscript exact-image unpaper ocaml poppler
 
 ### PDFSandwich
-wget https://sourceforge.net/projects/pdfsandwich/files/pdfsandwich%200.1.6/pdfsandwich-0.1.6.tar.bz2 | unzip
-tar xjvf pdfsandwich-0.1.6.tar.bz2
-cd pdfsandwich-0.1.6
-sudo ./configure && make && make install 
+# wget https://sourceforge.net/projects/pdfsandwich/files/pdfsandwich%200.1.6/pdfsandwich-0.1.6.tar.bz2 | unzip
+# tar xjvf pdfsandwich-0.1.6.tar.bz2
+# cd pdfsandwich-0.1.6
+# sudo ./configure && make && make install 
 
-rm pdfsandwich-0.1.6.tar.bz2
-rm -rf pdfsandwich-0.1.6
+# rm pdfsandwich-0.1.6.tar.bz2
+# rm -rf pdfsandwich-0.1.6
 
 # Check if PDFSandwich is correctly configured
-echolog "PDFSandwich: $(which pdfsandwich)"
-echolog "PDFSandwich Version: $(pdfsandwich --version)"
-echolog "PDFSandwich Languages: $(pdfsandwich -list_langs)"
-echolog "$(pdfsandwich)"
+printf "PDFSandwich: $(which pdfsandwich)"
+printf "PDFSandwich Version: $(pdfsandwich --version)"
+printf "PDFSandwich Languages: $(pdfsandwich -list_langs)"
+printf "$(pdfsandwich)"
 
 ### Xpdf
-brew uninstall --force xpdf
-brew install xpdf
-brew link --overwrite xpdf
+# brew uninstall --force xpdf
+# brew install xpdf
+# brew link --overwrite xpdf
 
 # Check if Xpdf is correctly configured
-echolog "XPDF (pdftotext): $(which pdftotext)"
-echolog "$(pdftotext)"
+printf "XPDF (pdftotext): $(which pdftotext)"
+printf "$(pdftotext)"
 
 #### pdftk
 
 # install
-brew install https://raw.githubusercontent.com/turforlag/homebrew-cervezas/master/pdftk.rb
+# brew install https://raw.githubusercontent.com/turforlag/homebrew-cervezas/master/pdftk.rb
 
 # Check if pdftk is correctly configured
-echo_log "pdftk: $(which pdftk)"
-echo_log "pdftk Version: $(pdftk --version)"
-echo_log "$(pdftk)"
+printf "pdftk: $(which pdftk)"
+printf "pdftk Version: $(pdftk --version)"
+printf "$(pdftk)"
 
 
 # Final configuration
 #----------------------------------------------------------------------------#
 configure "status_log"
+
 
 #----------------------------------------------------------------------------#
 #                                    End                                     #

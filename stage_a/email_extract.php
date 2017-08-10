@@ -146,17 +146,6 @@ if($emails) {
         echo "address";
         print_r($address[1]);
 
-        // if (preg_match('/(.*@.*)(<mailto.*)/', $message, $address_simple)) {
-        // };
-
-        // echo "address";
-        // print_r($address_simple[1]);
-
-        // if($address_simple[1]!="") 
-        // {
-        // $address[1]=$address_simple[1];
-        // }
-
         echo "address";
         print_r($address[1]);
      
@@ -203,11 +192,6 @@ if($emails) {
             // attached message headers, can ignore
             break;
     
-            case 3: // application
-            case 4: // audio
-            case 5: // image
-            case 6: // video
-            case 7: // other
             $filename = getFilenameFromPart($part);
             
             if($filename) {

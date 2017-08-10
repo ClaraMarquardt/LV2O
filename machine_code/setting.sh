@@ -46,8 +46,8 @@ export data_path_structured=$wd_path_data"/structured_data"
 export data_path_annotated=$wd_path_data"/annotated_data"
 
 ## vb interface paths
-export vb_path_input=$wd_path_interface"/vb_input"
-export vb_path_output=$wd_path_interface"/vb_output"
+export vb_path_input=$wd_path_interface"/product_code_input"
+export vb_path_output=$wd_path_interface"/product_code_output"
 export send_path=$wd_path_interface"/send_order"
 
 ## error_paths
