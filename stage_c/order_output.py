@@ -82,7 +82,7 @@ for x in range(0, len(output_file_list)):
     temp_email=[temp_ws.cell(row=i,column=17).value for i in range(1,temp_ws.max_row)]
     
     temp_project=[temp_ws.cell(row=i,column=12).value for i in range(1,temp_ws.max_row)]
-    temp_project_ext=[temp_ws.cell(row=i,column=12).value for i in range(1,temp_ws.max_row)]
+    temp_project_ext=[temp_ws.cell(row=i,column=18).value for i in range(1,temp_ws.max_row)]
 
     # append
     order_name.append(temp_order_name)
@@ -98,7 +98,7 @@ for x in range(0, len(output_file_list)):
     email.append(temp_email)
     
     project.append(temp_project)
-    project_ext.append(temp_project)
+    project_ext.append(temp_project_ext)
 
 ## create final dt
 order_dt=pd.DataFrame({'order_name': sum(order_name,[])[1:],
@@ -118,20 +118,20 @@ order_dt=order_dt[pd.notnull(order_dt["order_name"])]
 
 # subset
 order_dt=order_dt[pd.notnull(order_dt["order_product_code_1"]) | pd.notnull(order_dt["order_product_code_2"]) | 
-    pd.notnull(order_dt["order_product_code_3"]) ]
+    pd.notnull(order_dt["order_product_code_3"])]
+order_dt=order_dt[(order_dt["order_product_code_1"]!="#N/A") | (order_dt["order_product_code_2"]!="#N/A")| 
+    (order_dt["order_product_code_3"]!="#N/A")]
 order_dt=order_dt[order_dt["project"]!="project"]
 
 # loop over
 #----------------------------------------------------------------------------#
-file_list_raw = order_dt['order_name'][1:]
-project_list_final = order_dt['project'][1:]
+file_list_raw = order_dt['order_name']
+project_list_final = order_dt['project']
 project_list_final=[max(x,'') for x in project_list_final]
 file_list_final=file_list_raw + project_list_final
 
 file_list_raw = file_list_raw.unique()
 file_list_final = file_list_final.unique()
-print file_list_final
-print file_list_raw
 file_count=len(file_list_final)
 
 for x in range(0, len(file_list_final)):
@@ -146,7 +146,7 @@ for x in range(0, len(file_list_final)):
 
     # obtain order_dt_subset
     #----------------------------------------------------------------------------#
-    order_dt_subset=order_dt.ix[order_dt['order_name']==file_list_final[x]]
+    order_dt_subset=order_dt.ix[order_dt['order_name']==file_list_raw[x]]
     order_dt_subset.reset_index(inplace=True, drop=True)
 
     # parse PDF 
@@ -289,7 +289,7 @@ email_dt['order_name_mod'] = [re.sub("_", " ",x) for x in  email_dt['order_name_
 # save
 file_name=output_path + "/" + "email_list_" +execution_id + ".csv"
 file_name=os.path.normpath(file_name)
-email_dt.to_csv(file_name, encoding="utf8")
+email_dt.to_csv(file_name, encoding="utf8", index=False)
 
 
 # move files to archive
@@ -310,9 +310,11 @@ for x in range(0, len(input_file_list)):
 output_file_list = glob.glob(input_path)
 
 for x in range(0, len(output_file_list)):
-
-    archive_file_path=archive_path_output
+    archive_file_path=archive_path_output + "/" + re.sub("\\.xlsx", "_"+execution_id + ".xlsx",os.path.basename(output_file_list[x]))
     filename=output_file_list[x]
+    print os.path.basename(output_file_list[x])
+    print archive_file_path
+    print filename
     shutil.move(filename, archive_file_path)
 
 

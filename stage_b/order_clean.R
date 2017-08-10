@@ -27,7 +27,7 @@ execution_id             <- commandArgs(trailingOnly = TRUE)[5]
 log_path                 <- commandArgs(trailingOnly = TRUE)[6]
 temp_path                <- commandArgs(trailingOnly = TRUE)[7]
 archive_path             <- commandArgs(trailingOnly = TRUE)[8]
-
+print(execution_id)
 # dependencies
 #-------------------------------------------------#
 source(paste0(init_path, "/R_init.R"))
@@ -99,26 +99,40 @@ lapply(file_list[start_id:length(file_list)], function(file_name) {
     # identify project name
     #-----------------------------------------#
     project_raw <- ""
+    text[, project_ext_ext:=project_raw]
     text[, project_ext:=project_raw]
     text[, project:=project_raw]
 
-    if (nrow( text[text_line %like% "Projekt:|LV:|BV:|Objekt:"])>0) {
-        project_raw <- text[text_line %like% "Projekt:|LV:|BV:|Objekt:"]
+    if (nrow( text[text_line %like% "Projekt|LV|BV|Objekt"])>0) {
+        project_raw <- text[text_line %like% "Projekt|LV|BV|Objekt"]
         project_raw <- project_raw[which.max(nchar(project_raw$text_line))]$text_line
-        project_raw <- gsub("(Projekt:|LV:|BV:|Objekt:)(.*)", "\\2", project_raw)
+        project_raw <- gsub("(Projekt|LV|BV|Objekt)(.*)", "\\2", project_raw)
         project_raw <- gsub("Sachbearbeiter|Datum", "", project_raw)
         project_raw <- gsub("[ ]{2,}", " ", project_raw)
-        project_raw <- gsub(" |-|/|,|:", "_",project_raw)
+        project_raw <- gsub(" |-|/|,|:|%|'|,|\\|=|„", "_",project_raw)
         project_raw <- gsub("\\.", "", project_raw)
         project_raw <- gsub("^_|_{2,}|_$", "", project_raw)
-        if (nchar(project_raw)>0)  text[, project_ext:=paste0("_", project_raw)]
-    }
-    
+        if (nchar(project_raw)>0)  text[, project_ext:=paste0(project_raw)]
+    } 
+
+
+    header_alt <- paste0(text[text_line!=""][1:20]$text_line, collapse=" ")
+    header_alt <- strsplit(header_alt,"Menge|Preis|EP|GP|preis|Position|Text|Einheit|Pos\\.|OZ", 
+                    perl=TRUE)[[1]][1]
+    header_alt <- gsub("(Projekt|LV|BV|Objekt|Leistungsverzeichnis|Leistungspositionen|Aufstellung)(.*)", "\\2", header_alt)
+    header_alt <- gsub("Sachbearbeiter|Datum", "", header_alt)
+    header_alt <- gsub("[ ]{2,}", " ", header_alt)
+    header_alt <- gsub(" |-|/|,|:|%|'|,|\\|=|„", "_",header_alt)
+    header_alt <- gsub("\\.", "", header_alt)
+    header_alt <- gsub("^_|_{2,}|_$", "", header_alt)
+    if (nchar(header_alt)>0)  text[, project_ext_ext:=paste0(header_alt)]
+
     print(project_raw)
-    
+    print(header_alt)
+
     # generate shortened version
-    project_raw_short <- substring(project_raw, 1, min(15, nchar(project_raw)))
-    text[, project:=project_raw_short]
+    project_raw_short <- paste0("_", substring(project_raw, 1, min(15, nchar(project_raw))))
+    if (nchar(project_raw_short)>1)  text[, project:=project_raw_short]
 
     # identify product breaks
     #-----------------------------------------#
@@ -195,13 +209,14 @@ lapply(file_list[start_id:length(file_list)], function(file_name) {
         "hist_id_2", "hist_price_2", "hist_id_3","hist_price_3"):=""]
     dt_final <- text[, .(date_processed, prod_desc, hist_id_1, hist_price_1, 
         hist_id_2, hist_price_2, hist_id_3,hist_price_3,
-        origin_file_name, project, item, piece_count, project_ext)]
+        origin_file_name, project, item, piece_count, project_ext, project_ext_ext)]
     dt_final <- unique(dt_final, by=c("item"))
     setnames(dt_final, c("date_processed", "prod_desc", 
         "historical product ID #1", "historical price #1", 
         "historical product ID #2", "historical price #2",
         "historical product ID #3","historical price #3",
-        "source order file name","project","source order-item number", "piece count", "project name"))
+        "source order file name","project","source order-item number", 
+        "piece count", "project name", "project name ext"))
 
     # clean
     dt_final[, prod_desc:=gsub("\n$", "",prod_desc )]
@@ -339,8 +354,8 @@ for (i in seq(1:ceiling(file_count_final/output_id_max))) {
 
     setcolorder(temp_comb, c("master_id", "master_order_id", 
         setdiff(names(temp_comb), c("source_email","master_id", 
-        "master_order_id", "execution_id", "project name", "project")), 
-        "source_email", "project name","execution_id"))
+        "master_order_id", "execution_id", "project name", "project name ext")), 
+        "source_email", "project name","project name ext", "execution_id"))
 
     output_file <- paste0(output_path, "/", "order_master_database_",
         execution_id,"_",i,".xlsx")
@@ -371,8 +386,8 @@ inv_lapply(move_list, function(x) file.rename(paste0(mod_order_path, "/", x),
 # -------------------------
 end_time <-  Sys.time()
 
-for (log_file in c(paste0(log_path, "/stage_b_i.txt"), 
-    paste0(log_path, "/stage_b_i_",execution_id, ".txt"))) {
+for (log_file in c(paste0(log_path, "/stage_b_ii.txt"), 
+    paste0(log_path, "/stage_b_ii_",execution_id, ".txt"))) {
 
     sink(log_file, append=TRUE)
 

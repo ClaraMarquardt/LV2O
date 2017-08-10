@@ -40,9 +40,9 @@ mkdir non_processed_PDF
 cd ${wd_path_code}/stage_c
 
 ipython order_output.py "${init_path}" "${vb_path_output}" "${data_path_archived_raw}" \
-	"${data_path_archived_structured}" "${execution_id}" \
-	"${data_path_annotated}" "${wd_path_log}" "${data_path_archived_vb_input}" \
-	"${data_path_archived_vb_output}" "$vb_path_input"
+"${data_path_archived_structured}" "${execution_id}" \
+"${data_path_annotated}" "${wd_path_log}" "${data_path_archived_vb_input}" \
+"${data_path_archived_vb_output}" "$vb_path_input"
 
 
 # Stage-c (ii): Merge PDFs
@@ -101,7 +101,7 @@ for file in *$execution_id*; do
 
 done
 
-cp ${vb_path_output}/*xlsx* $output_folder/annotated_order
+cp ${data_path_archived_vb_output}/*${execution_id}.xlsx* $output_folder/annotated_order
 cp ${data_path_annotated}/*csv* $output_folder/annotated_order
 
 # non parsed 

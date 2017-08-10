@@ -52,7 +52,7 @@ load_or_install <- function(package_names, verbose=FALSE, upgrade=FALSE) {
 # ---------------------------------------
 package_list <- list( "rJava","dplyr", "data.table","stringr","lubridate",
   "tidyr","reshape", "reshape2", "xlsxjars", "xlsx","zoo")
-load_or_install(package_names=package_list, upgrade=TRUE)
+load_or_install(package_names=package_list, upgrade=FALSE)
 
 # ---------------------------------------
 # embedded dependencies

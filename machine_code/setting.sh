@@ -77,18 +77,14 @@ export thorough_mode="TRUE"
 
 # email settings [DEFAULT]
 #-------------------------------------------------#
-
-## basic settings
 export email_sender=`cat helper/email/email_sender.txt`
 export email_text=`cat helper/email/email_text.txt`
 export email_pwd=`cat helper/email/email_password.txt`
 export email_address=`cat helper/email/email_username.txt`
 
-# testing settings [DEFAULT]
+# Cocoa Dialogue [DEFAULT]
 #-------------------------------------------------#
-export test_mode="TRUE"
-export email_target='cmarquardt@uchicago.edu'
-
+export CD="$wd_path/code_base/helper_code/CocoaDialog.app/Contents/MacOS/CocoaDialog"
 
 #----------------------------------------------------------------------------#
 #                                    End                                     #

@@ -162,10 +162,10 @@ echo "Total number of orders: ${total_file}"
 echo "Parsed number of orders: ${ocr_file}"
 echo "Run time (minutes): $(((end-start)/60))"
 
-echo "\n\n###########" | tee -a $log_file
-echo "\nExecution ID: ${execution_id}" | tee -a $log_file $log_file_specific
+echo "###########" | tee -a $log_file
+echo "Execution ID: ${execution_id}" | tee -a $log_file $log_file_specific
 echo "Date: ${current_date}" | tee -a $log_file $log_file_specific
-echo "\nTotal number of orders: ${total_file}" | tee -a $log_file $log_file_specific
+echo "Total number of orders: ${total_file}" | tee -a $log_file $log_file_specific
 echo "Parsed number of orders: ${ocr_file}" | tee -a $log_file $log_file_specific
 echo "Run time (minutes): $(((end-start)/60))" | tee -a $log_file $log_file_specific
 

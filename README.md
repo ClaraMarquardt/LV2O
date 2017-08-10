@@ -113,6 +113,7 @@ dependencies)
 * You may be asked to install xcode/xcode command line tools & Java SDk externally - in these cases follow the given instructions to complete the installation
 * Depending on whether or not e.g. Xcode (command line tools), are already installed installation may 
 take up to 30 minutes
+* If helpful - create a Desktop alias
 
 # [3] Verify that the installation has been successful & set-up the integration with the product code application
 Open the configuration log: documentation_setup/config_status.txt and verify that all dependencies 
@@ -121,8 +122,7 @@ Configure the product code application to write/save to the vb input/output path
 at the top of the configuration log (section 'Interface Paths')
 
 ## Notes:
-* Should problems have occurred during installation - review the more detailed installation log 
-documentation_setup/install_log.txt
+* Should problems have occurred during installation - review the more detailed installation log documentation_setup/install_log.txt
 ````
 
 ##### **## Execution**  
@@ -132,6 +132,8 @@ Navigate to the directory ([local path]/LV2O)
 Launch any of the 3 applications 
 Upon completion - close the application window
 
+## Notes:
+* Should problems occur - execute the reset application (documentation/set_up/reset.app) selecting "no" when asked whether you want to complete a full reset
 
 ````
 

@@ -11,6 +11,8 @@
 #----------------------------------------------------------------------------#
 source code_base/machine_code/setting.sh
 
+
+
 # Output folder
 #----------------------------------------------------------------------------#
 output_folder=${wd_path_output}/ExtractToExcel_$execution_id
@@ -49,9 +51,8 @@ source order_parse.sh
 #---------------------------------------------------#
 cd ${wd_path_code}/stage_b
 
-ipython order_parse.py "${init_path}" "${data_path_parsed}" \
-	"${data_path_structured}" "${error_path_parsed}" "${data_path_archived_parsed}" \
-	"${wd_path_log}" "${execution_id}" 
+ipython order_parse.py "${init_path}" "${data_path_parsed}" "${data_path_structured}" \
+"${error_path_parsed}" "${data_path_archived_parsed}" "${wd_path_log}" "${execution_id}" 
 
 cd "${data_path_structured}"
 
@@ -66,9 +67,9 @@ done
 #---------------------------------------------------#
 cd ${wd_path_code}/stage_b
 
-R CMD BATCH --no-save "--args ${init_path} ${data_path_structured} ${vb_path_input} ${helper_path_keyword} \
-	${execution_id}  ${wd_path_log} ${data_path_temp} \
-	${data_path_archived_structured}" order_clean.R
+R CMD BATCH --no-save "--args ${init_path} ${data_path_structured} \
+${vb_path_input} ${helper_path_keyword} ${execution_id} ${wd_path_log} \
+${data_path_temp} ${data_path_archived_structured}" order_clean.R
 
 ## delete output file
 [ -e .RData ] && rm .RData
@@ -90,7 +91,7 @@ done
 # parsed orders & vb output
 cd ${data_path_archived_structured}
 
-for file in *$execution_id*; do
+for file in *$execution_id*pdf; do
 
 	cp $file $output_folder/processed_order
 

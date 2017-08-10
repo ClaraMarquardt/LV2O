@@ -245,7 +245,7 @@ print "Runtime (minutes):" + str((end_time - start_time))
 
 orig_stdout = sys.stdout
 
-for log_filename in [log_path+'/stage_b_ii'+'.txt', log_path+'/stage_b_ii_'+execution_id+'.txt']:
+for log_filename in [log_path+'/stage_b_i'+'.txt', log_path+'/stage_b_i_'+execution_id+'.txt']:
 
     file_name=os.path.normpath(log_filename)
     log_file  = open(file_name,'a+')

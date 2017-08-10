@@ -207,7 +207,7 @@ printf "Installing R Packages"
 printf "\n# ----------------------\n"
 
 ### java configuration
-# sudo R CMD javareconf
+sudo R CMD javareconf
 
 ### other packages
 cd ${wd_path}
