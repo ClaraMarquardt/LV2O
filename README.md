@@ -67,7 +67,7 @@ and El Capitan)
 * Base Dependencies: Homebrew, Xcode (command line tools), gcc, Java SDK
 
 # Other Dependencies
-* Dependencies which are pre-installed on all MacOSX platforms: Perl, awk
+* Dependencies which are pre-installed on all MacOSX platforms: perl, gawk
 * Excel  
 * Gmail account with external imap support: The LV2O application is designed to interface with a gmail 
 account which has been configured to allow external applications to connect through imap (see to configure: 
