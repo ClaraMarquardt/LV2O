@@ -23,8 +23,8 @@ the customers from which the order was received
 
 ##### **## Interface and Output**  
 
-- Each application execution generates a folder in the output directory (name of application + 
-execution identifier) containing all the key output along with the log files
+- Each application execution generates a folder in the output directory (*'name of application + 
+execution identifier'*) containing all the key output along with the log files
 
 
 ##### **## Notes** 
