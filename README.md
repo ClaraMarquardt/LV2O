@@ -116,7 +116,6 @@ take up to 30 minutes
 - Launch the LV2O.app
 - Select the processing step which is to be completed
 
-
 ````
 
 
