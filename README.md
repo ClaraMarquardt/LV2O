@@ -34,18 +34,17 @@ overnight given that it can take a significant amount of time to parse all order
 All subsequent steps should complete, assuming daily tool execution and 10-15 orders per day, in 
 under 15 minutes and can thus be executed in-time
 
-- *Back end structure*: The LV2O application back end consists of bash scripts which are wrapped into
-a MacOSX application (.app) using Platypus. Each bash script calls upon subroutines written in R, 
+- *Backend structure*: The LV2O application backend consists of bash scripts which are wrapped into
+a MacOSX application (.app) using Platypus and cocoaDialogue. Each bash script calls upon subroutines written in R, 
 Python, php and bash. The codebase along with a number of helper files (e.g. product keywords) 
 can be accessed by right clicking the application icon and selecting "Show Package Contents". 
 
 - *Traceability*: All orders processed by the LV2O application are archived (at each processing stage) 
 along with the log files generated during execution. The archived data can be accessed by right 
 clicking the application icon and selecting "Show Package Contents" 
-( -> Navigating to contents/resources/data/archived_data and contents/resources/log/. 
-Should the application at any point become too large the application may be reset, i.e. the 
-archive cleared, using the reset.app (documentation_setup/reset.app). The reset.app preserves a 
-record of the highest product id so as to preserve a unique order - order id mapping. 
+( -> Navigating to contents/resources/data/archived_data and contents/resources/log/). 
+Should the application at any point become too large or should problems occur the application may be reset, i.e. the 
+archive and data cleared, using the _'reset.app'_ (_'documentation_setup/reset.app'_). The _'reset.app'_ preserves a unique order - order id mapping. 
 
 ##### **## Licenses**  
 
