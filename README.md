@@ -112,12 +112,10 @@ take up to 30 minutes
 
 ````
 [1] Start the application
-Navigate to the directory ([local path]/LV2O)
-Launch any of the 3 applications 
-Upon completion - close the application window
+- Navigate to the directory ([local path]/LV2O)
+- Launch the LV2O.app
+- Select the processing step which is to be completed
 
-## Notes:
-* Should problems occur - execute the reset application (documentation/set_up/reset.app) selecting "no" when asked whether you want to complete a full reset
 
 ````
 
