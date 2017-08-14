@@ -21,13 +21,13 @@ start_time <- Sys.time()
 #-------------------------------------------------#
 init_path                <- commandArgs(trailingOnly = TRUE)[1]
 mod_order_path           <- commandArgs(trailingOnly = TRUE)[2]
-output_path              <- commandArgs(trailingOnly = TRUE)[3]
-helper_path_keyword      <- commandArgs(trailingOnly = TRUE)[4]
-execution_id             <- commandArgs(trailingOnly = TRUE)[5]
-log_path                 <- commandArgs(trailingOnly = TRUE)[6]
-temp_path                <- commandArgs(trailingOnly = TRUE)[7]
-archive_path             <- commandArgs(trailingOnly = TRUE)[8]
+helper_path_keyword      <- commandArgs(trailingOnly = TRUE)[3]
+execution_id             <- commandArgs(trailingOnly = TRUE)[4]
+log_path                 <- commandArgs(trailingOnly = TRUE)[5]
+temp_path                <- commandArgs(trailingOnly = TRUE)[6]
+archive_path             <- commandArgs(trailingOnly = TRUE)[7]
 print(execution_id)
+
 # dependencies
 #-------------------------------------------------#
 source(paste0(init_path, "/R_init.R"))
@@ -109,7 +109,7 @@ lapply(file_list[start_id:length(file_list)], function(file_name) {
         project_raw <- gsub("(Projekt|LV|BV|Objekt)(.*)", "\\2", project_raw)
         project_raw <- gsub("Sachbearbeiter|Datum", "", project_raw)
         project_raw <- gsub("[ ]{2,}", " ", project_raw)
-        project_raw <- gsub(" |-|/|,|:|%|'|,|\\|=|„", "_",project_raw)
+        project_raw <- gsub(" |-|/|,|:|%|'|,|\\|=|„|\\?", "_",project_raw)
         project_raw <- gsub("\\.", "", project_raw)
         project_raw <- gsub("^_|_{2,}|_$", "", project_raw)
         if (nchar(project_raw)>0)  text[, project_ext:=paste0(project_raw)]
@@ -250,7 +250,8 @@ lapply(file_list[start_id:length(file_list)], function(file_name) {
     # subset to identified products
     #-----------------------------------------#
     dt_final <- dt_final[product_type!=""]
-    
+
+
     # output
     #-----------------------------------------#
     print(dt_final)
@@ -258,7 +259,7 @@ lapply(file_list[start_id:length(file_list)], function(file_name) {
     dt_final_identified <- dt_final
     dt_final_identified[, master_product_id:=0]
 
-    output_file   <- paste0(temp_path, "/", "order_master_database_",
+    output_file   <- paste0(temp_path, "/", "order_master_",
         execution_id,".csv")
     
     if (file.exists (gsub("\\.csv", paste0("_identified_", output_id, ".csv"), 
@@ -294,10 +295,27 @@ lapply(file_list[start_id:length(file_list)], function(file_name) {
         file_name_pdf)
     file_name_text_updated <- gsub("\\.txt$", paste0(project_raw_short, ".txt"), 
         file_name)
-    file.rename(paste0(mod_order_path, "/",file_name_pdf),
+
+
+    if (nrow(dt_final)>0) {
+
+     file_name_pdf_updated_KEYWORD  <- gsub("\\.pdf$", "_KEYWORD.pdf", file_name_pdf_updated)
+     file_name_text_updated_KEYWORD <- gsub("\\.txt$", "_KEYWORD.txt", file_name_text_updated)
+
+     file.rename(paste0(mod_order_path, "/",file_name_pdf),
+        paste0(mod_order_path, "/",file_name_pdf_updated_KEYWORD))
+     file.rename(paste0(mod_order_path, "/",file_name),
+        paste0(mod_order_path, "/",file_name_text_updated_KEYWORD))
+
+   } else {
+
+     file.rename(paste0(mod_order_path, "/",file_name_pdf),
         paste0(mod_order_path, "/",file_name_pdf_updated))
-    file.rename(paste0(mod_order_path, "/",file_name),
+     file.rename(paste0(mod_order_path, "/",file_name),
         paste0(mod_order_path, "/",file_name_text_updated))
+
+   }
+
 })
 
 
@@ -307,7 +325,7 @@ lapply(file_list[start_id:length(file_list)], function(file_name) {
 # file list
 file_list_update <- list.files(temp_path)[ list.files(temp_path) %like% "csv"]
 file_list_update <- file_list_update[file_list_update %like% execution_id & 
-    file_list_update %like% "order_master_database"]
+    file_list_update %like% "order_master"]
 file_count_final <- length(file_list_update)
 
 # settings
@@ -357,7 +375,7 @@ for (i in seq(1:ceiling(file_count_final/output_id_max))) {
         "master_order_id", "execution_id", "project name", "project name ext")), 
         "source_email", "project name","project name ext", "execution_id"))
 
-    output_file <- paste0(output_path, "/", "order_master_database_",
+    output_file <- paste0(mod_order_path, "/", "order_master_",
         execution_id,"_",i,".xlsx")
 
     # save 

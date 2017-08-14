@@ -15,7 +15,7 @@ load_or_install <- function(package_names, verbose=FALSE, upgrade=FALSE) {
 
     print("Updating Packages")
 
-    tryCatch({update.packages(ask = FALSE, repos = "http://cran.cnr.berkeley.edu/", 
+    tryCatch({update.packages(ask = FALSE, repos = "https://cran.rstudio.com", 
       checkBuilt = TRUE, type="source")}, error=function(e) {print("Package update failed")})
   
   }
@@ -29,7 +29,7 @@ load_or_install <- function(package_names, verbose=FALSE, upgrade=FALSE) {
        print(sprintf("Fresh Install: %s", x))
     
        suppressMessages(install.packages(x,
-        repos="http://cran.cnr.berkeley.edu/", 
+        repos="https://cran.rstudio.com", 
         type="source"))
 
   })

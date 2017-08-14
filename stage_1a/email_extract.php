@@ -192,6 +192,12 @@ if($emails) {
             // attached message headers, can ignore
             break;
     
+            case 3: // application
+            case 4: // audio
+            case 5: // image
+            case 6: // video
+            case 7: // other
+            
             $filename = getFilenameFromPart($part);
             
             if($filename) {

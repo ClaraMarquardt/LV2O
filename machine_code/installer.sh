@@ -30,11 +30,8 @@ echo $1
 echo $1 >> ${status_file}
 )
 
-
 # email files
-package_path_1=${wd_path}/LV2O-ExtractToExcel.app/Contents/Resources/helper/email
-package_path_2=${wd_path}/LV2O-WriteToPDF.app/Contents/Resources/helper/email
-package_path_3=${wd_path}/LV2O-SendToCustomer.app/Contents/Resources/helper/email
+package_path=${wd_path}/LV2O.app/Contents/Resources/helper
 
 # Configure function
 #----------------------------------------------------------------------------#
@@ -56,12 +53,6 @@ configure() {
 	$log_temp "# WD: $wd_path"
 	$log_temp "# PATH: $PATH"
 
-	# interface paths - VB
-	$log_temp "## Interface Paths "
-
-	$log_temp "# Product Code Mapping - Input (Read in): $(cd $wd_path"/interface/product_code_input"; pwd)"
-	$log_temp "# Product Code Mapping - Output (Save to): $(cd $wd_path"/interface/product_code_output"; pwd)"
-
 	# helper dependencues
 	$log_temp "## Devtools "
 
@@ -78,6 +69,9 @@ configure() {
 
 	$log_temp "# R: $(which R)"
 	$log_temp "# R Version: $(R --version)"
+
+	$log_temp "# Python: $(which python)"
+	$log_temp "# Python Version: $(python --version)"
 
 	$log_temp "# Ipython: $(which Ipython)"
 	$log_temp "# Ipython Version: $(ipython --version)"
@@ -112,13 +106,17 @@ configure() {
 configure "status"
 
 
+
 # User Settings - Save
 #----------------------------------------------------------------------------#
 
 ## Store email settings
-echo $email_address | tee ${package_path_1}/email_username.txt ${package_path_2}/email_username.txt ${package_path_3}/email_username.txt
-echo $email_pwd | tee ${package_path_1}/email_username.txt ${package_path_2}/email_username.txt ${package_path_3}/email_password.txt
+echo $email_address > ${package_path}/email/email_username.txt
+echo $email_pwd > ${package_path}/email/email_password.txt 
+echo $email_cc_address > ${package_path}/email/email_cc_address.txt 
 
+## Store excel settings
+echo $excel_path > ${package_path}/excel/excel_path.txt
 
 # Install
 #----------------------------------------------------------------------------#
@@ -184,6 +182,10 @@ brew cleanup
 brew update
 brew doctor
 
+## Wget & Gawk (key helpers)
+brew uninstall --force wget gawk 
+brew install wget gawk 
+
 ## R
 printf "Installing R"
 printf "\n# ----------------------\n"
@@ -207,12 +209,24 @@ printf "Installing R Packages"
 printf "\n# ----------------------\n"
 
 ### java configuration
+
+# check if java (SDK) is configured 
+# (http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+if [ ! -f "`which java`" ]; then
+	
+	printf("Installing Java SDK")
+	
+	brew cask install java
+	
+fi
+
+# configure java support in R
 sudo R CMD javareconf
 
 ### other packages
 cd ${wd_path}
-# R CMD BATCH --no-save ${wd_path}/documentation_setup/installer/R_dependency.R \
-# ${wd_path}/documentation_setup/installer/R_dependency.Rout
+R CMD BATCH --no-save ${wd_path}/documentation_setup/installer/R_dependency.R \
+${wd_path}/documentation_setup/installer/R_dependency.Rout
 
 printf "\n# SUCCESS - R successfully installed & configured"
 printf "\n# ----------------------\n"
@@ -230,8 +244,10 @@ brew uninstall --force python
 
 ## - Reinstall
 brew prune 
-# brew install python
-# brew link --overwrite python
+brew install python
+pip2 install --upgrade pip setuptools
+brew link --overwrite python
+echo "export PATH="/usr/local/opt/python/libexec/bin:$PATH"" >> ~/.bash_profile
 
 # Check if Python is correctly configured
 printf "Python: $(which python)"
@@ -239,7 +255,7 @@ printf "Python Version: $(python --version)"
 printf "Pip: $(which pip)"
 
 ## Ipython
-# pip install ipython
+pip install ipython
 
 # Check if Ipython is correctly configured
 printf "Ipython: $(which ipython)"
@@ -249,7 +265,7 @@ printf "Ipython Version: $(ipython --version)"
 printf "Installing Python Packages"
 printf "\n# ----------------------\n"
 
-# pip install -r ${wd_path}/documentation_setup/installer/python_dependency.txt
+pip install -r ${wd_path}/documentation_setup/installer/python_dependency.txt
 
 printf "\n# SUCCESS - Python & Ipython successfully installed & configured"
 printf "\n# ----------------------\n"
@@ -259,23 +275,24 @@ printf "\n# ----------------------\n"
 # ----------------
 
 ### Tesseract
-# brew uninstall --force tesseract
-# brew install tesseract --all-languages
-# brew link --overwrite tesseract
+brew uninstall --force tesseract
+brew install tesseract --with-all-languages
+brew link --overwrite tesseract
 
 ### PDFSandwich dependencies
-# brew uninstall --force imagemagick ghostscript exact-image unpaper ocaml poppler
-# brew install imagemagick ghostscript exact-image unpaper ocaml poppler
-# brew link --overwrite imagemagick ghostscript exact-image unpaper ocaml poppler
+brew uninstall --force imagemagick ghostscript exact-image unpaper ocaml poppler
+brew install imagemagick ghostscript exact-image unpaper ocaml poppler
+brew link --overwrite imagemagick ghostscript exact-image unpaper ocaml poppler
 
-### PDFSandwich
-# wget https://sourceforge.net/projects/pdfsandwich/files/pdfsandwich%200.1.6/pdfsandwich-0.1.6.tar.bz2 | unzip
-# tar xjvf pdfsandwich-0.1.6.tar.bz2
-# cd pdfsandwich-0.1.6
-# sudo ./configure && make && make install 
 
-# rm pdfsandwich-0.1.6.tar.bz2
-# rm -rf pdfsandwich-0.1.6
+wget http://sourceforge.net/projects/pdfsandwich/files/pdfsandwich%200.1.6/pdfsandwich-0.1.6.tar.bz2 | unzip
+tar xjvf pdfsandwich-0.1.6.tar.bz2
+cd pdfsandwich-0.1.6
+sudo ./configure && make && make install 
+
+cd ..
+rm pdfsandwich-0.1.6.tar.bz2
+rm -rf pdfsandwich-0.1.6
 
 # Check if PDFSandwich is correctly configured
 printf "PDFSandwich: $(which pdfsandwich)"
@@ -284,9 +301,10 @@ printf "PDFSandwich Languages: $(pdfsandwich -list_langs)"
 printf "$(pdfsandwich)"
 
 ### Xpdf
-# brew uninstall --force xpdf
-# brew install xpdf
-# brew link --overwrite xpdf
+brew uninstall --force xpdf
+brew cask install xquartz
+brew install xpdf
+brew link --overwrite xpdf
 
 # Check if Xpdf is correctly configured
 printf "XPDF (pdftotext): $(which pdftotext)"
@@ -295,7 +313,7 @@ printf "$(pdftotext)"
 #### pdftk
 
 # install
-# brew install https://raw.githubusercontent.com/turforlag/homebrew-cervezas/master/pdftk.rb
+brew install https://raw.githubusercontent.com/turforlag/homebrew-cervezas/master/pdftk.rb
 
 # Check if pdftk is correctly configured
 printf "pdftk: $(which pdftk)"

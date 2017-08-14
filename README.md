@@ -73,10 +73,11 @@ and El Capitan)
 * IPython & Set of Python Packages 
 * php with imap support 
 * Supporting Dependencies: PDFSandwich (requires tesseract and a number of other dependencies), xpdf, pdftk 
-* Base Dependencies: Homebrew, Xcode (command line tools), gcc (Installed as part of the set-up process)
+* Base Dependencies: Homebrew, Xcode (command line tools), gcc, java SDK(Installed as part of the set-up process)
 
 # Other Dependencies
 * Dependencies which are pre-installed on all MacOSX platforms: Perl, awk
+*Excel  (configured not to warn re macros)
 * Gmail account with external imap support: The LV2O application is designed to interface with a gmail 
 account which has been configured to allow external applications to connect through imap (see to configure: 
 https://myaccount.google.com/lesssecureapps)
@@ -84,6 +85,7 @@ https://myaccount.google.com/lesssecureapps)
 processed orders from interface/vb_input and to write its output to interface/vb_output (*See the 'Set-Up' 
 below for more details on how to configure this*)
 
+* MacOSx - e.g. coffee - does not go to sleep
 ````
 
 ##### **## Set-up (BASIC)**  

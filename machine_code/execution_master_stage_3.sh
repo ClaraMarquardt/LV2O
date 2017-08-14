@@ -7,94 +7,128 @@
 
 #----------------------------------------------------------------------------#
 
-# Settings
-#----------------------------------------------------------------------------#
-source code_base/machine_code/setting.sh
-
-# User settings
-#----------------------------------------------------------------------------#
-export test_mode=`$CD dropdown --title "LV20 - SendToCustomer" --text "Mode" --items "Send to Customer" "Send to (Internal) Test Address" --button1 "  OK  " ‑‑no‑cancel`
-export test_mode=${test_mode:2}
-
-if [ "$test_mode" = "1" ]; then
-	export email_target=`$CD inputbox --title "LV20 - SendToCustomer" --informative-text "(Internal) email address to which to send orders (Non-Gmail)" --button1 "  OK  " ‑‑no‑cancel`
-	export email_target=${email_target:2}
-fi
-
 # Output folder
 #----------------------------------------------------------------------------#
-output_folder=${wd_path_output}/SendToCustomer_$execution_id
+output_folder=${wd_path_output}/WriteToPDF_$execution_id
 mkdir $output_folder
 
 cd $output_folder
 
 mkdir log
-mkdir sent_order
+mkdir raw_order
+mkdir annotated_order
+mkdir non_processed_PDF
 
 #----------------------------------------------------------------------------#
 #----------------------------------------------------------------------------#
-# Execution Commmand #3
+# Execution Command #3
 #----------------------------------------------------------------------------#
 #----------------------------------------------------------------------------#
 
-# replace source emails with test email (TEEST MODE only)
+# Obtain from excel tool
+#----------------------------------------------------------------------------#
+mv ${TextToCode_output}/* ${vb_path_output}/
+
+# clear up
+rm ${TextToCode_input}/* 
+rm ${TextToCode_output}/* 
+
+# Stage-c (ii): Annotate PDFs
 # ----------------------------------------------------------------------------#
-if [ "${test_mode}" = "1" ]; then
+cd ${wd_path_code}/stage_3
 
-	echo "TEST MODE - using test email target"
+ipython order_output.py "${init_path}" "${vb_path_output}" "${data_path_archived_raw}" \
+"${data_path_archived_structured}" "${execution_id}" \
+"${data_path_annotated}" "${wd_path_log}" "${vb_path_input}"
 
-	cd ${send_path}
 
-	file=$(ls *email_list*.csv*)
-	awk -v var="$email_target" '$1=var' FS=, OFS=, ${file} > "temp_${file}"
-	mv temp_${file} ${file}
+# Stage-c (ii): Merge PDFs
+# ----------------------------------------------------------------------------#
+cd ${data_path_annotated}
 
-fi
+for file in *_offer*; do
+    
+    # identify files
+	file_letter=$file
+	file_order="${file_letter//_offer/}"
+	file_order_mod="${file_letter//_offer/_order}"
 
-# execute
-#---------------------------------------------------#
-cd ${wd_path_code}/stage_d
+	# rename originals
+	mv $file_order $file_order_mod
 
-php "send_email.php"
+	# merge
+	pdftk $file_letter $file_order_mod cat output $file_order
 
-## move processed files to archive
+done
+
+# move non-merged PDFs
 cd "${data_path_annotated}"
 
-for file in *; do
+for file in *_offer*; do
 
 	mv $file $data_path_archived_annotated
 
 done
 
+for file in *_order*; do
 
-## move error files to archive
-cd $error_path_ocr
-
-for file in *; do
-
-	mv $file $data_path_archived_error
+	mv $file $data_path_archived_annotated
 
 done
-
-cd ${error_path_parsed}
-
-for file in *; do
-
-	mv $file $data_path_archived_error
-
-done
-
 
 # Stage-x: Copy to output folder
 #----------------------------------------------------------------------------#
 
-# sent mail
-cd ${send_path}
+# raw orders
+cd ${data_path_archived_raw}
 
 for file in *$execution_id*; do
 
-	mv $file $data_path_archived_sent
+	if [ -e $file ]; then
 
+		cp $file $output_folder/raw_order
+
+	fi
+
+done
+
+
+# annotated orders & vb output
+cd ${data_path_annotated}
+
+for file in *$execution_id*; do
+
+	if [ -e $file ]; then
+
+		cp $file $output_folder/annotated_order
+	fi
+
+done
+
+cp ${data_path_archived_structured}/*${execution_id}.xlsx* $output_folder/annotated_order
+cp ${data_path_annotated}/*csv* $output_folder/annotated_order
+
+# non parsed 
+cd ${error_path_parsed}
+
+for file in *$execution_id*; do
+
+	if [ -e $file ]; then
+
+		cp $file $output_folder/non_processed_PDF
+	fi
+
+done
+
+cd ${error_path_ocr}
+
+for file in *$execution_id*; do
+
+	if [ -e $file ]; then
+
+		cp $file $output_folder/non_processed_PDF
+
+	fi
 done
 
 # log files
@@ -102,18 +136,20 @@ cd ${wd_path_log}
 
 for file in *$execution_id*; do
 
-	mv $file $output_folder/log
+	if [ -e $file ]; then
 
+		mv $file $output_folder/log
+
+	fi
+	
 done
 
-
-# Stage-x: Clear interface folder
+# Status
 #----------------------------------------------------------------------------#
-
-# interface
-cd ${wd_path_interface}
-
-find  . -type f -name "*" -exec rm {} \;
+$CD bubble --title "LV2O - WriteToPDF" \
+--text "Successfully Completed" ‑‑no‑timeout \
+--background-top "F8F8F8" --background-bottom "F8F8F8" --border-color "F8F8F8" \
+--icon-file "${wd_path_helper}/icon/Bourdon_logo_macro_icon.png"
 
 
 #----------------------------------------------------------------------------#

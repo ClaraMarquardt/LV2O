@@ -24,9 +24,7 @@ annotated_input_path=sys.argv[4]
 execution_id=sys.argv[5]
 output_path=sys.argv[6]
 log_path=sys.argv[7]
-archive_path_input=sys.argv[8]
-archive_path_output=sys.argv[9]
-vb_input_path=sys.argv[10]
+vb_input_path=sys.argv[8]
 
 
 # dependencies
@@ -136,7 +134,7 @@ file_count=len(file_list_final)
 
 for x in range(0, len(file_list_final)):
 
-    file_name_mod=annotated_input_path + "/" + file_list_final[x] + '.pdf'
+    file_name_mod=annotated_input_path + "/" + file_list_final[x] + '_KEYWORD.pdf'
     file_name_mod=os.path.normpath(file_name_mod)
     file_name_raw=raw_input_path + "/" + file_list_raw[x] + '.pdf'
     file_name_raw=os.path.normpath(file_name_raw)
@@ -231,7 +229,7 @@ for x in range(0, len(file_list_final)):
 
         elif (len(position_prod_subset["pos_x"])>0):
             position_line=min_index
-            x1    = max(position_prod_subset["pos_x"])+5
+            x1    = max(position_prod_subset["pos_x"])-30
             y1    = position_sort.ix[(min_index)]["pos_y"] - 20
             y_1   = y1-10
             y_2   = y1-20
@@ -277,7 +275,7 @@ for x in range(0, len(file_list_final)):
 
 # save email list
 #----------------------------------------------------------------------------#
-email_dt=order_dt[['email','order_name','project_ext']]
+email_dt=order_dt[['email','order_name','project_ext','project']]
 email_dt=email_dt.drop_duplicates()
 
 email_dt['email'] = [re.sub("_x[^_]*_$", "",x) for x in email_dt['email']]
@@ -296,13 +294,13 @@ email_dt.to_csv(file_name, encoding="utf8", index=False)
 #----------------------------------------------------------------------------#
 
 ## vb input
-file_name=vb_input_path +"/*"+execution_id+"*"
+file_name=vb_input_path + "/*"
 file_name=os.path.normpath(file_name)
 input_file_list = glob.glob(file_name)
 
 for x in range(0, len(input_file_list)):
 
-    archive_file_path=archive_path_input 
+    archive_file_path=annotated_input_path 
     filename=input_file_list[x]
     shutil.move(filename, archive_file_path)
 
@@ -310,7 +308,8 @@ for x in range(0, len(input_file_list)):
 output_file_list = glob.glob(input_path)
 
 for x in range(0, len(output_file_list)):
-    archive_file_path=archive_path_output + "/" + re.sub("\\.xlsx", "_"+execution_id + ".xlsx",os.path.basename(output_file_list[x]))
+    archive_file_path=annotated_input_path + "/" + re.sub("\\.xlsx", "_"+execution_id + ".xlsx",
+        os.path.basename(output_file_list[x]))
     filename=output_file_list[x]
     print os.path.basename(output_file_list[x])
     print archive_file_path

@@ -14,6 +14,7 @@
 
 <?php
 require 'PHPMailerAutoload.php';
+ini_set('auto_detect_line_endings', true);
 
 date_default_timezone_set('EST');
 $file_path = getenv("send_path");
@@ -23,6 +24,8 @@ $execution_id = getenv("execution_id");
 $log_path = getenv("wd_path_log");
 $email_text = getenv("email_text");
 $email_sender = getenv("email_sender");
+$email_cc_address = getenv("email_cc_address");
+$test_mode = getenv("test_mode");
 
 /* initialise output buffer */
 function ob_file_callback($buffer)
@@ -42,6 +45,7 @@ $email_list = array("xx");
 $project_list = array("xx");
 $file_list_mod = array("xx");
 $file_list_mod_no_ext = array("xx");
+$project_list_raw = array("xx");
 
 $csvFile = $file_path . "/" . 'email_list_' . $execution_id . '.csv';
 
@@ -54,14 +58,15 @@ while(! feof($file))
   $temp_file = $temp_array[1] . '.pdf';
   $temp_file_no_ext = $temp_array[1];
   $temp_project = $temp_array[2];
+  $temp_project_raw = $temp_array[4];
   $temp_file_mod = $temp_array[3];
   $temp_file_mod_no_ext = preg_replace("/(\\.pdf)/", "", $temp_array[3]);
-  ;
 
   array_push($email_list, $temp_email);
   array_push($file_list, $temp_file);
   array_push($file_list_no_ext, $temp_file_no_ext);
   array_push($project_list, $temp_project);
+  array_push($project_list_raw, $temp_project_raw);
   array_push($file_list_mod, $temp_file_mod);
   array_push($file_list_mod_no_ext, $temp_file_mod_no_ext);
 
@@ -81,6 +86,7 @@ for ($i = 1; $i < $length-1; $i++) {
     // echo $file;
     $email_to = $email_list[$i+1];
     $project_name=$project_list[$i+1];
+    $project_raw=$project_list_raw[$i+1];
     $file_mod = $file_list_mod[$i+1];
     $file_mod_no_ext = $file_list_mod_no_ext[$i+1];
 
@@ -118,15 +124,19 @@ for ($i = 1; $i < $length-1; $i++) {
     $email->Body      = $msg;
     $email->AddAddress($email_to);
 
-    if (strlen($project_name)>0) {
-      $email->AddAttachment( $file_path . "/" . $file_no_ext . "_" . $project_name . ".pdf" , $file_mod);
+    if ($test_mode === "2") {
+      $email->AddCC($email_cc_address);
+    }
+
+    if (strlen($project_raw)>0) {
+      $email->AddAttachment( $file_path . "/" . $file_no_ext . $project_raw . ".pdf" , $file_mod);
     } else { 
       $email->AddAttachment( $file_path . "/" . $file_no_ext . ".pdf" , $file_mod);
     }
 
     /* print status */ 
-    if (strlen($project_name)>0) {
-      echo "sent " . $file_no_ext . "_" . $project_name . ".pdf" . " to " . $email_to . "\n";
+    if (strlen($project_raw)>0) {
+      echo "sent " . $file_no_ext . $project_raw . ".pdf" . " to " . $email_to . "\n";
     } else {
       echo "sent " . $file_no_ext . ".pdf" . " to " . $email_to . "\n";
     }
@@ -149,8 +159,8 @@ for ($i = 1; $i < $length-1; $i++) {
     fwrite($fp,$date_text);
     
 
-    if (strlen($project_name)>0) {
-       $content = "sent " . $file_no_ext . "_" . $project_name . ".pdf" . " to " . $email_to . "\n";
+    if (strlen($project_raw)>0) {
+       $content = "sent " . $file_no_ext . $project_raw . ".pdf" . " to " . $email_to . "\n";
     } else {
       $content = "sent " . $file_no_ext . ".pdf" . " to " . $email_to . "\n";
     }

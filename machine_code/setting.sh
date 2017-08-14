@@ -58,8 +58,6 @@ export error_path_parsed=$wd_path_data"/error/parse"
 export data_path_archived_raw=$wd_path_data"/archived_data/raw_data"
 export data_path_archived_parsed=$wd_path_data"/archived_data/parsed_data"
 export data_path_archived_structured=$wd_path_data"/archived_data/structured_data"
-export data_path_archived_vb_input=$wd_path_data"/archived_data/vb_input"
-export data_path_archived_vb_output=$wd_path_data"/archived_data/vb_output"
 export data_path_archived_annotated=$wd_path_data"/archived_data/annotated_data"
 export data_path_archived_sent=$wd_path_data"/archived_data/sent_data"
 export data_path_archived_error=$wd_path_data"/archived_data/error"
@@ -69,6 +67,12 @@ export init_path=$wd_path_code"/helper_code"
 
 ## helper paths
 export helper_path_keyword=${wd_path_helper}"/product/master_keyword.xlsm"
+
+## texttocode app
+export TextToCode_app=$wd_path"/TextToCode/P2F_petm_V70_21_2017_Bourdon_LV_V46.xlsb"
+export TextToCode_database=$wd_path"/TextToCode/P2F-Database_V70_21_2017_BOURDON_SU.xlsb"
+export TextToCode_input=$wd_path"/TextToCode/input"
+export TextToCode_output=$wd_path"/TextToCode/output"
 
 # parsing settings [DEFAULT]
 #-------------------------------------------------#
@@ -81,10 +85,21 @@ export email_sender=`cat helper/email/email_sender.txt`
 export email_text=`cat helper/email/email_text.txt`
 export email_pwd=`cat helper/email/email_password.txt`
 export email_address=`cat helper/email/email_username.txt`
+export email_cc_address=`cat helper/email/email_cc_address.txt`
 
 # Cocoa Dialogue [DEFAULT]
 #-------------------------------------------------#
 export CD="$wd_path/code_base/helper_code/CocoaDialog.app/Contents/MacOS/CocoaDialog"
+
+# Excel [DEFAULT]
+#-------------------------------------------------#
+export EXCEL=`cat helper/excel/excel_path.txt`
+
+# PHP [DEFAULT]
+#-------------------------------------------------#
+export PHP="/usr/local/php5/bin/php"
+export PHP_ini="/usr/local/php5/lib/php.ini"
+
 
 #----------------------------------------------------------------------------#
 #                                    End                                     #

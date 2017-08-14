@@ -7,130 +7,58 @@
 
 #----------------------------------------------------------------------------#
 
-# Settings
 #----------------------------------------------------------------------------#
-source code_base/machine_code/setting.sh
-
-# Output folder
-#----------------------------------------------------------------------------#
-output_folder=${wd_path_output}/WriteToPDF_$execution_id
-mkdir $output_folder
-
-cd $output_folder
-
-mkdir log
-mkdir raw_order
-mkdir annotated_order
-mkdir non_processed_PDF
-
-#----------------------------------------------------------------------------#
-#----------------------------------------------------------------------------#
-# Visual Basic Macro (Input: Csv Output: Xlsx)
-#----------------------------------------------------------------------------#
+#                         Step-by-Step Tool Execution                        #
 #----------------------------------------------------------------------------#
 
+# User control check (!)
+#----------------------------------------------------------------------------#
+export user_check=`$CD msgbox --title "LV2O - TextToCode" \
+--text "Processed orders checked?" \
+--informative-text "All approved orders (and the accompanying 'order_master....xlsx') \
+need to be copied from 'output/.../' to 'interface/product_code_input/'" \
+--button1 "Yes" --button2 "No" \
+--icon-file "${wd_path_helper}/icon/notice.png"`
+
+if [ "${user_check:0:1}" = "2" ]; then
+
+	printf "Exit - User Check Fail"
+
+	exit;
+
+fi
+
 #----------------------------------------------------------------------------#
 #----------------------------------------------------------------------------#
-# Execution Commmand #2
+# Execution Command #2
 #----------------------------------------------------------------------------#
 #----------------------------------------------------------------------------#
 
-# Stage-c (ii): Annotate PDFs
-# ----------------------------------------------------------------------------#
-cd ${wd_path_code}/stage_c
-
-ipython order_output.py "${init_path}" "${vb_path_output}" "${data_path_archived_raw}" \
-"${data_path_archived_structured}" "${execution_id}" \
-"${data_path_annotated}" "${wd_path_log}" "${data_path_archived_vb_input}" \
-"${data_path_archived_vb_output}" "$vb_path_input"
-
-
-# Stage-c (ii): Merge PDFs
-# ----------------------------------------------------------------------------#
-cd ${data_path_annotated}
-
-for file in *_offer*; do
-    
-    # identify files
-	file_letter=$file
-	file_order="${file_letter//_offer/}"
-	file_order_mod="${file_letter//_offer/_order}"
-
-	# rename originals
-	mv $file_order $file_order_mod
-
-	# merge
-	pdftk $file_letter $file_order_mod cat output $file_order
-
-done
-
-# move non-merged PDFs
-cd "${data_path_annotated}"
-
-for file in *_offer*; do
-
-	mv $file $data_path_archived_annotated
-
-done
-
-for file in *_order*; do
-
-	mv $file $data_path_archived_annotated
-
-done
-
-# Stage-x: Copy to output folder
+# Stage-x: Subset to user-approved orders
 #----------------------------------------------------------------------------#
 
-# raw orders
-cd ${data_path_archived_raw}
+# execute
+#---------------------------------------------------#
+cd ${wd_path_code}/stage_2
 
-for file in *$execution_id*; do
+R CMD BATCH --no-save "--args ${init_path} ${vb_path_input} \
+${data_path_archived_structured} ${execution_id} ${error_path_parsed}" order_subset.R
 
-	cp $file $output_folder/raw_order
+## delete output file
+[ -e .RData ] && rm .RData
+[ -e order_subset.Rout ] && rm order_subset.Rout
 
-done
-
-
-# annotated orders & vb output
-cd ${data_path_annotated}
-
-for file in *$execution_id*; do
-
-	cp $file $output_folder/annotated_order
-
-done
-
-cp ${data_path_archived_vb_output}/*${execution_id}.xlsx* $output_folder/annotated_order
-cp ${data_path_annotated}/*csv* $output_folder/annotated_order
-
-# non parsed 
-cd ${error_path_parsed}
-
-for file in *$execution_id*; do
-
-	cp $file $output_folder/non_processed_PDF
-
-done
-
-cd ${error_path_ocr}
-
-for file in *$execution_id*; do
-
-	cp $file $output_folder/non_processed_PDF
-
-done
-
-# log files
-cd ${wd_path_log}
-
-for file in *$execution_id*; do
-
-	mv $file $output_folder/log
-
-done
+# pass to excel tool
+#---------------------------------------------------#
+cp ${vb_path_input}/* ${TextToCode_input}/
 
 
+# Stage-x: Start TextToCode app
+#----------------------------------------------------------------------------#
+
+# execute
+open_command="open $TextToCode_app -a $EXCEL"
+eval $open_command
 
 #----------------------------------------------------------------------------#
 #                                    End                                     #

@@ -9,39 +9,29 @@
 
 #----------------------------------------------------------------------------#
 
-# Settings
-#----------------------------------------------------------------------------#
-source code_base/machine_code/setting.sh
-
-
 # User input
 # ----------------------------------------------------------------------------#
-
-printf "###\n\n"
-
-# Email settings
-unset complete_reset
-read -p 'Complete (archival) reset (Yes/No)? ' complete_reset
-export complete_reset=${complete_reset}
-
-printf "\n###\n"
+export complete_reset=`$CD msgbox --title "LV2O - Reset Application" \
+--text "Complete (archival) reset?" --button1 "  Yes  " --button2 "  No  "`
 
 # Clear data
 # ----------------------------------------------------------------------------#
 
-# delete all files - non-archived
-find $data_path_raw $data_path_temp  $data_path_parsed \
-$data_path_structured $data_path_annotated $vb_path_input \
-$vb_path_output $send_path $error_path_ocr $error_path_parsed \
+# delete all files - non-archived 
+find $data_path_raw $data_path_temp  $data_path_parsed ${TextToCode_input} ${TextToCode_output} \
+$data_path_structured $data_path_annotated $error_path_ocr $error_path_parsed \
 \( -name "*.pdf" -or -name "*.txt" -or -name "*.xlsx" -or -name "*.csv" \) -exec rm {} \;
 
 # delete all files - interface
-find $vb_path_input $vb_path_output  $send_path \
+find $vb_path_input $vb_path_output $send_path \
 \( -name "*.pdf" -or -name "*.txt" -or -name "*.xlsx" -or -name "*.csv" \) -exec rm {} \;
 
-echo "# Application Reset Sucessfull"
+# delete all nuisance files
+find $wd_path \( -name "*.DS*" \)  -exec rm {} \;
 
-if [ "$complete_reset" = "Yes" ]; then
+echo "# Application Reset Successful"
+
+if [ "$complete_reset" = "1" ]; then
 	
 	# delete all files - archived
 	find $data_path_archived_parsed $data_path_archived_structured  $data_path_archived_vb_input \
@@ -71,9 +61,16 @@ if [ "$complete_reset" = "Yes" ]; then
 
 	((file_id++))
 
-	echo "# Complete Application Reset Sucessfull - Next Product ID: $file_id"
+	echo "# Complete Application Reset Successful - Next Product ID: $file_id"
 
 fi
+
+# Status
+#----------------------------------------------------------------------------#
+$CD bubble --title "LV2O - Reset Application" \
+--text "Successfully Completed" ‑‑no‑timeout \
+--background-top "F8F8F8" --background-bottom "F8F8F8" --border-color "F8F8F8" \
+--icon-file "${wd_path_helper}/icon/Bourdon_logo_macro_icon.png"
 
 
 #----------------------------------------------------------------------------#

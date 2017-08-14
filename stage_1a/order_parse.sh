@@ -67,7 +67,7 @@ for file in *; do
 	# echo $file_mod
 
 	# move
-	mv $file $file_mod 
+	mv "$file" "$file_mod" 
 	sleep 1
 
 	((file_id++))
@@ -89,8 +89,8 @@ agg_file=$(ls -l | wc -l )
 total_file=0
 ocr_file=0
 
-log_file=${wd_path_log}'/stage_a.txt'
-log_file_specific=${wd_path_log}"/stage_a_${execution_id}.txt"
+log_file=${wd_path_log}'/stage_1a.txt'
+log_file_specific=${wd_path_log}"/stage_1a_${execution_id}.txt"
 
 for file in *; do
 
@@ -104,7 +104,7 @@ for file in *; do
 		# ALTERNATIVES
 		# pypdfocr -l deu $file [WINDOWS vs. BAD QUALITY]
 		# ocrmypdf  -l deu --force-ocr --pdf-renderer sandwich --clean \
-		# 		--tesseract-config ${wd_path_code}/stage_a/tesseract_config.cfg $file $file [WINDOWS vs. GOOD QUALITY]
+		# 		--tesseract-config ${wd_path_code}/stage_1a/tesseract_config.cfg $file $file [WINDOWS vs. GOOD QUALITY]
 
 		if [ "${thorough_mode}" = 'TRUE' ]; then
 			
@@ -127,7 +127,7 @@ for file in *; do
 
 		else 
 
-			check=`ipython ${wd_path_code}/stage_a/encrypt.py "${init_path}" "${data_path_raw}"/"${file}"`
+			check=`ipython ${wd_path_code}/stage_1a/encrypt.py "${init_path}" "${data_path_raw}"/"${file}"`
 
 			if [ "$check" = 'False' ]; then
 

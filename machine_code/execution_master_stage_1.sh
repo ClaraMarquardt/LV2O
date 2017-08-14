@@ -7,12 +7,6 @@
 
 #----------------------------------------------------------------------------#
 
-# Settings
-#----------------------------------------------------------------------------#
-source code_base/machine_code/setting.sh
-
-
-
 # Output folder
 #----------------------------------------------------------------------------#
 output_folder=${wd_path_output}/ExtractToExcel_$execution_id
@@ -31,7 +25,7 @@ mkdir processed_order
 
 #----------------------------------------------------------------------------#
 #----------------------------------------------------------------------------#
-# Execution Commmand #1
+# Execution Command #1
 #----------------------------------------------------------------------------#
 #----------------------------------------------------------------------------#
 
@@ -40,8 +34,8 @@ mkdir processed_order
 
 # execute
 #---------------------------------------------------#
-cd ${wd_path_code}/stage_a
-php email_extract.php
+cd ${wd_path_code}/stage_1a
+${PHP} -c ${PHP_ini} -f email_extract.php
 source order_parse.sh
 
 # Stage-b: Split PDFs
@@ -49,7 +43,7 @@ source order_parse.sh
 
 # execute
 #---------------------------------------------------#
-cd ${wd_path_code}/stage_b
+cd ${wd_path_code}/stage_1b
 
 ipython order_parse.py "${init_path}" "${data_path_parsed}" "${data_path_structured}" \
 "${error_path_parsed}" "${data_path_archived_parsed}" "${wd_path_log}" "${execution_id}" 
@@ -65,10 +59,10 @@ done
 
 # execute
 #---------------------------------------------------#
-cd ${wd_path_code}/stage_b
+cd ${wd_path_code}/stage_1b
 
 R CMD BATCH --no-save "--args ${init_path} ${data_path_structured} \
-${vb_path_input} ${helper_path_keyword} ${execution_id} ${wd_path_log} \
+${helper_path_keyword} ${execution_id} ${wd_path_log} \
 ${data_path_temp} ${data_path_archived_structured}" order_clean.R
 
 ## delete output file
@@ -83,7 +77,9 @@ cd ${data_path_archived_raw}
 
 for file in *$execution_id*; do
 
-	cp $file $output_folder/raw_order
+	if [ -e $file ]; then
+		cp $file $output_folder/raw_order
+	fi
 
 done
 
@@ -91,20 +87,28 @@ done
 # parsed orders & vb output
 cd ${data_path_archived_structured}
 
-for file in *$execution_id*pdf; do
+for file in *$execution_id*KEYWORD.pdf; do
 
-	cp $file $output_folder/processed_order
+	if [ -e $file ]; then
+
+		cp $file $output_folder/processed_order
+
+	fi
 
 done
 
-cp ${vb_path_input}/*$execution_id* $output_folder/processed_order
+cp ${data_path_archived_structured}/*$execution_id*xlsx $output_folder/processed_order
 
 # non parsed 
 cd ${error_path_parsed}
 
 for file in *$execution_id*; do
 
-	cp $file $output_folder/non_processed_PDF
+	if [ -e $file ]; then
+
+		cp $file $output_folder/non_processed_PDF
+
+	fi
 
 done
 
@@ -112,7 +116,11 @@ cd ${error_path_ocr}
 
 for file in *$execution_id*; do
 
-	cp $file $output_folder/non_processed_PDF
+	if [ -e $file ]; then
+
+		cp $file $output_folder/non_processed_PDF
+
+	fi
 
 done
 
@@ -121,16 +129,20 @@ cd ${wd_path_log}
 
 for file in *$execution_id*; do
 
-	mv $file $output_folder/log
+	if [ -e $file ]; then
+
+		mv $file $output_folder/log
+	fi
 
 done
 
+# Status
+#----------------------------------------------------------------------------#
+$CD bubble --title "LV2O - ExtractToExcel" \
+--text "Successfully Completed" ‑‑no‑timeout \
+--background-top "F8F8F8" --background-bottom "F8F8F8" --border-color "F8F8F8" \
+--icon-file "${wd_path_helper}/icon/Bourdon_logo_macro_icon.png"
 
-#----------------------------------------------------------------------------#
-#----------------------------------------------------------------------------#
-# Visual Basic Macro (Input: Csv Output: Xlsx)
-#----------------------------------------------------------------------------#
-#----------------------------------------------------------------------------#
 
 #----------------------------------------------------------------------------#
 #                                    End                                     #
