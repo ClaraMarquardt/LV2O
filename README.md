@@ -1,6 +1,6 @@
 ### **LV2O - LeistungsVerzeichnis-to-Order** 
 
-Note: https://drive.google.com/drive/folders/0B8_7JE9uq-iDa3AwWlhMY25KRkU?usp=sharing
+Application Repository: https://drive.google.com/drive/folders/0B8_7JE9uq-iDa3AwWlhMY25KRkU?usp=sharing
 
 #### # OVERVIEW
 
