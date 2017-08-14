@@ -81,8 +81,7 @@ https://myaccount.google.com/lesssecureapps)
 
 ````
 # [1] Download the tool & Unzip to a selected path ('local path')
-Download the most up-to date version of the tool: 
-https://drive.google.com/drive/folders/0B8_7JE9uq-iDa3AwWlhMY25KRkU?usp=sharing
+Download the most up-to date version of the tool from the application repository
 
 ## Notes:
 * To minimize the risk of problems it is recommended that the path to the tool directory 
@@ -104,16 +103,9 @@ dependencies)
 * You may be asked to install xcode/xcode command line tools & Java SDk externally - in these cases follow the given instructions to complete the installation
 * Depending on whether or not e.g. Xcode (command line tools), are already installed installation may 
 take up to 30 minutes
-* If helpful - create a Desktop alias
-
-# [3] Verify that the installation has been successful & set-up the integration with the product code application
-Open the configuration log: documentation_setup/config_status.txt and verify that all dependencies 
-are installed and accessible 
-Configure the product code application to write/save to the vb input/output paths recorded
-at the top of the configuration log (section 'Interface Paths')
 
 ## Notes:
-* Should problems have occurred during installation - review the more detailed installation log documentation_setup/install_log.txt
+* Should problems occur during installation - review the more detailed installation log documentation_setup/install_log.txt
 ````
 
 ##### **## Execution**  
