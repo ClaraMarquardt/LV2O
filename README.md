@@ -1,4 +1,4 @@
-### **LV2O - LeistungsVerzeichnis-to-Order** 
+### **LV2O - LeistungsVerzeichnis-to-Order** (Under Development)
 
 Application Repository: https://drive.google.com/drive/folders/0B8_7JE9uq-iDa3AwWlhMY25KRkU?usp=sharing
 
@@ -111,6 +111,7 @@ take up to 30 minutes
 ##### **## Execution**  
 
 ````
+[1] Start the application
 Navigate to the directory ([local path]/LV2O)
 Launch any of the 3 applications 
 Upon completion - close the application window
