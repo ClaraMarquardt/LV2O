@@ -1,4 +1,4 @@
-### **LV2O - LeistungsVerzeichnis-to-Order** (Under Development)
+### **LV2O - LeistungsVerzeichnis-to-Order** _(Under Development)_
 
 Application Repository: https://drive.google.com/drive/folders/0B8_7JE9uq-iDa3AwWlhMY25KRkU?usp=sharing
 
