@@ -184,7 +184,7 @@ mapping is ensured unless the "reset ID" option is selected
 - The TextToCode application can be launched independently by selecting "* Launch TextToCode Application"
 from the main menu
 
-- The version of the **TextToCode** application, i.e. the application and database, can be checked 
+- The version of the *TextToCode* application, i.e. the application and database, can be checked 
 by starting the application and selecting "about" from the main menu bar
 
 - The TextToCode application/database can be updated, i.e. the application and 
