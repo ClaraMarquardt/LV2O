@@ -161,9 +161,9 @@ copied, along with the order_master...xlsx file, to the interface/product_code_i
 prior to launching the *TextToCode* process
 
 (b) Prior to launching the *SendToCustomer* process - (a) all processed LVs
-(_output/WriteToPDF.../annotated_order_) need to be reviewed and where necessary modified in-place 
+(output/WriteToPDF.../annotated_order) need to be reviewed and where necessary modified in-place 
 using e.g. AdobeAcrobat Reader (or any other PDF reader) (b) non-processed LVs 
-(_output/WriteToPDF.../non_processed_PDF_) need to be processed manually and appended to 
+(output/WriteToPDF.../non_processed_PDF) need to be processed manually and appended to 
 the email_list...csv file . *Correctly* processed LVs need to be copied, along with the 
 email_list...csv file, to the interface/send_order folder prior to launching 
 the *SendToCustomer* process
