@@ -109,12 +109,11 @@ lapply(file_list[start_id:length(file_list)], function(file_name) {
         project_raw <- gsub("(Projekt|LV|BV|Objekt)(.*)", "\\2", project_raw)
         project_raw <- gsub("Sachbearbeiter|Datum", "", project_raw)
         project_raw <- gsub("[ ]{2,}", " ", project_raw)
-        project_raw <- gsub(" |-|/|,|:|%|'|,|\\|=|„|\\?", "_",project_raw)
+        project_raw <- gsub(" |-|/|,|:|%|'|,|\\|=|„|\\?|\\\f|ä|ö|ü|@|\\]|\\[|\\$", "_",project_raw)
         project_raw <- gsub("\\.", "", project_raw)
         project_raw <- gsub("^_|_{2,}|_$", "", project_raw)
         if (nchar(project_raw)>0)  text[, project_ext:=paste0(project_raw)]
     } 
-
 
     header_alt <- paste0(text[text_line!=""][1:20]$text_line, collapse=" ")
     header_alt <- strsplit(header_alt,"Menge|Preis|EP|GP|preis|Position|Text|Einheit|Pos\\.|OZ", 
@@ -122,9 +121,10 @@ lapply(file_list[start_id:length(file_list)], function(file_name) {
     header_alt <- gsub("(Projekt|LV|BV|Objekt|Leistungsverzeichnis|Leistungspositionen|Aufstellung)(.*)", "\\2", header_alt)
     header_alt <- gsub("Sachbearbeiter|Datum", "", header_alt)
     header_alt <- gsub("[ ]{2,}", " ", header_alt)
-    header_alt <- gsub(" |-|/|,|:|%|'|,|\\|=|„", "_",header_alt)
+    header_alt <- gsub(" |-|/|,|:|%|'|,|\\|=|„\\?|\\\f|ä|ö|ü|@|\\]|\\[|\\$", "_",header_alt)
     header_alt <- gsub("\\.", "", header_alt)
     header_alt <- gsub("^_|_{2,}|_$", "", header_alt)
+    header_alt <- substring(header_alt, 1, 150)
     if (nchar(header_alt)>0)  text[, project_ext_ext:=paste0(header_alt)]
 
     print(project_raw)

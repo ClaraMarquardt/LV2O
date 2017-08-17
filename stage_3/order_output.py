@@ -29,6 +29,9 @@ vb_input_path=sys.argv[8]
 
 # dependencies
 #-------------------------------------------------#
+reload(sys)
+sys.setdefaultencoding('utf8')
+
 sys.path.append(init_path)
 
 from python_init import *
@@ -267,7 +270,8 @@ for x in range(0, len(file_list_final)):
         output.addPage(page)
 
     # save 
-    file_name=output_path + "/"+  file_list_final[x] + '.pdf'
+    mod_file_name = file_list_final[x]
+    file_name=output_path + "/"+  mod_file_name + '.pdf'
     file_name=os.path.normpath(file_name)
     outputStream = file(file_name, "wb")
     output.write(outputStream)
@@ -294,12 +298,11 @@ email_dt.to_csv(file_name, encoding="utf8", index=False)
 #----------------------------------------------------------------------------#
 
 ## vb input
-file_name=vb_input_path + "/*"
+file_name=vb_input_path + "/*xlsx"
 file_name=os.path.normpath(file_name)
 input_file_list = glob.glob(file_name)
 
 for x in range(0, len(input_file_list)):
-
     archive_file_path=annotated_input_path 
     filename=input_file_list[x]
     shutil.move(filename, archive_file_path)

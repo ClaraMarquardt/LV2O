@@ -58,9 +58,9 @@ while(! feof($file))
   $temp_file = $temp_array[1] . '.pdf';
   $temp_file_no_ext = $temp_array[1];
   $temp_project = $temp_array[2];
-  $temp_project_raw = $temp_array[4];
-  $temp_file_mod = $temp_array[3];
-  $temp_file_mod_no_ext = preg_replace("/(\\.pdf)/", "", $temp_array[3]);
+  $temp_project_raw = $temp_array[3];
+  $temp_file_mod = $temp_array[4];
+  $temp_file_mod_no_ext = preg_replace("/(\\.pdf)/", "", $temp_array[4]);
 
   array_push($email_list, $temp_email);
   array_push($file_list, $temp_file);

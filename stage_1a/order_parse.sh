@@ -141,7 +141,7 @@ for file in *; do
 	  		else
 	  			echo "non ocr (python)"
     		
-				cp $file ${error_path_raw}/$file
+				cp $file ${error_path_ocr}/$file
 
 			fi
 		fi 

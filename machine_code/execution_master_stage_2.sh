@@ -57,7 +57,7 @@ cp ${vb_path_input}/* ${TextToCode_input}/
 #----------------------------------------------------------------------------#
 
 # execute
-open_command="open $TextToCode_app -a $EXCEL"
+open_command="open $TextToCode_app -a '$EXCEL'"
 eval $open_command
 
 #----------------------------------------------------------------------------#

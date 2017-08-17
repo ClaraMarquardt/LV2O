@@ -42,6 +42,7 @@ if [ "$complete_reset" = "1" ]; then
 	# delete all but most recent raw order (archived)
 	cd ${data_path_archived_raw}
 	rm `ls -t *.pdf  | awk 'NR>1'`
+	rm `ls -t *.txt  | awk 'NR>1'`
 
 	# obtain new product id
 	cd "${data_path_archived_raw}"
@@ -59,9 +60,29 @@ if [ "$complete_reset" = "1" ]; then
 
 	done
 
-	((file_id++))
+	file_id_old=${file_id}
+	((file_id_old++))
 
-	echo "# Complete Application Reset Successful - Next Product ID: $file_id"
+	export reset_id=`$CD msgbox --title "LV2O - Reset Application" \
+	--text "Default next order ID: $file_id_old" \
+	--button1 "  Use ID  " --button2 "  Reset ID  "`
+
+	if [ "${reset_id:0:1}" = "2" ]; then
+
+		printf "Reset ID"
+
+		export file_id=`$CD inputbox --title "LV2O - Reset Application" \
+		--informative-text "Default next order ID: $file_id_old" \
+		--button1 "  OK  " ‑‑no‑cancel`
+
+
+	fi
+
+	# create new file with id
+	rm `ls *.txt`
+	rm `ls *.pdf`
+	touch ${data_path_archived_raw}/${file_id}_id_file.txt
+
 
 fi
 

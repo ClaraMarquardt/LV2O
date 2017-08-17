@@ -15,7 +15,6 @@ mkdir $output_folder
 cd $output_folder
 
 mkdir log
-mkdir raw_order
 mkdir annotated_order
 mkdir non_processed_PDF
 
@@ -27,7 +26,14 @@ mkdir non_processed_PDF
 
 # Obtain from excel tool
 #----------------------------------------------------------------------------#
-mv ${TextToCode_output}/* ${vb_path_output}/
+for file in ${TextToCode_output}/*; do
+	echo $file
+	if [ -e $file ]; then
+
+		cp $file $vb_path_output/
+
+	fi
+done
 
 # clear up
 rm ${TextToCode_input}/* 
@@ -41,23 +47,45 @@ ipython order_output.py "${init_path}" "${vb_path_output}" "${data_path_archived
 "${data_path_archived_structured}" "${execution_id}" \
 "${data_path_annotated}" "${wd_path_log}" "${vb_path_input}"
 
-
 # Stage-c (ii): Merge PDFs
 # ----------------------------------------------------------------------------#
+for file in ${vb_path_output}/*pdf; do
+	echo $file
+	if [ -e $file ]; then
+
+		cp $file $data_path_annotated/
+
+	fi
+done
+
 cd ${data_path_annotated}
 
 for file in *_offer*; do
     
     # identify files
+	file_id="${file//[a-z_]/ }"
+	file_id=(${file_id// .*/ })
+	file_id=$(echo ${file_id} | sed 's/^\([0-9]*\) .*/\1/')
+
+	# rename offer
 	file_letter=$file
-	file_order="${file_letter//_offer/}"
-	file_order_mod="${file_letter//_offer/_order}"
+	file_letter_mod="${file_letter//${file_id}/offer_${file_id}}"
+	mv $file_letter $file_order_mod
+
+	# identify offer and letter
+	file_order=$(ls $file_id*.pdf)
+	file_letter=$(ls offer_$file_id*.pdf)
 
 	# rename originals
+	file_order_mod="${file_order//.pdf/_order.pdf}"
 	mv $file_order $file_order_mod
 
+	file_letter_mod="${file_letter//offer_/}"
+	mv $file_letter $file_letter_mod
+
 	# merge
-	pdftk $file_letter $file_order_mod cat output $file_order
+	file_orig="${file_order_mod//_order/}"
+	pdftk $file_letter_mod $file_order_mod cat output $file_order
 
 done
 
@@ -79,24 +107,10 @@ done
 # Stage-x: Copy to output folder
 #----------------------------------------------------------------------------#
 
-# raw orders
-cd ${data_path_archived_raw}
-
-for file in *$execution_id*; do
-
-	if [ -e $file ]; then
-
-		cp $file $output_folder/raw_order
-
-	fi
-
-done
-
-
 # annotated orders & vb output
 cd ${data_path_annotated}
 
-for file in *$execution_id*; do
+for file in *pdf; do
 
 	if [ -e $file ]; then
 
@@ -105,13 +119,13 @@ for file in *$execution_id*; do
 
 done
 
-cp ${data_path_archived_structured}/*${execution_id}.xlsx* $output_folder/annotated_order
+cp ${data_path_archived_structured}/_order_master*${execution_id}.xlsx* $output_folder/annotated_order
 cp ${data_path_annotated}/*csv* $output_folder/annotated_order
 
 # non parsed 
 cd ${error_path_parsed}
 
-for file in *$execution_id*; do
+for file in *; do
 
 	if [ -e $file ]; then
 
@@ -122,7 +136,7 @@ done
 
 cd ${error_path_ocr}
 
-for file in *$execution_id*; do
+for file in *; do
 
 	if [ -e $file ]; then
 

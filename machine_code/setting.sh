@@ -34,6 +34,7 @@ export wd_path_data=$wd_path"/data"
 export wd_path_helper=$wd_path"/helper"
 export wd_path_log=$wd_path"/log"
 export wd_path_code=$wd_path"/code_base"
+export wd_path_TextToCode=$wd_path"/TextToCode"
 
 export wd_path_output=$(cd $wd_path/../../../output; pwd)
 export wd_path_interface=$(cd $wd_path/../../../interface; pwd)
@@ -69,10 +70,14 @@ export init_path=$wd_path_code"/helper_code"
 export helper_path_keyword=${wd_path_helper}"/product/master_keyword.xlsm"
 
 ## texttocode app
-export TextToCode_app=$wd_path"/TextToCode/P2F_petm_V70_21_2017_Bourdon_LV_V46.xlsb"
-export TextToCode_database=$wd_path"/TextToCode/P2F-Database_V70_21_2017_BOURDON_SU.xlsb"
-export TextToCode_input=$wd_path"/TextToCode/input"
-export TextToCode_output=$wd_path"/TextToCode/output"
+export app_name=`cat helper/TextToCode/app_version.txt`
+export database_name=`cat helper/TextToCode/database_version.txt`
+
+export TextToCode_app=$wd_path_TextToCode"/"$app_name
+export TextToCode_database=$wd_path_TextToCode"/"$database_name
+
+export TextToCode_input=$wd_path_TextToCode"/input"
+export TextToCode_output=$wd_path_TextToCode"/output"
 
 # parsing settings [DEFAULT]
 #-------------------------------------------------#
@@ -81,11 +86,11 @@ export thorough_mode="TRUE"
 
 # email settings [DEFAULT]
 #-------------------------------------------------#
-export email_sender=`cat helper/email/email_sender.txt`
-export email_text=`cat helper/email/email_text.txt`
-export email_pwd=`cat helper/email/email_password.txt`
-export email_address=`cat helper/email/email_username.txt`
-export email_cc_address=`cat helper/email/email_cc_address.txt`
+export email_sender=`cat helper/user_setting/email/email_sender.txt`
+export email_text=`cat helper/user_setting/email/email_text.txt`
+export email_pwd=`cat helper/user_setting/email/email_password.txt`
+export email_address=`cat helper/user_setting/email/email_username.txt`
+export email_cc_address=`cat helper/user_setting/email/email_cc_address.txt`
 
 # Cocoa Dialogue [DEFAULT]
 #-------------------------------------------------#
@@ -93,7 +98,7 @@ export CD="$wd_path/code_base/helper_code/CocoaDialog.app/Contents/MacOS/CocoaDi
 
 # Excel [DEFAULT]
 #-------------------------------------------------#
-export EXCEL=`cat helper/excel/excel_path.txt`
+export EXCEL=`cat helper/user_setting/excel/excel_path.txt`
 
 # PHP [DEFAULT]
 #-------------------------------------------------#

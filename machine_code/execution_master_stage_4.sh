@@ -106,11 +106,11 @@ done
 # sent mail
 cd ${send_path}
 
-for file in *$execution_id*; do
+for file in *; do
 
 	if [ -e $file ]; then
 
-		mv $file $data_path_archived_sent
+		mv $file $output_folder/
 
 	fi
 
@@ -145,7 +145,7 @@ $CD bubble --title "LV2O - SendToCustomer" \
 --icon-file "${wd_path_helper}/icon/Bourdon_logo_macro_icon.png"
 
 
-#----------------------------------------------------------------------------#
-#                                    End                                     #
-#----------------------------------------------------------------------------#
+# #----------------------------------------------------------------------------#
+# #                                    End                                     #
+# #----------------------------------------------------------------------------#
 

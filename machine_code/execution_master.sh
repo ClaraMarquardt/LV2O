@@ -74,7 +74,7 @@ elif [ "$stage" = "4" ]; then
 
 	printf "Launching TextToCode application"
 
-	open_command="open $TextToCode_app -a $EXCEL"
+	open_command="open $TextToCode_app -a '$EXCEL'"
 	eval $open_command
 
 elif [ "$stage" = "5" ]; then
